@@ -14,7 +14,7 @@
 package main
 
 import (
-	"github.com/kyoungho/rticonnextdds-connector"
+	"github.com/rticommunity/rticonnextdds-connector-go"
 	"path"
 	"runtime"
 	"log"

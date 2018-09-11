@@ -19,6 +19,9 @@ import (
 	"path"
 	"runtime"
 	"time"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
@@ -28,6 +31,10 @@ func main() {
 		log.Panic("runtime.Caller error")
 	}
 	filepath := path.Join(path.Dir(filename), "../ShapeExample.xml")
+
+	// Create a channel to receive signals from OS
+	sigchan := make(chan os.Signal, 1)
+	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 
 	// Create a connector defined in the XML configuration
 	connector, err := rti.NewConnector("MyParticipantLibrary::Zero", filepath)
@@ -43,24 +50,32 @@ func main() {
 		log.Panic(err)
 	}
 
-	// Get values from a received sample and print them
-	for i := 0; i < 500; i++ {
-		input.Take()
-		numOfSamples := input.Samples.GetLength()
-		for j := 0; j < numOfSamples; j++ {
-			if input.Infos.IsValid(j) {
-				color := input.Samples.GetString(j, "color")
-				x := input.Samples.GetInt(j, "x")
-				y := input.Samples.GetInt(j, "y")
-				shapesize := input.Samples.GetInt(j, "shapesize")
+	run := true
 
-				log.Println("---Received Sample---")
-				log.Printf("color: %s\n", color)
-				log.Printf("x: %d\n", x)
-				log.Printf("y: %d\n", y)
-				log.Printf("shapesize: %d\n", shapesize)
+	// Get values from a received sample and print them
+	for run == true {
+		select {
+		case sig := <-sigchan:
+			log.Printf("Received signal %v: terminating\n", sig)
+			run = false
+		default:
+			input.Take()
+			numOfSamples := input.Samples.GetLength()
+			for j := 0; j < numOfSamples; j++ {
+				if input.Infos.IsValid(j) {
+					color := input.Samples.GetString(j, "color")
+					x := input.Samples.GetInt(j, "x")
+					y := input.Samples.GetInt(j, "y")
+					shapesize := input.Samples.GetInt(j, "shapesize")
+
+					log.Println("---Received Sample---")
+					log.Printf("color: %s\n", color)
+					log.Printf("x: %d\n", x)
+					log.Printf("y: %d\n", y)
+					log.Printf("shapesize: %d\n", shapesize)
+				}
 			}
+			time.Sleep(time.Second * 1)
 		}
-		time.Sleep(time.Second * 1)
 	}
 }
