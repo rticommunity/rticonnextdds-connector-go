@@ -25,7 +25,7 @@ We are building our library for few architectures only. Check them out [here](ht
 If you want to check the version of the libraries you can run the following command:
 
 ``` bash
-strings librtiddsconnector.dylib | grep BUILD
+strings librtiddsconnector.so | grep BUILD
 ```
 
 ### Threading model
