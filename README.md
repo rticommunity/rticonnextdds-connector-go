@@ -26,7 +26,7 @@ Be sure you have Go installed and set your go workspace ($GOPATH). Then run:
 $ go get github.com/rticommunity/rticonnextdds-connector-go
 ```
 
-Check out the Go Connector repository is cloned properly at in the following location.
+Check out the Go Connector repository is cloned properly at the following location.
 $GOPATH/src/github.com/rticommunity/rticonnextdds-connector-go
 
 Then, take a look at [this document](examples/README.md) to build and run examples!
