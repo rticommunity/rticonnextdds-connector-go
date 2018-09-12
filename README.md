@@ -1,4 +1,4 @@
-rticonnextdds-connector
+rticonnextdds-connector-go
 =======
 
 ### RTI Connector for Connext DDS
