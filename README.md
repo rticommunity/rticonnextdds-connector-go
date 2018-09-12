@@ -29,7 +29,7 @@ $ go get github.com/rticommunity/rticonnextdds-connector-go
 Check out the Go Connector repository is cloned properly at in the following location.
 $GOPATH/src/github.com/rticommunity/rticonnextdds-connector-go
 
-Then, take a look at the [examples/README.md](examples/README.md) to build and run examples!
+Then, take a look at [this document](examples/README.md) to build and run examples!
 
 ### Platform support
 We are building our library for few architectures only. Check them out [here](https://github.com/rticommunity/rticonnextdds-connector/tree/master/lib). If you need another architecture.
