@@ -4,7 +4,7 @@ RTI Connext Go Connector Examples
 ### Installation and Platform support
 Check [here](https://github.com/rticommunity/rticonnextdds-connector-go#getting-started-with-go) for installation and [here](https://github.com/rticommunity/rticonnextdds-connector#platform-support) for platform support.
 
-If you still have trouble write on the [RTI Community Forum](https://community.rti.com/forums/technical-questions)
+If you still have any issue, please leave your question at the [RTI Community Forum](https://community.rti.com/forums/technical-questions)
 
 ### Building and running examples
 ``` bash
@@ -169,4 +169,3 @@ for j := 0; j < numOfSamples; j++ {
 }
 
 ```
-
