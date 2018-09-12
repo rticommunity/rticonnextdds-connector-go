@@ -41,7 +41,7 @@ strings librtiddsconnector.so | grep BUILD
 ```
 
 ### Threading model
-The RTI Connext DDS Connector Native API do not yet implement any mechanism for thread safety. Originally the Connector native code was built to work with RTI DDS Prototyper and Lua. That was a single threaded loop. We then introduced support for javascript and python. For now the responsibility of protecting calls to the Connector are left to the user. This may change in the future.
+The RTI Connext DDS Connector Native API do not yet implement any mechanism for thread safety. Originally the Connector native code was built to work with RTI DDS Prototyper and Lua. That was a single threaded loop. We then introduced support for javascript, python, and Go. For now the responsibility of protecting calls to the Connector are left to the user. This may change in the future.
 
 ### Support
 This is an experimental RTI product. As such we do offer support through the [RTI Community Forum](https://community.rti.com/forums/technical-questions) where fellow users and RTI engineers can help you.
