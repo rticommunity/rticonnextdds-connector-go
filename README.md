@@ -20,7 +20,7 @@ For **Go Connector**, we leveraged [cgo](https://golang.org/cmd/cgo) to call our
 that from you using a nice Go wrapper. We tested with Go v1.10.1.
 
 ### Getting started with Go
-Be sure you have Go installed and set your go workspace(GOPATH) properly (e.g. $HOME/go). Then run:
+Be sure you have Go installed and set your go workspace ($GOPATH). Then run:
 
 ``` bash
 $ go get github.com/rticommunity/rticonnextdds-connector-go
