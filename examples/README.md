@@ -2,21 +2,19 @@ RTI Connext Go Connector Examples
 ========
 
 ### Installation and Platform support
-Check [here](https://github.com/rticommunity/rticonnextdds-connector#getting-started-with-python) and [here](https://github.com/rticommunity/rticonnextdds-connector#platform-support).
+Check [here](https://github.com/rticommunity/rticonnextdds-connector-go#getting-started-with-go) for installation and [here](https://github.com/rticommunity/rticonnextdds-connector#platform-support) for platform support.
+
 If you still have trouble write on the [RTI Community Forum](https://community.rti.com/forums/technical-questions)
-
-### Available examples
-In this directory you can find the following examples
-
- * **simple**: shows simple examples of how to write samples and how to read/take
 
 ### Building and running examples
 ``` bash
-$ go build reader.go
+$ go build $GOPATH/src/github.com/rticommunity/rticonnextdds-connector-go/examples/reader.go
 ```
-Currently, Go Connector links to DDS library dynamically so the path for DDS library needs to be added to a shared library path (e.g. LD_LIBRARY_PATH for Linux). "ARCH" needs to be replaced with your architecture(e.g. x64Linux2.6gcc4.45 for 64-bit Linux)
+After the go build command, you can find an executable for reader at your current path. 
+Currently, Go Connector links to DDS library dynamically so the path to the dynamic library needs to be added to your library path. 
+
 ``` bash
-$ export LD_LIBRARY_PATH=$GOPATH/src/github.com/kyoungho/rticonnextdds-connector/lib/ARCH:$LD_LIBRARY_PATH
+$ export LD_LIBRARY_PATH=$GOPATH/src/github.com/rticommunity/rticonnextdds-connector-go/rticonnextdds-connector/lib/x64Linux2.6gcc4.4.5:$LD_LIBRARY_PATH
 $ ./reader
 ```
 
@@ -29,8 +27,7 @@ import "github.com/kyoungho/rticonnextdds-connector"
 ```
 
 #### Instantiate a new connector
-To create a new connector you have to pass a location of an XML configuration file and a configuration name in XML. For more information on
-the XML format check the [XML App Creation guide](https://community.rti.com/rti-doc/510/ndds.5.1.0/doc/pdf/RTI_CoreLibrariesAndUtilities_XML_AppCreation_GettingStarted.pdf) or take a look at the [ShapeExample.xml](ShapeExample.xml) file included in this directory.  
+To create a new connector you have to pass a location of an XML configuration file and a configuration name in XML. For more information on the XML format check the [XML App Creation guide](https://community.rti.com/static/documentation/connext-dds/5.3.1/doc/manuals/connext_dds/xml_application_creation/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted.pdf) or take a look at the [ShapeExample.xml](ShapeExample.xml) file included in this directory.  
 
 ```go
 connector, err := rti.NewConnector("MyParticipantLibrary::Zero", filepath)
@@ -94,10 +91,8 @@ output.Instance.Set(&shape)
 output.Instance.SetInt("y", 2);
 ```
 
-Nested fields can be accessed with the dot notation: `"x.y.z"`, and array or sequences with square brakets: `"x.y[1].z"`. For more info on how to access
-fields, check Section 6.4 'Data Access API' of the
+Nested fields can be accessed with the dot notation: `"x.y.z"`, and array or sequences with square brakets: `"x.y[1].z"`. For more info on how to access fields, check Section 6.4 'Data Access API' of the
 [RTI Prototyper Getting Started Guide](https://community.rti.com/rti-doc/510/ndds.5.1.0/doc/pdf/RTI_CoreLibrariesAndUtilities_Prototyper_GettingStarted.pdf)
-
 
 #### reading/taking data
 To read/take samples first you have to get a reference to the input port:
