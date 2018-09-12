@@ -19,6 +19,18 @@ The RTI Connector library is provided in binary form for selected architectures.
 For **Go Connector**, we leveraged [cgo](https://golang.org/cmd/cgo) to call our C library, but we try to hide
 that from you using a nice Go wrapper. We tested with Go v1.10.1.
 
+### Getting started with Go
+Be sure you have Go installed and set your go workspace(GOPATH) properly (e.g. $HOME/go). Then run:
+
+``` bash
+$ go get github.com/rticommunity/rticonnextdds-connector-go
+```
+
+Check out the Go Connector repository is cloned properly at in the following location.
+$GOPATH/src/github.com/rticommunity/rticonnextdds-connector-go
+
+Then, take a look at the [examples/README.md](examples/README.md) to build and run examples!
+
 ### Platform support
 We are building our library for few architectures only. Check them out [here](https://github.com/rticommunity/rticonnextdds-connector/tree/master/lib). If you need another architecture.
 
@@ -40,16 +52,6 @@ We do not have much documentation yet. But we promise you: if you look at the
 examples you'll see that is very easy to use our connector.
 
 For an overview of the API, check this [page](examples/README.md).
-
-### Getting started with Go
-Be sure you have Go installed and set your go workspace(GOPATH) properly (e.g. $HOME/go). Then run:
-
-``` bash
-$ go get github.com/rticommunity/rticonnextdds-connector-go
-```
-
-Check out the Go Connector repository is cloned properly at this location ($GOPATH/src/github.com/rticommunity/rticonnextdds-connector-go)
-Then, take a look at the [examples/README.md](examples/README.md) to build and run examples!
 
 ### License
 With the sole exception of the contents of the "examples" subdirectory, all use of this product is subject to the RTI Software License Agreement included at the top level of this repository. Files within the "examples" subdirectory are licensed as marked within the file.
