@@ -19,7 +19,7 @@ The RTI Connector library is provided in binary form for selected architectures.
 For **Go Connector**, we leveraged [cgo](https://golang.org/cmd/cgo) to call our C library, but we try to hide
 that from you using a nice Go wrapper. We tested with Go v1.10.1.
 
-### Getting started with Go
+### Getting started
 Be sure you have Go installed and set your go workspace ($GOPATH). Then run:
 
 ``` bash
