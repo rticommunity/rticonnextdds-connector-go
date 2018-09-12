@@ -39,10 +39,7 @@ We'd love your feedback.
 We do not have much documentation yet. But we promise you: if you look at the
 examples you'll see that is very easy to use our connector.
 
-For an overview of the API in JavaScript check this [page](examples/nodejs/README.md). For the Python version visit this [one](examples/python/README.md).
-
-We have documentation on how to access the data sample fields in Section 6.4 'Data Access API' of the
-[RTI Prototyper Getting Started Guide](https://community.rti.com/rti-doc/510/ndds.5.1.0/doc/pdf/RTI_CoreLibrariesAndUtilities_Prototyper_GettingStarted.pdf)  
+For an overview of the API, check this [page](examples/README.md).
 
 ### Getting started with Go
 Be sure you have Go installed and set your go workspace(GOPATH) properly (e.g. $HOME/go). Then run:
@@ -52,12 +49,7 @@ $ go get github.com/rticommunity/rticonnextdds-connector-go
 ```
 
 Check out the Go Connector repository is cloned properly at this location ($GOPATH/src/github.com/rticommunity/rticonnextdds-connector-go)
-Then, take a look at the [examples/go/README.md](examples/go/README.md) to build and run examples!
-
-You can also download the [zip file](https://github.com/rticommunity/rticonnextdds-connector/archive/master.zip)
-and then unzip it at this location ($GOPATH/src/github.com/rticommunity/rticonnextdds-connector-go).
-
-When that is done, cd into your new directory and have a look to the [examples/python/README.md](examples/python/README.md)
+Then, take a look at the [examples/README.md](examples/README.md) to build and run examples!
 
 ### License
 With the sole exception of the contents of the "examples" subdirectory, all use of this product is subject to the RTI Software License Agreement included at the top level of this repository. Files within the "examples" subdirectory are licensed as marked within the file.
