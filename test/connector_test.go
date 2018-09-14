@@ -1,9 +1,9 @@
-package rti_test
+package connector_test
 
 import (
 	"github.com/rticommunity/rticonnextdds-connector-go"
-	"testing"
 	"github.com/stretchr/testify/assert"
+	"testing"
 	"runtime"
 	"path"
 )
@@ -35,5 +35,10 @@ func TestMultipleConnectorCreation(t *testing.T) {
 	for i := 0; i < 5; i++ {
 		connectors[i], _ = rti.NewConnector(participant_profile, xml_path)
 		assert.NotNil(t, connectors[i])
+	}
+
+	for i := 0; i < 5; i++ {
+		err := connectors[i].Delete()
+		assert.Nil(t, err)
 	}
 }
