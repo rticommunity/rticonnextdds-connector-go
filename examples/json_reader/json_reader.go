@@ -11,7 +11,7 @@
 *                                                                            *
 *****************************************************************************/
 
-package json_reader
+package main
 
 import (
 	"github.com/rticommunity/rticonnextdds-connector-go"
