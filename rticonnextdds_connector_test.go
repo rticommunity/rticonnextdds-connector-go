@@ -56,6 +56,12 @@ func TestMultipleConnectorCreation(t *testing.T) {
 	}
 }
 
+func TestConnectorDeletion(t *testing.T) {
+	var null_connector *Connector
+	err := null_connector.Delete()
+	assert.NotNil(t, err)
+}
+
 // Input tests
 func TestInvalidDR(t *testing.T) {
         invalidReaderName := "invalidDR"
@@ -76,6 +82,11 @@ func TestCreateDR(t *testing.T) {
         assert.NotNil(t, input.Infos)
         assert.Nil(t, err)
         deleteTestConnector(connector)
+
+	var null_connector *Connector
+	input, err = null_connector.GetInput(readerName)
+	assert.Nil(t, input)
+	assert.NotNil(t, err)
 }
 
 // Output tests
@@ -97,5 +108,10 @@ func TestCreateWriter(t *testing.T) {
         assert.NotNil(t, output.Instance)
         assert.Nil(t, err)
         deleteTestConnector(connector)
+
+        var null_connector *Connector
+        output, err = null_connector.GetOutput(writerName)
+        assert.Nil(t, output)
+        assert.NotNil(t, err)
 }
 
