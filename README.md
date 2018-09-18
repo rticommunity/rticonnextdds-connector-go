@@ -1,5 +1,6 @@
 rticonnextdds-connector-go
 =======
+[![GoDoc](https://godoc.org/github.com/rticommunity/rticonnextdds-connector-go?status.png)](https://godoc.org/github.com/rticommunity/rticonnextdds-connector-go)
 
 [![Build Status](https://travis-ci.org/kyoungho/rticonnextdds-connector-go.svg?branch=master)](https://travis-ci.org/kyoungho/rticonnextdds-connector-go)
 
@@ -19,7 +20,7 @@ with tons of other available technologies.
 The RTI Connector library is provided in binary form for selected architectures. Scripting language bindings and examples are provided in source format.
 
 For **Go Connector**, we leveraged [cgo](https://golang.org/cmd/cgo) to call our C library, but we try to hide
-that from you using a nice Go wrapper. We tested with Go v1.10.1.
+that from you using a nice Go wrapper. We tested with Go v1.10 and v1.9.
 
 ### Getting started
 Be sure you have Go installed and set your go workspace ($GOPATH). Then run:
