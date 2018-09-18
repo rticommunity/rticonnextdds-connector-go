@@ -1,5 +1,6 @@
 rticonnextdds-connector-go
 =======
+[![GoDoc](https://godoc.org/github.com/rticommunity/rticonnextdds-connector-go?status.png)](https://godoc.org/github.com/rticommunity/rticonnextdds-connector-go)
 
 ### RTI Connector for Connext DDS
 RTI Connector for Connext DDS is a quick and easy way to access the power and
