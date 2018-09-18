@@ -11,21 +11,21 @@
 *                                                                            *
 *****************************************************************************/
 
-package main
+package json_reader
 
 import (
 	"github.com/rticommunity/rticonnextdds-connector-go"
+	"log"
 	"path"
 	"runtime"
 	"time"
-	"log"
 )
 
 type Shape struct {
-        Color     string `json:"color"`
-        X         int    `json:"x"`
-        Y         int    `json:"y"`
-        Shapesize int    `json:"shapesize"`
+	Color     string `json:"color"`
+	X         int    `json:"x"`
+	Y         int    `json:"y"`
+	Shapesize int    `json:"shapesize"`
 }
 
 func main() {
@@ -44,22 +44,30 @@ func main() {
 	// Delete the connector when this main function returns
 	defer connector.Delete()
 
-	// Get an output from the connector
-	output, err := connector.GetOutput("MyPublisher::MySquareWriter")
+	// Get an input from the connector
+	input, err := connector.GetInput("MySubscriber::MySquareReader")
 	if err != nil {
 		log.Panic(err)
 	}
 
-	// Set values to the instance and write the instance
+	// Get values from a received sample and print them
 	for i := 0; i < 500; i++ {
-		var shape Shape
-		shape.X = i
-		shape.Y = i*2
-		shape.Shapesize = 30
-		shape.Color = "BLUE"
-		output.Instance.Set(&shape)
-		output.Write()
-		log.Println("Writing...")
+		input.Take()
+		numOfSamples := input.Samples.GetLength()
+		for j := 0; j < numOfSamples; j++ {
+			if input.Infos.IsValid(j) {
+				var shape Shape
+				err := input.Samples.Get(j, &shape)
+				if err != nil {
+					log.Println(err)
+				}
+				log.Println("---Received Sample---")
+				log.Printf("color: %s\n", shape.Color)
+				log.Printf("x: %d\n", shape.X)
+				log.Printf("y: %d\n", shape.Y)
+				log.Printf("shapesize: %d\n", shape.Shapesize)
+			}
+		}
 		time.Sleep(time.Second * 1)
 	}
 }
