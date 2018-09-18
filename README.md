@@ -1,6 +1,8 @@
 rticonnextdds-connector-go
 =======
 
+[![Build Status](https://travis-ci.org/kyoungho/rticonnextdds-connector-go.svg?branch=master)]https://travis-ci.org/kyoungho/rticonnextdds-connector-go)
+
 ### RTI Connector for Connext DDS
 RTI Connector for Connext DDS is a quick and easy way to access the power and
 functionality of [RTI Connext DDS](http://www.rti.com/products/index.html).
