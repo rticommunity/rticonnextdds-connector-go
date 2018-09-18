@@ -8,7 +8,7 @@ import (
 )
 
 // Helper functions
-func newTestConnector()(connector *Connector){
+func newTestConnector()(connector *Connector) {
         _, cur_path, _, _ := runtime.Caller(0)
         xml_path := path.Join(path.Dir(cur_path), "./test/xml/ShapeExample.xml")
         participant_profile := "MyParticipantLibrary::Zero"
@@ -18,6 +18,16 @@ func newTestConnector()(connector *Connector){
 
 func deleteTestConnector(connector *Connector){
         connector.Delete()
+}
+
+func newTestInput()(input *Input) {
+	input, _ = newTestConnector().GetInput("MySubscriber::MySquareReader")
+	return input
+}
+
+func newTestOutput()(output *Output) {
+	output, _ = newTestConnector().GetOutput("MyPublisher::MySquareWriter")
+	return output
 }
 
 // Connector test
