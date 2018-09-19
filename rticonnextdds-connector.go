@@ -591,12 +591,10 @@ func (samples *Samples) Get(index int, v interface{}) (e error) {
 }
 
 func (infos *Infos) IsValid(index int) (valid bool) {
-	input_name_c_str := C.CString(infos.input.name)
-	defer C.free(unsafe.Pointer(input_name_c_str))
 	member_name_c_str := C.CString("valid_data")
 	defer C.free(unsafe.Pointer(member_name_c_str))
 
-	if int(C.RTIDDSConnector_getBooleanFromInfos(unsafe.Pointer(infos.input.connector.native), input_name_c_str, C.int(index+1), member_name_c_str)) != 0 {
+	if int(C.RTIDDSConnector_getBooleanFromInfos(unsafe.Pointer(infos.input.connector.native), infos.input.name_c_str, C.int(index+1), member_name_c_str)) != 0 {
 		valid = true
 	} else {
 		valid = false
@@ -605,9 +603,6 @@ func (infos *Infos) IsValid(index int) (valid bool) {
 }
 
 func (infos *Infos) GetLength() (length int) {
-	input_name_c_str := C.CString(infos.input.name)
-	defer C.free(unsafe.Pointer(input_name_c_str))
-
-	length = int(C.RTIDDSConnector_getInfosLength(unsafe.Pointer(infos.input.connector.native), input_name_c_str))
+	length = int(C.RTIDDSConnector_getInfosLength(unsafe.Pointer(infos.input.connector.native), infos.input.name_c_str))
 	return length
 }
