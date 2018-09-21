@@ -93,6 +93,8 @@ func TestCreateDR(t *testing.T) {
 	input, err = null_connector.GetInput(readerName)
 	assert.Nil(t, input)
 	assert.NotNil(t, err)
+	err = null_connector.Wait(-1)
+	assert.NotNil(t, err)
 }
 
 // Output tests
@@ -139,7 +141,8 @@ func TestDataFlow(t *testing.T) {
         output.Instance.SetString("color", "BLUE")
 	output.Write()
 
-	connector.Wait(10)
+	err := connector.Wait(10)
+        assert.Nil(t, err)
         input.Take()
 
 	sample_length := input.Samples.GetLength()
@@ -162,4 +165,7 @@ func TestDataFlow(t *testing.T) {
         shapesize := input.Samples.GetInt(0, "shapesize")
 	assert.Equal(t, shapesize, 5)
 
+	// Testing Wait TimeOut
+	err = connector.Wait(5)
+        assert.NotNil(t, err)
 }
