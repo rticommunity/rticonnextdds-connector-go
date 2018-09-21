@@ -70,13 +70,13 @@ type Infos struct {
 * Private Functions *
 ********************/
 
-func newInstance(output *Output) (instance *Instance, err error) {
+func newInstance(output *Output) (instance *Instance) {
 	// Error checking for the output is skipped because it was already checked
 
 	instance = new(Instance)
 	instance.output = output
 
-	return instance, nil
+	return instance
 }
 
 func newOutput(connector *Connector, output_name string) (output *Output, err error) {
@@ -93,11 +93,7 @@ func newOutput(connector *Connector, output_name string) (output *Output, err er
 		return nil, err
 	}
 	output.name = output_name
-	output.Instance, err = newInstance(output)
-	if err != nil {
-		err = errors.New("newInstance error")
-		return nil, err
-	}
+	output.Instance = newInstance(output)
 
 	connector.Outputs = append(connector.Outputs, *output)
 
@@ -118,37 +114,29 @@ func newInput(connector *Connector, input_name string) (input *Input, err error)
 		return nil, err
 	}
 	input.name = input_name
-	input.Samples, err = newSamples(input)
-	if err != nil {
-		err = errors.New("newSamples error")
-		return nil, err
-	}
-	input.Infos, err = newInfos(input)
-	if err != nil {
-		err = errors.New("newInfos error")
-		return nil, err
-	}
+	input.Samples = newSamples(input)
+
+	input.Infos = newInfos(input)
 
 	connector.Inputs = append(connector.Inputs, *input)
 
 	return input, nil
 }
 
-func newSamples(input *Input) (samples *Samples, err error) {
+func newSamples(input *Input) (samples *Samples) {
 	// Error checking for the input is skipped because it was already checked
 
-	// TODO - need to check "new" could fail. if so, I need to check after calling this
 	samples = new(Samples)
 	samples.input = input
-	return samples, nil
+	return samples
 }
 
-func newInfos(input *Input) (infos *Infos, err error) {
+func newInfos(input *Input) (infos *Infos) {
 	// Error checking for the input is skipped because it was already checked
 
 	infos = new(Infos)
 	infos.input = input
-	return infos, nil
+	return infos
 }
 
 /*******************
