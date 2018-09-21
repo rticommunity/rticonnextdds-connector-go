@@ -16,10 +16,6 @@ func newTestConnector()(connector *Connector) {
         return connector
 }
 
-func deleteTestConnector(connector *Connector){
-        connector.Delete()
-}
-
 func newTestInput(connector *Connector)(input *Input) {
 	input, _ = connector.GetInput("MySubscriber::MySquareReader")
 	return input
@@ -86,12 +82,12 @@ func TestCreateDR(t *testing.T) {
         readerName := "MySubscriber::MySquareReader"
 
         connector := newTestConnector()
+	defer connector.Delete()
         input, err := connector.GetInput(readerName)
         assert.NotNil(t, input)
         assert.NotNil(t, input.Samples)
         assert.NotNil(t, input.Infos)
         assert.Nil(t, err)
-        deleteTestConnector(connector)
 
 	var null_connector *Connector
 	input, err = null_connector.GetInput(readerName)
@@ -104,6 +100,7 @@ func TestInvalidWriter(t *testing.T) {
         invalidWriterName := "invalidWriter"
 
         connector := newTestConnector()
+	defer connector.Delete()
         output, err := connector.GetOutput(invalidWriterName)
         assert.Nil(t, output)
         assert.NotNil(t, err)
@@ -113,11 +110,11 @@ func TestCreateWriter(t *testing.T) {
         writerName := "MyPublisher::MySquareWriter"
 
         connector := newTestConnector()
+	defer connector.Delete()
         output, err := connector.GetOutput(writerName)
         assert.NotNil(t, output)
         assert.NotNil(t, output.Instance)
         assert.Nil(t, err)
-        deleteTestConnector(connector)
 
         var null_connector *Connector
         output, err = null_connector.GetOutput(writerName)
@@ -128,6 +125,7 @@ func TestCreateWriter(t *testing.T) {
 // Data flow tests
 func TestDataFlow(t *testing.T) {
 	connector := newTestConnector()
+	defer connector.Delete()
 	input := newTestInput(connector)
 	output := newTestOutput(connector)
 
@@ -163,4 +161,5 @@ func TestDataFlow(t *testing.T) {
 	assert.Equal(t, z, true)
         shapesize := input.Samples.GetInt(0, "shapesize")
 	assert.Equal(t, shapesize, 5)
+
 }
