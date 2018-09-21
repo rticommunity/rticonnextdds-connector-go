@@ -20,13 +20,13 @@ func deleteTestConnector(connector *Connector){
         connector.Delete()
 }
 
-func newTestInput()(input *Input) {
-	input, _ = newTestConnector().GetInput("MySubscriber::MySquareReader")
+func newTestInput(connector *Connector)(input *Input) {
+	input, _ = connector.GetInput("MySubscriber::MySquareReader")
 	return input
 }
 
-func newTestOutput()(output *Output) {
-	output, _ = newTestConnector().GetOutput("MyPublisher::MySquareWriter")
+func newTestOutput(connector *Connector)(output *Output) {
+	output, _ = connector.GetOutput("MyPublisher::MySquareWriter")
 	return output
 }
 
@@ -125,3 +125,42 @@ func TestCreateWriter(t *testing.T) {
         assert.NotNil(t, err)
 }
 
+// Data flow tests
+func TestDataFlow(t *testing.T) {
+	connector := newTestConnector()
+	input := newTestInput(connector)
+	output := newTestOutput(connector)
+
+	// Take any pre-existing samples from cache
+	input.Take()
+
+        output.Instance.SetInt("x", 1)
+        output.Instance.SetInt("y", 1)
+        output.Instance.SetBoolean("z", true)
+        output.Instance.SetInt("shapesize", 5)
+        output.Instance.SetString("color", "BLUE")
+	output.Write()
+
+	connector.Wait(10)
+        input.Take()
+
+	sample_length := input.Samples.GetLength()
+	assert.Equal(t, sample_length, 1)
+
+	info_length := input.Infos.GetLength()
+	assert.Equal(t, info_length, 1)
+
+	valid := input.Infos.IsValid(0)
+	assert.Equal(t, valid, true)
+
+        color := input.Samples.GetString(0, "color")
+	assert.Equal(t, color, "BLUE")
+        x := input.Samples.GetInt(0, "x")
+	assert.Equal(t, x, 1)
+        y := input.Samples.GetInt(0, "y")
+	assert.Equal(t, y, 1)
+        z := input.Samples.GetBoolean(0, "y")
+	assert.Equal(t, z, true)
+        shapesize := input.Samples.GetInt(0, "shapesize")
+	assert.Equal(t, shapesize, 5)
+}
