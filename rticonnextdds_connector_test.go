@@ -184,8 +184,6 @@ func TestDataFlow(t *testing.T) {
 	assert.Equal(t, input.Samples.GetUint16(0, "us"), us)
 	assert.Equal(t, input.Samples.GetInt32(0, "l"), l)
 	assert.Equal(t, input.Samples.GetUint32(0, "ul"), ul)
-	assert.Equal(t, input.Samples.GetInt(0, "l"), l)
-	assert.Equal(t, input.Samples.GetUint(0, "ul"), ul)
         //assert.Equal(t, input.Samples.GetInt64(0, "ll"), ll)
         //assert.Equal(t, input.Samples.GetUint64(0, "ull"), ull)
 	assert.Equal(t, input.Samples.GetFloat32(0, "f"), f)
