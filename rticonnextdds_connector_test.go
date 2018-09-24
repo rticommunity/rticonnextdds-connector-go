@@ -5,24 +5,25 @@ import (
 	"testing"
 	"runtime"
 	"path"
+	"math"
 )
 
 // Helper functions
 func newTestConnector()(connector *Connector) {
         _, cur_path, _, _ := runtime.Caller(0)
-        xml_path := path.Join(path.Dir(cur_path), "./test/xml/ShapeExample.xml")
+        xml_path := path.Join(path.Dir(cur_path), "./test/xml/Test.xml")
         participant_profile := "MyParticipantLibrary::Zero"
         connector, _ = NewConnector(participant_profile, xml_path)
         return connector
 }
 
 func newTestInput(connector *Connector)(input *Input) {
-	input, _ = connector.GetInput("MySubscriber::MySquareReader")
+	input, _ = connector.GetInput("MySubscriber::MyReader")
 	return input
 }
 
 func newTestOutput(connector *Connector)(output *Output) {
-	output, _ = connector.GetOutput("MyPublisher::MySquareWriter")
+	output, _ = connector.GetOutput("MyPublisher::MyWriter")
 	return output
 }
 
@@ -38,7 +39,7 @@ func TestInvalidXMLPath(t *testing.T) {
 
 func TestInvalidParticipantProfile(t *testing.T) {
         _, cur_path, _, _ := runtime.Caller(0)
-        xml_path := path.Join(path.Dir(cur_path), "./test/xml/ShapeExample.xml")
+        xml_path := path.Join(path.Dir(cur_path), "./test/xml/Test.xml")
 	invalid_participant_profile := "InvalidParticipantProfile"
 
         connector, err := NewConnector(invalid_participant_profile, xml_path)
@@ -48,7 +49,7 @@ func TestInvalidParticipantProfile(t *testing.T) {
 
 func TestMultipleConnectorCreation(t *testing.T) {
 	_, cur_path, _, _ := runtime.Caller(0)
-        xml_path := path.Join(path.Dir(cur_path), "./test/xml/ShapeExample.xml")
+        xml_path := path.Join(path.Dir(cur_path), "./test/xml/Test.xml")
 	participant_profile := "MyParticipantLibrary::Zero"
 	var connectors [5]*Connector
 	for i := 0; i < 5; i++ {
@@ -79,7 +80,7 @@ func TestInvalidDR(t *testing.T) {
 }
 
 func TestCreateDR(t *testing.T) {
-        readerName := "MySubscriber::MySquareReader"
+        readerName := "MySubscriber::MyReader"
 
         connector := newTestConnector()
 	defer connector.Delete()
@@ -109,7 +110,7 @@ func TestInvalidWriter(t *testing.T) {
 }
 
 func TestCreateWriter(t *testing.T) {
-        writerName := "MyPublisher::MySquareWriter"
+        writerName := "MyPublisher::MyWriter"
 
         connector := newTestConnector()
 	defer connector.Delete()
@@ -134,11 +135,32 @@ func TestDataFlow(t *testing.T) {
 	// Take any pre-existing samples from cache
 	input.Take()
 
-        output.Instance.SetInt("x", 1)
-        output.Instance.SetInt("y", 1)
-        output.Instance.SetBoolean("z", true)
-        output.Instance.SetInt("shapesize", 5)
-        output.Instance.SetString("color", "BLUE")
+	s := int16(math.MaxInt16)
+	us := uint16(math.MaxUint16)
+	l := int32(math.MaxInt32)
+	ul := uint32(math.MaxUint32)
+	//ll := int64(math.MaxInt64)
+	//ull := uint64(math.MaxUint64)
+	f := float32(math.MaxFloat32)
+	d := float64(math.MaxFloat64)
+
+	//c := byte('A')
+	b := true
+	st := "test"
+
+        //output.Instance.SetByte("c", c)
+        output.Instance.SetString("st", st)
+        output.Instance.SetBoolean("b", b)
+
+        output.Instance.SetInt16("s", s)
+        output.Instance.SetUint16("us", us)
+        output.Instance.SetInt32("l", l)
+        output.Instance.SetUint32("ul", ul)
+        //output.Instance.SetInt64("ll", ll)
+        //output.Instance.SetUint64("ull", ull)
+        output.Instance.SetFloat32("f", f)
+        output.Instance.SetFloat64("d", d)
+
 	output.Write()
 
 	err := connector.Wait(10)
@@ -154,6 +176,22 @@ func TestDataFlow(t *testing.T) {
 	valid := input.Infos.IsValid(0)
 	assert.Equal(t, valid, true)
 
+	assert.Equal(t, input.Samples.GetString(0, "st"), st)
+	assert.Equal(t, input.Samples.GetBoolean(0, "b"), b)
+
+	//assert.Equal(t, input.Samples.GetByte(0, "c"), c)
+	assert.Equal(t, input.Samples.GetInt16(0, "s"), s)
+	assert.Equal(t, input.Samples.GetUint16(0, "us"), us)
+	assert.Equal(t, input.Samples.GetInt32(0, "l"), l)
+	assert.Equal(t, input.Samples.GetUint32(0, "ul"), ul)
+	assert.Equal(t, input.Samples.GetInt(0, "l"), l)
+	assert.Equal(t, input.Samples.GetUint(0, "ul"), ul)
+        //assert.Equal(t, input.Samples.GetInt64(0, "ll"), ll)
+        //assert.Equal(t, input.Samples.GetUint64(0, "ull"), ull)
+	assert.Equal(t, input.Samples.GetFloat32(0, "f"), f)
+        assert.Equal(t, input.Samples.GetFloat64(0, "d"), d)
+
+/*
         color := input.Samples.GetString(0, "color")
 	assert.Equal(t, color, "BLUE")
         x := input.Samples.GetInt(0, "x")
@@ -164,6 +202,7 @@ func TestDataFlow(t *testing.T) {
 	assert.Equal(t, z, true)
         shapesize := input.Samples.GetInt(0, "shapesize")
 	assert.Equal(t, shapesize, 5)
+*/
 
 	// Testing Wait TimeOut
 	err = connector.Wait(5)
