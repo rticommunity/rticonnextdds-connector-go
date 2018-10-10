@@ -15,9 +15,7 @@
 
     <!-- Qos Library -->
 	<qos_library name="QosLibrary">
-		<qos_profile name="DefaultProfile" 
-				     base_name="BuiltinQosLibExp::Generic.StrictReliable"
-					 is_default_qos="true">
+		<qos_profile name="DefaultProfile" is_default_qos="true">
 			<participant_qos>
 				<transport_builtin>
 				    <mask>UDPV4 | SHMEM</mask>
@@ -39,37 +37,55 @@
 				</property>
 				 End Monitoring -->
 			</participant_qos>
+			<datawriter_qos>
+				<reliability>
+					<kind> RELIABLE_RELIABILITY_QOS </kind>
+				</reliability>
+				<history>
+					<kind> KEEP_ALL_HISTORY_QOS </kind>
+				</history>
+				<durability>
+					<kind> TRANSIENT_LOCAL_DURABILITY_QOS </kind>
+				</durability>
+			</datawriter_qos>
+			<datareader_qos>
+				<reliability>
+					<kind> RELIABLE_RELIABILITY_QOS </kind>
+				</reliability>
+				<history>
+					<kind> KEEP_ALL_HISTORY_QOS </kind>
+				</history>
+				<durability>
+					<kind> TRANSIENT_LOCAL_DURABILITY_QOS </kind>
+				</durability>
+			</datareader_qos>
 		</qos_profile>
 	</qos_library>
 
     <!-- types -->
     <types>
+		<struct name="TestType" extensibility="extensible">
+                        <member name="st" stringMaxLength="128" type="string" key="true"/>
+                        <member name="b" type="boolean"/>
+                        <member name="c" type="char"/>
+                        <member name="s" type="int16"/>
+                        <member name="us" type="uint16"/>
+                        <member name="l" type="int32"/>
+                        <member name="ul" type="uint32"/>
+                        <member name="ll" type="int64"/>
+                        <member name="ull" type="uint64"/>
+                        <member name="f" type="float32"/>
+                        <member name="d" type="float64"/>
 
-	   	<struct name="ShapeType" extensibility="extensible">
-			<member name="color" stringMaxLength="128" id="0" type="string" key="true"/>
-			<member name="x" id="1" type="long"/>
-			<member name="y" id="2" type="long"/>
-			<member name="shapesize" id="3" type="long"/>
-		</struct>
-		<enum name="ShapeFillKind" extensibility="extensible">
-			<enumerator name="SOLID_FILL" value="0"/>
-			<enumerator name="TRANSPARENT_FILL" value="1"/>
-			<enumerator name="HORIZONTAL_HATCH_FILL" value="2"/>
-			<enumerator name="VERTICAL_HATCH_FILL" value="3"/>
-		</enum>
-		<struct name="ShapeTypeExtended" baseType="ShapeType" extensibility="extensible">
-			<member name="fillKind" id="4" type="nonBasic" nonBasicTypeName="ShapeFillKind"/>
-			<member name="angle" id="5" type="float"/>
-		</struct>
+                </struct>
     </types>
 
 
     <!-- Domain Library -->
     <domain_library name="MyDomainLibrary">
         <domain name="MyDomain" domain_id="0">
-            <register_type name="ShapeType"  type_ref="ShapeType" />
-            <topic name="Square"    register_type_ref="ShapeType"/>
-
+            <register_type name="TestType"  type_ref="TestType" />
+            <topic name="Test"    register_type_ref="TestType"/>
         </domain>
     </domain_library>
 
@@ -79,13 +95,13 @@
       <domain_participant name="Zero" domain_ref="MyDomainLibrary::MyDomain">
 
         <publisher name="MyPublisher">
-				  <data_writer name="MySquareWriter" topic_ref="Square" />
+				  <data_writer name="MyWriter" topic_ref="Test" />
         </publisher>
 
         <subscriber name="MySubscriber">
-          <data_reader name="MySquareReader" topic_ref="Square" />
+          <data_reader name="MyReader" topic_ref="Test" />
         </subscriber>
 
-		  </domain_participant>
+     </domain_participant>
    </domain_participant_library>
 </dds>
