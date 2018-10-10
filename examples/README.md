@@ -8,7 +8,7 @@ If you still have any issue, please leave your question at [RTI Community Forum]
 
 ### Building and running examples
 ``` bash
-$ go build $GOPATH/src/github.com/rticommunity/rticonnextdds-connector-go/examples/simple/reader.go
+$ go build $GOPATH/src/github.com/rticommunity/rticonnextdds-connector-go/examples/simple_reader/reader.go
 ```
 After the go build command, you can find an executable for reader at your current path. 
 Currently, Go Connector links to DDS library dynamically so the path to the dynamic library needs to be added to your library path. 
