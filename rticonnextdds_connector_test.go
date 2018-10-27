@@ -163,7 +163,7 @@ func TestDataFlow(t *testing.T) {
 
 	output.Write()
 
-	err := connector.Wait(10)
+	err := connector.Wait(-1)
         assert.Nil(t, err)
         input.Take()
 
