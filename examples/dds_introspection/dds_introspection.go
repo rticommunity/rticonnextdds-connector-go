@@ -14,9 +14,9 @@ import (
 	"github.com/rticommunity/rticonnextdds-connector-go"
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli"
-	"time"
 	"log"
 	"os"
+	"time"
 )
 
 func main() {
@@ -29,41 +29,41 @@ func main() {
 
 	app := cli.NewApp()
 
-	app.Flags = []cli.Flag {
+	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name: "cfgPath, c",
-			Value: "ShapeExample.xml",
-			Usage: "Path for XML App Creation configuration",
+			Name:        "cfgPath, c",
+			Value:       "ShapeExample.xml",
+			Usage:       "Path for XML App Creation configuration",
 			Destination: &configPath,
 		},
 		cli.StringFlag{
-			Name: "participant, p",
-			Value: "MyParticipantLibrary::Zero",
-			Usage: "Participant name in XML",
+			Name:        "participant, p",
+			Value:       "MyParticipantLibrary::Zero",
+			Usage:       "Participant name in XML",
 			Destination: &participantName,
 		},
 		cli.StringFlag{
-			Name: "writer, w",
-			Value: "MyPublisher::MySquareWriter",
-			Usage: "Writer name in XML",
+			Name:        "writer, w",
+			Value:       "MyPublisher::MySquareWriter",
+			Usage:       "Writer name in XML",
 			Destination: &writerName,
 		},
 		cli.StringFlag{
-			Name: "data, d",
-			Value: `{"color": "BLUE", "x": 10, "y": 20, "shapesize": 30}`,
-			Usage: "Data in JSON format",
+			Name:        "data, d",
+			Value:       `{"color": "BLUE", "x": 10, "y": 20, "shapesize": 30}`,
+			Usage:       "Data in JSON format",
 			Destination: &data,
 		},
 		cli.IntFlag{
-			Name: "count",
-			Value: 10,
-			Usage: "Number of injecting samples",
+			Name:        "count",
+			Value:       10,
+			Usage:       "Number of injecting samples",
 			Destination: &count,
 		},
 		cli.IntFlag{
-			Name: "interval",
-			Value: 1,
-			Usage: "Interval between samples in seconds",
+			Name:        "interval",
+			Value:       1,
+			Usage:       "Interval between samples in seconds",
 			Destination: &interval,
 		},
 	}
