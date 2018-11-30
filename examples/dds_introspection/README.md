@@ -1,6 +1,6 @@
-DDS Introspection
+# DDS Introspection
 
-### Build
+### Building
 ```
 $ go get github.com/tidwall/gjson
 $ go get github.com/urfave/cli
@@ -8,7 +8,7 @@ $ go build
 $ go build dds_introspection.go
 ```
 
-### Run
+### Running
 ``` 
 ./dds_introspection -h
 NAME:
