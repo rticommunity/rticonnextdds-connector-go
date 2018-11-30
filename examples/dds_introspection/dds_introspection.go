@@ -28,6 +28,9 @@ func main() {
 	var interval int
 
 	app := cli.NewApp()
+	app.Name = "DDS Introspection"
+	app.Usage = "Injecting DDS data for diagnostics"
+	app.Version = "0.0.1"
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
@@ -67,8 +70,7 @@ func main() {
 			Destination: &interval,
 		},
 	}
-	app.Name = "DDS Introspection"
-	app.Usage = "Injecting DDS data for diagnostics"
+
 	app.Action = func(c *cli.Context) error {
 		// Create a connector defined in the XML configuration
 		connector, err := rti.NewConnector(participantName, configPath)
