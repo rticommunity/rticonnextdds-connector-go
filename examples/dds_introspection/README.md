@@ -1,5 +1,5 @@
 # DDS Introspection
-``` bash
+``` 
 ./dds_introspection -h
 NAME:
    DDS Introspection - Injecting DDS data for diagnostics
