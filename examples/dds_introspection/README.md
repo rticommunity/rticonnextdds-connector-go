@@ -4,7 +4,6 @@
 ```
 $ go get github.com/tidwall/gjson
 $ go get github.com/urfave/cli
-$ go build 
 $ go build dds_introspection.go
 ```
 
