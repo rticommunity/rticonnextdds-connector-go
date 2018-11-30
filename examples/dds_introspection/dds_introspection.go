@@ -75,7 +75,7 @@ func main() {
 		// Create a connector defined in the XML configuration
 		connector, err := rti.NewConnector(participantName, configPath)
 		if err != nil {
-			log.Panic(err)
+			log.Fatal(err)
 		}
 		// Delete the connector when this main function returns
 		defer connector.Delete()
@@ -83,13 +83,13 @@ func main() {
 		// Get an output from the connector
 		output, err := connector.GetOutput(writerName)
 		if err != nil {
-			log.Panic(err)
+			log.Fatal(err)
 		}
 
 		for i := 0; i < count; i++ {
 			m, ok := gjson.Parse(data).Value().(map[string]interface{})
 			if !ok {
-				log.Panic(err)
+				log.Fatal(err)
 			}
 
 			output.Instance.Set(&m)
@@ -104,7 +104,7 @@ func main() {
 
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(err)
 	}
 
 }
