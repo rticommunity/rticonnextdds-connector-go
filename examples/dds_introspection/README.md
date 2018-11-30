@@ -8,7 +8,7 @@ USAGE:
    dds_introspection [global options] command [command options] [arguments...]
 
 VERSION:
-   0.0.0
+   0.0.1
 
 COMMANDS:
      help, h  Shows a list of commands or help for one command
