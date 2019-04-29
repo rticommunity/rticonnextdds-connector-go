@@ -148,6 +148,7 @@ func TestDataFlow(t *testing.T) {
 	b := true
 	st := "test"
 
+        output.Instance.SetUint8("c", c)
         output.Instance.SetByte("c", c)
         output.Instance.SetString("st", st)
         output.Instance.SetBoolean("b", b)
@@ -181,6 +182,7 @@ func TestDataFlow(t *testing.T) {
 	assert.Equal(t, input.Samples.GetString(0, "st"), st)
 	assert.Equal(t, input.Samples.GetBoolean(0, "b"), b)
 
+	assert.Equal(t, input.Samples.GetUint8(0, "c"), c)
 	assert.Equal(t, input.Samples.GetByte(0, "c"), c)
 	assert.Equal(t, input.Samples.GetInt16(0, "s"), s)
 	assert.Equal(t, input.Samples.GetUint16(0, "us"), us)
