@@ -144,18 +144,20 @@ func TestDataFlow(t *testing.T) {
 	f := float32(math.MaxFloat32)
 	d := float64(math.MaxFloat64)
 
-	//c := byte('A')
+	c := byte('A')
 	b := true
 	st := "test"
 
-        //output.Instance.SetByte("c", c)
+        output.Instance.SetByte("c", c)
         output.Instance.SetString("st", st)
         output.Instance.SetBoolean("b", b)
-
         output.Instance.SetInt16("s", s)
         output.Instance.SetUint16("us", us)
         output.Instance.SetInt32("l", l)
         output.Instance.SetUint32("ul", ul)
+	output.Instance.SetInt("l", int(l))
+	output.Instance.SetUint("ul", uint(ul))
+	output.Instance.SetRune("l", rune(l))
         //output.Instance.SetInt64("ll", ll)
         //output.Instance.SetUint64("ull", ull)
         output.Instance.SetFloat32("f", f)
@@ -179,28 +181,24 @@ func TestDataFlow(t *testing.T) {
 	assert.Equal(t, input.Samples.GetString(0, "st"), st)
 	assert.Equal(t, input.Samples.GetBoolean(0, "b"), b)
 
-	//assert.Equal(t, input.Samples.GetByte(0, "c"), c)
+	assert.Equal(t, input.Samples.GetByte(0, "c"), c)
 	assert.Equal(t, input.Samples.GetInt16(0, "s"), s)
 	assert.Equal(t, input.Samples.GetUint16(0, "us"), us)
 	assert.Equal(t, input.Samples.GetInt32(0, "l"), l)
+	assert.Equal(t, input.Samples.GetInt(0, "l"), int(l))
+	assert.Equal(t, input.Samples.GetUint(0, "ul"), uint(ul))
+	assert.Equal(t, input.Samples.GetRune(0, "l"), rune(l))
 	assert.Equal(t, input.Samples.GetUint32(0, "ul"), ul)
         //assert.Equal(t, input.Samples.GetInt64(0, "ll"), ll)
         //assert.Equal(t, input.Samples.GetUint64(0, "ull"), ull)
 	assert.Equal(t, input.Samples.GetFloat32(0, "f"), f)
         assert.Equal(t, input.Samples.GetFloat64(0, "d"), d)
 
-/*
-        color := input.Samples.GetString(0, "color")
-	assert.Equal(t, color, "BLUE")
-        x := input.Samples.GetInt(0, "x")
-	assert.Equal(t, x, 1)
-        y := input.Samples.GetInt(0, "y")
-	assert.Equal(t, y, 1)
-        z := input.Samples.GetBoolean(0, "y")
-	assert.Equal(t, z, true)
-        shapesize := input.Samples.GetInt(0, "shapesize")
-	assert.Equal(t, shapesize, 5)
-*/
+	output.ClearMembers()
+	output.Write()
+	connector.Wait(-1)
+	input.Read()
+	assert.NotEqual(t, input.Samples.GetString(0, "st"), st)
 
 	// Testing Wait TimeOut
 	err = connector.Wait(5)
