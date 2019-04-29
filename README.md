@@ -16,7 +16,7 @@ with tons of other available technologies.
 The RTI Connector library is provided in binary form for selected architectures. Language bindings and examples are provided in source format.
 
 For **Go Connector**, we leveraged [cgo](https://golang.org/cmd/cgo) to call our C library, but we try to hide
-that from you using a nice Go wrapper. We tested with Go v.12, v1.11, v1.10 and v1.9.
+that from you using a nice Go wrapper. We tested with Go v1.12, v1.11, v1.10 and v1.9.
 
 ### Getting started
 Be sure you have Go installed and set your go workspace ($GOPATH). Then run:
