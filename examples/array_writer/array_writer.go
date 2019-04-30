@@ -12,17 +12,17 @@ package main
 
 import (
 	"github.com/rticommunity/rticonnextdds-connector-go"
+	"log"
 	"path"
 	"runtime"
 	"time"
-	"log"
 )
 
 type Shape struct {
-        Color     string `json:"color"`
-        X         [100]int    `json:"x"`
-        Y         [100]int    `json:"y"`
-        Shapesize int    `json:"shapesize"`
+	Color     string   `json:"color"`
+	X         [100]int `json:"x"`
+	Y         [100]int `json:"y"`
+	Shapesize int      `json:"shapesize"`
 }
 
 func main() {
@@ -51,7 +51,7 @@ func main() {
 	for i := 0; i < 500; i++ {
 		var shape Shape
 		shape.X[i%100] = i
-		shape.Y[i%100] = i*2
+		shape.Y[i%100] = i * 2
 		shape.Shapesize = 30
 		shape.Color = "BLUE"
 		output.Instance.Set(&shape)

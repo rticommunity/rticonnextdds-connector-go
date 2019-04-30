@@ -39,11 +39,11 @@ type Connector struct {
 
 // Output publishes DDS data
 type Output struct {
-	native     unsafe.Pointer // a pointer to a native DataWriter
-	connector  *Connector
-	name       string // name of the native DataWriter
-	nameCStr *C.char
-	Instance   *Instance
+	native    unsafe.Pointer // a pointer to a native DataWriter
+	connector *Connector
+	name      string // name of the native DataWriter
+	nameCStr  *C.char
+	Instance  *Instance
 }
 
 // Data instance needed to write by an output
@@ -53,12 +53,12 @@ type Instance struct {
 
 // Input subscribes to DDS data
 type Input struct {
-	native     unsafe.Pointer // a pointer to a native DataReader
-	connector  *Connector
-	name       string // name of the native DataReader
-	nameCStr *C.char
-	Samples    *Samples
-	Infos      *Infos
+	native    unsafe.Pointer // a pointer to a native DataReader
+	connector *Connector
+	name      string // name of the native DataReader
+	nameCStr  *C.char
+	Samples   *Samples
+	Infos     *Infos
 }
 
 // Data sample needed to read by an input
@@ -66,7 +66,7 @@ type Samples struct {
 	input *Input
 }
 
-// Info sample needed to read by an input 
+// Info sample needed to read by an input
 type Infos struct {
 	input *Input
 }

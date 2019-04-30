@@ -20,8 +20,8 @@ import (
 
 type Shape struct {
 	Color     string `json:"color"`
-	X         []int    `json:"x"`
-	Y         []int    `json:"y"`
+	X         []int  `json:"x"`
+	Y         []int  `json:"y"`
 	Shapesize int    `json:"shapesize"`
 }
 

@@ -19,10 +19,10 @@ import (
 )
 
 type Shape struct {
-	Color     string `json:"color"`
-	X         [100]int    `json:"x"`
-	Y         [100]int    `json:"y"`
-	Shapesize int    `json:"shapesize"`
+	Color     string   `json:"color"`
+	X         [100]int `json:"x"`
+	Y         [100]int `json:"y"`
+	Shapesize int      `json:"shapesize"`
 }
 
 func main() {

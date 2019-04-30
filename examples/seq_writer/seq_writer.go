@@ -12,18 +12,18 @@ package main
 
 import (
 	"github.com/rticommunity/rticonnextdds-connector-go"
+	"log"
+	"math/rand"
 	"path"
 	"runtime"
 	"time"
-	"log"
-	"math/rand"
 )
 
 type Shape struct {
-        Color     string `json:"color"`
-        X         []int    `json:"x"`
-        Y         []int    `json:"y"`
-        Shapesize int    `json:"shapesize"`
+	Color     string `json:"color"`
+	X         []int  `json:"x"`
+	Y         []int  `json:"y"`
+	Shapesize int    `json:"shapesize"`
 }
 
 func main() {
