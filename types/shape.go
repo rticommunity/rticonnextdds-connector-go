@@ -1,6 +1,6 @@
 package types
 
-// A struct parsed from the data type for RTI shapes demo
+// Shape is a struct parsed from the data type for RTI shapes demo
 type Shape struct {
 	Color     string `json:"color"`
 	X         int    `json:"x"`
@@ -8,7 +8,7 @@ type Shape struct {
 	Shapesize int    `json:"shapesize"`
 }
 
-// A Shape struct with arrays
+// ShapeArray is a shape struct with arrays
 type ShapeArray struct {
 	Color     string `json:"color"`
 	X         [100]int    `json:"x"`
@@ -16,7 +16,7 @@ type ShapeArray struct {
 	Shapesize int    `json:"shapesize"`
 }
 
-// A Shape struct with slices
+// ShapeSlice is a shape struct with slices
 type ShapeSlice struct {
 	Color     string `json:"color"`
 	X         []int    `json:"x"`
