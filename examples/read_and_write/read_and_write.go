@@ -12,18 +12,12 @@ package main
 
 import (
 	"github.com/rticommunity/rticonnextdds-connector-go"
+	"github.com/rticommunity/rticonnextdds-connector-go/types"
 	"log"
 	"path"
 	"runtime"
 	"time"
 )
-
-type Shape struct {
-	Color     string `json:"color"`
-	X         int    `json:"x"`
-	Y         int    `json:"y"`
-	Shapesize int    `json:"shapesize"`
-}
 
 func main() {
 	_, filename, _, ok := runtime.Caller(0)
@@ -50,7 +44,7 @@ func main() {
 		numOfSamples := input.Samples.GetLength()
 		for j := 0; j < numOfSamples; j++ {
 			if input.Infos.IsValid(j) {
-				var shape Shape
+				var shape types.Shape
 				err := input.Samples.Get(j, &shape)
 				if err != nil {
 					log.Println(err)

@@ -12,18 +12,12 @@ package main
 
 import (
 	"github.com/rticommunity/rticonnextdds-connector-go"
+	"github.com/rticommunity/rticonnextdds-connector-go/types"
 	"log"
 	"path"
 	"runtime"
 	"time"
 )
-
-type Shape struct {
-	Color     string   `json:"color"`
-	X         [100]int `json:"x"`
-	Y         [100]int `json:"y"`
-	Shapesize int      `json:"shapesize"`
-}
 
 func main() {
 	// Find the file path to the XML configuration
@@ -49,7 +43,7 @@ func main() {
 
 	// Set values to the instance and write the instance
 	for i := 0; i < 500; i++ {
-		var shape Shape
+		var shape types.ShapeArray
 		shape.X[i%100] = i
 		shape.Y[i%100] = i * 2
 		shape.Shapesize = 30
