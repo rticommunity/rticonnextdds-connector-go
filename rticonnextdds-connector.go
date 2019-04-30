@@ -30,37 +30,43 @@ import "encoding/json"
 * Types *
 *********/
 
+// Connector is a container managing DDS inputs and outputs
 type Connector struct {
 	native  *C.struct_RTIDDSConnector
 	Inputs  []Input
 	Outputs []Output
 }
 
+// Output publishes DDS data
 type Output struct {
 	native     unsafe.Pointer // a pointer to a native DataWriter
 	connector  *Connector
 	name       string // name of the native DataWriter
-	name_c_str *C.char
+	nameCStr *C.char
 	Instance   *Instance
 }
 
+// Data instance needed to write by an output
 type Instance struct {
 	output *Output
 }
 
+// Input subscribes to DDS data
 type Input struct {
 	native     unsafe.Pointer // a pointer to a native DataReader
 	connector  *Connector
 	name       string // name of the native DataReader
-	name_c_str *C.char
+	nameCStr *C.char
 	Samples    *Samples
 	Infos      *Infos
 }
 
+// Data sample needed to read by an input
 type Samples struct {
 	input *Input
 }
 
+// Info sample needed to read by an input 
 type Infos struct {
 	input *Input
 }
@@ -78,20 +84,20 @@ func newInstance(output *Output) (instance *Instance) {
 	return instance
 }
 
-func newOutput(connector *Connector, output_name string) (output *Output, err error) {
+func newOutput(connector *Connector, outputName string) (output *Output, err error) {
 	// Error checking for the connector is skipped because it was already checked
 
 	output = new(Output)
 	output.connector = connector
 
-	output.name_c_str = C.CString(output_name)
+	output.nameCStr = C.CString(outputName)
 
-	output.native = C.RTIDDSConnector_getWriter(unsafe.Pointer(connector.native), output.name_c_str)
+	output.native = C.RTIDDSConnector_getWriter(unsafe.Pointer(connector.native), output.nameCStr)
 	if output.native == nil {
 		err = errors.New("Invalid Publication::DataWriter name")
 		return nil, err
 	}
-	output.name = output_name
+	output.name = outputName
 	output.Instance = newInstance(output)
 
 	connector.Outputs = append(connector.Outputs, *output)
@@ -99,22 +105,21 @@ func newOutput(connector *Connector, output_name string) (output *Output, err er
 	return output, nil
 }
 
-func newInput(connector *Connector, input_name string) (input *Input, err error) {
+func newInput(connector *Connector, inputName string) (input *Input, err error) {
 	// Error checking for the connector is skipped because it was already checked
 
 	input = new(Input)
 	input.connector = connector
 
-	input.name_c_str = C.CString(input_name)
+	input.nameCStr = C.CString(inputName)
 
-	input.native = C.RTIDDSConnector_getReader(unsafe.Pointer(connector.native), input.name_c_str)
+	input.native = C.RTIDDSConnector_getReader(unsafe.Pointer(connector.native), input.nameCStr)
 	if input.native == nil {
 		err = errors.New("Invalid Subscription::DataReader name")
 		return nil, err
 	}
-	input.name = input_name
+	input.name = inputName
 	input.Samples = newSamples(input)
-
 	input.Infos = newInfos(input)
 
 	connector.Inputs = append(connector.Inputs, *input)
@@ -142,15 +147,15 @@ func newInfos(input *Input) (infos *Infos) {
 * Public Functions *
 *******************/
 
-func NewConnector(config_name string, file_name string) (connector *Connector, err error) {
+func NewConnector(configName string, fileName string) (connector *Connector, err error) {
 	connector = new(Connector)
 
-	config_name_c_str := C.CString(config_name)
-	defer C.free(unsafe.Pointer(config_name_c_str))
-	file_name_c_str := C.CString(file_name)
-	defer C.free(unsafe.Pointer(file_name_c_str))
+	configNameCStr := C.CString(configName)
+	defer C.free(unsafe.Pointer(configNameCStr))
+	fileNameCStr := C.CString(fileName)
+	defer C.free(unsafe.Pointer(fileNameCStr))
 
-	connector.native = C.RTIDDSConnector_new(config_name_c_str, file_name_c_str, nil)
+	connector.native = C.RTIDDSConnector_new(configNameCStr, fileNameCStr, nil)
 	if connector.native == nil {
 		err = errors.New("Invalid participant profile, xml path or xml profile")
 		return nil, err
@@ -167,10 +172,10 @@ func (connector *Connector) Delete() (err error) {
 
 	// Delete memory allocated in C layer
 	for _, input := range connector.Inputs {
-		C.free(unsafe.Pointer(input.name_c_str))
+		C.free(unsafe.Pointer(input.nameCStr))
 	}
 	for _, output := range connector.Outputs {
-		C.free(unsafe.Pointer(output.name_c_str))
+		C.free(unsafe.Pointer(output.nameCStr))
 	}
 
 	C.RTIDDSConnector_delete(connector.native)
@@ -179,26 +184,26 @@ func (connector *Connector) Delete() (err error) {
 	return nil
 }
 
-func (connector *Connector) GetOutput(output_name string) (output *Output, err error) {
+func (connector *Connector) GetOutput(outputName string) (output *Output, err error) {
 	if connector == nil {
 		err = errors.New("Connector is null")
 		return nil, err
 	}
 
-	output, err = newOutput(connector, output_name)
+	output, err = newOutput(connector, outputName)
 	if err != nil {
 		return nil, err
 	}
 	return output, nil
 }
 
-func (connector *Connector) GetInput(input_name string) (input *Input, err error) {
+func (connector *Connector) GetInput(inputName string) (input *Input, err error) {
 	if connector == nil {
 		err = errors.New("Connector is null")
 		return nil, err
 	}
 
-	input, err = newInput(connector, input_name)
+	input, err = newInput(connector, inputName)
 	if err != nil {
 		return nil, err
 	}
@@ -224,144 +229,144 @@ func (connector *Connector) Wait(timeout_ms int) (err error) {
 func (output *Output) Write() error {
 	// The C function does not return errors. In the futurue, we will check erros this when supported in the C layer
 	// CON-24 (for more information)
-	C.RTIDDSConnector_write(unsafe.Pointer(output.connector.native), output.name_c_str, nil)
+	C.RTIDDSConnector_write(unsafe.Pointer(output.connector.native), output.nameCStr, nil)
 	return nil
 }
 
 func (output *Output) ClearMembers() error {
 	// The C function does not return errors. In the futurue, we will check erros when supported in C the C layer
-	C.RTIDDSConnector_clear(unsafe.Pointer(output.connector.native), output.name_c_str)
+	C.RTIDDSConnector_clear(unsafe.Pointer(output.connector.native), output.nameCStr)
 	return nil
 }
 
-func (instance *Instance) SetUint8(field_name string, value uint8) error {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (instance *Instance) SetUint8(fieldName string, value uint8) error {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.name_c_str, field_name_c_str, C.double(value))
+	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
 	return nil
 }
 
-func (instance *Instance) SetUint16(field_name string, value uint16) error {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (instance *Instance) SetUint16(fieldName string, value uint16) error {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.name_c_str, field_name_c_str, C.double(value))
+	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
 	return nil
 }
 
-func (instance *Instance) SetUint32(field_name string, value uint32) error {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (instance *Instance) SetUint32(fieldName string, value uint32) error {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.name_c_str, field_name_c_str, C.double(value))
+	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
 	return nil
 }
 
-func (instance *Instance) SetUint64(field_name string, value uint64) error {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (instance *Instance) SetUint64(fieldName string, value uint64) error {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.name_c_str, field_name_c_str, C.double(value))
+	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
 	return nil
 }
 
-func (instance *Instance) SetInt8(field_name string, value int8) error {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (instance *Instance) SetInt8(fieldName string, value int8) error {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.name_c_str, field_name_c_str, C.double(value))
+	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
 	return nil
 }
 
-func (instance *Instance) SetInt16(field_name string, value int16) error {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (instance *Instance) SetInt16(fieldName string, value int16) error {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.name_c_str, field_name_c_str, C.double(value))
+	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
 	return nil
 }
 
-func (instance *Instance) SetInt32(field_name string, value int32) error {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (instance *Instance) SetInt32(fieldName string, value int32) error {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.name_c_str, field_name_c_str, C.double(value))
+	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
 	return nil
 }
 
-func (instance *Instance) SetInt64(field_name string, value int64) error {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (instance *Instance) SetInt64(fieldName string, value int64) error {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.name_c_str, field_name_c_str, C.double(value))
+	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
 	return nil
 }
 
-func (instance *Instance) SetUint(field_name string, value uint) error {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (instance *Instance) SetUint(fieldName string, value uint) error {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.name_c_str, field_name_c_str, C.double(value))
+	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
 	return nil
 }
 
-func (instance *Instance) SetInt(field_name string, value int) error {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (instance *Instance) SetInt(fieldName string, value int) error {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.name_c_str, field_name_c_str, C.double(value))
+	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
 	return nil
 }
 
-func (instance *Instance) SetFloat32(field_name string, value float32) error {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (instance *Instance) SetFloat32(fieldName string, value float32) error {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.name_c_str, field_name_c_str, C.double(value))
+	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
 	return nil
 }
 
-func (instance *Instance) SetFloat64(field_name string, value float64) error {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (instance *Instance) SetFloat64(fieldName string, value float64) error {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.name_c_str, field_name_c_str, C.double(value))
+	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
 	return nil
 }
 
-func (instance *Instance) SetString(field_name string, value string) error {
+func (instance *Instance) SetString(fieldName string, value string) error {
 
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
 	value_c_str := C.CString(value)
 	defer C.free(unsafe.Pointer(value_c_str))
 
-	C.RTIDDSConnector_setStringIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.name_c_str, field_name_c_str, value_c_str)
+	C.RTIDDSConnector_setStringIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, value_c_str)
 
 	return nil
 }
 
-func (instance *Instance) SetByte(field_name string, value byte) error {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (instance *Instance) SetByte(fieldName string, value byte) error {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.name_c_str, field_name_c_str, C.double(value))
+	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
 	return nil
 }
 
-func (instance *Instance) SetRune(field_name string, value rune) error {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (instance *Instance) SetRune(fieldName string, value rune) error {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.name_c_str, field_name_c_str, C.double(value))
+	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
 	return nil
 }
 
-func (instance *Instance) SetBoolean(field_name string, value bool) error {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (instance *Instance) SetBoolean(fieldName string, value bool) error {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
 	var int_value int
 	if value == true {
@@ -369,7 +374,7 @@ func (instance *Instance) SetBoolean(field_name string, value bool) error {
 	} else {
 		int_value = 0
 	}
-	C.RTIDDSConnector_setBooleanIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.name_c_str, field_name_c_str, C.int(int_value))
+	C.RTIDDSConnector_setBooleanIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.int(int_value))
 	return nil
 }
 
@@ -377,7 +382,7 @@ func (instance *Instance) SetJson(json []byte) error {
 	json_c_str := C.CString(string(json))
 	defer C.free(unsafe.Pointer(json_c_str))
 
-	C.RTIDDSConnector_setJSONInstance(unsafe.Pointer(instance.output.connector.native), instance.output.name_c_str, json_c_str)
+	C.RTIDDSConnector_setJSONInstance(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, json_c_str)
 	return nil
 }
 
@@ -403,7 +408,7 @@ func (input *Input) Read() (err error) {
 	}
 
 	// The C function does not return errors. In the futurue, we will update this when supported in the C layer
-	C.RTIDDSConnector_read(unsafe.Pointer(input.connector.native), input.name_c_str)
+	C.RTIDDSConnector_read(unsafe.Pointer(input.connector.native), input.nameCStr)
 	return nil
 }
 
@@ -413,132 +418,132 @@ func (input *Input) Take() (err error) {
 		return err
 	}
 	// The C function does not return errors. In the futurue, we will update this when supported in the C layer
-	C.RTIDDSConnector_take(unsafe.Pointer(input.connector.native), input.name_c_str)
+	C.RTIDDSConnector_take(unsafe.Pointer(input.connector.native), input.nameCStr)
 	return nil
 }
 
 func (samples *Samples) GetLength() (length int) {
-	length = int(C.RTIDDSConnector_getSamplesLength(unsafe.Pointer(samples.input.connector.native), samples.input.name_c_str))
+	length = int(C.RTIDDSConnector_getSamplesLength(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr))
 	return length
 }
 
-func (samples *Samples) GetUint8(index int, field_name string) (value uint8) {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (samples *Samples) GetUint8(index int, fieldName string) (value uint8) {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	value = uint8(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.name_c_str, C.int(index+1), field_name_c_str))
+	value = uint8(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
 	return value
 }
 
-func (samples *Samples) GetUint16(index int, field_name string) (value uint16) {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (samples *Samples) GetUint16(index int, fieldName string) (value uint16) {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	value = uint16(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.name_c_str, C.int(index+1), field_name_c_str))
+	value = uint16(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
 	return value
 }
 
-func (samples *Samples) GetUint32(index int, field_name string) (value uint32) {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (samples *Samples) GetUint32(index int, fieldName string) (value uint32) {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	value = uint32(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.name_c_str, C.int(index+1), field_name_c_str))
+	value = uint32(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
 	return value
 }
 
-func (samples *Samples) GetUint64(index int, field_name string) (value uint64) {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (samples *Samples) GetUint64(index int, fieldName string) (value uint64) {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	value = uint64(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.name_c_str, C.int(index+1), field_name_c_str))
+	value = uint64(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
 	return value
 }
 
-func (samples *Samples) GetInt8(index int, field_name string) (value int8) {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (samples *Samples) GetInt8(index int, fieldName string) (value int8) {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	value = int8(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.name_c_str, C.int(index+1), field_name_c_str))
+	value = int8(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
 	return value
 }
 
-func (samples *Samples) GetInt16(index int, field_name string) (value int16) {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (samples *Samples) GetInt16(index int, fieldName string) (value int16) {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	value = int16(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.name_c_str, C.int(index+1), field_name_c_str))
+	value = int16(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
 	return value
 }
 
-func (samples *Samples) GetInt32(index int, field_name string) (value int32) {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (samples *Samples) GetInt32(index int, fieldName string) (value int32) {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	value = int32(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.name_c_str, C.int(index+1), field_name_c_str))
+	value = int32(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
 	return value
 }
 
-func (samples *Samples) GetInt64(index int, field_name string) (value int64) {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (samples *Samples) GetInt64(index int, fieldName string) (value int64) {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	value = int64(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.name_c_str, C.int(index+1), field_name_c_str))
+	value = int64(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
 	return value
 }
 
-func (samples *Samples) GetFloat32(index int, field_name string) (value float32) {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (samples *Samples) GetFloat32(index int, fieldName string) (value float32) {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	value = float32(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.name_c_str, C.int(index+1), field_name_c_str))
+	value = float32(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
 	return value
 }
 
-func (samples *Samples) GetFloat64(index int, field_name string) (value float64) {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (samples *Samples) GetFloat64(index int, fieldName string) (value float64) {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	value = float64(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.name_c_str, C.int(index+1), field_name_c_str))
+	value = float64(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
 	return value
 }
 
-func (samples *Samples) GetInt(index int, field_name string) (value int) {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (samples *Samples) GetInt(index int, fieldName string) (value int) {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	value = int(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.name_c_str, C.int(index+1), field_name_c_str))
+	value = int(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
 	return value
 }
 
-func (samples *Samples) GetUint(index int, field_name string) (value uint) {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (samples *Samples) GetUint(index int, fieldName string) (value uint) {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	value = uint(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.name_c_str, C.int(index+1), field_name_c_str))
+	value = uint(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
 	return value
 }
 
-func (samples *Samples) GetByte(index int, field_name string) (value byte) {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (samples *Samples) GetByte(index int, fieldName string) (value byte) {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	value = byte(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.name_c_str, C.int(index+1), field_name_c_str))
+	value = byte(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
 	return value
 }
 
-func (samples *Samples) GetRune(index int, field_name string) (value rune) {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (samples *Samples) GetRune(index int, fieldName string) (value rune) {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	value = rune(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.name_c_str, C.int(index+1), field_name_c_str))
+	value = rune(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
 	return value
 }
 
-func (samples *Samples) GetBoolean(index int, field_name string) bool {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (samples *Samples) GetBoolean(index int, fieldName string) bool {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	value := int(C.RTIDDSConnector_getBooleanFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.name_c_str, C.int(index+1), field_name_c_str))
+	value := int(C.RTIDDSConnector_getBooleanFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
 	if value != 0 {
 		return true
 	} else {
@@ -546,19 +551,19 @@ func (samples *Samples) GetBoolean(index int, field_name string) bool {
 	}
 }
 
-func (samples *Samples) GetString(index int, field_name string) (value string) {
-	field_name_c_str := C.CString(field_name)
-	defer C.free(unsafe.Pointer(field_name_c_str))
+func (samples *Samples) GetString(index int, fieldName string) (value string) {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	value = C.GoString((*C.char)(C.RTIDDSConnector_getStringFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.name_c_str, C.int(index+1), field_name_c_str)))
+	value = C.GoString((*C.char)(C.RTIDDSConnector_getStringFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr)))
 	return value
 }
 
 func (samples *Samples) GetJson(index int) (json []byte, e error) {
-	json_c_str := C.RTIDDSConnector_getJSONSample(unsafe.Pointer(samples.input.connector.native), samples.input.name_c_str, C.int(index+1))
-	defer C.RTIDDSConnector_freeString((*C.char)(json_c_str))
+	jsonCStr := C.RTIDDSConnector_getJSONSample(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1))
+	defer C.RTIDDSConnector_freeString((*C.char)(jsonCStr))
 
-	json = []byte(C.GoString((*C.char)(json_c_str)))
+	json = []byte(C.GoString((*C.char)(jsonCStr)))
 
 	return json, e
 }
@@ -578,10 +583,10 @@ func (samples *Samples) Get(index int, v interface{}) (e error) {
 }
 
 func (infos *Infos) IsValid(index int) (valid bool) {
-	member_name_c_str := C.CString("valid_data")
-	defer C.free(unsafe.Pointer(member_name_c_str))
+	memberNameCStr := C.CString("valid_data")
+	defer C.free(unsafe.Pointer(memberNameCStr))
 
-	if int(C.RTIDDSConnector_getBooleanFromInfos(unsafe.Pointer(infos.input.connector.native), infos.input.name_c_str, C.int(index+1), member_name_c_str)) != 0 {
+	if int(C.RTIDDSConnector_getBooleanFromInfos(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr, C.int(index+1), memberNameCStr)) != 0 {
 		valid = true
 	} else {
 		valid = false
@@ -590,6 +595,6 @@ func (infos *Infos) IsValid(index int) (valid bool) {
 }
 
 func (infos *Infos) GetLength() (length int) {
-	length = int(C.RTIDDSConnector_getInfosLength(unsafe.Pointer(infos.input.connector.native), infos.input.name_c_str))
+	length = int(C.RTIDDSConnector_getInfosLength(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr))
 	return length
 }
