@@ -222,7 +222,7 @@ func (connector *Connector) Wait(timeout_ms int) (err error) {
 		return err
 	} else if retcode != 0 /* DDS_RETCODE_OK */ {
 		err = errors.New("RTIDDSConnector_wait error")
-    return err
+		return err
 	}
 	return nil
 }
