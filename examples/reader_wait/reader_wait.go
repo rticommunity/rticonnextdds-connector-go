@@ -12,9 +12,9 @@ package main
 
 import (
 	"github.com/rticommunity/rticonnextdds-connector-go"
+	"log"
 	"path"
 	"runtime"
-	"log"
 )
 
 func main() {
@@ -40,7 +40,7 @@ func main() {
 		for j := 0; j < numOfSamples; j++ {
 			if input.Infos.IsValid(j) {
 				json, err := input.Samples.GetJson(j)
-				if (err != nil) {
+				if err != nil {
 					log.Println(err)
 				} else {
 					log.Println(string(json))

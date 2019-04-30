@@ -2,27 +2,27 @@ package rti
 
 import (
 	"github.com/stretchr/testify/assert"
-	"testing"
-	"runtime"
-	"path"
 	"math"
+	"path"
+	"runtime"
+	"testing"
 )
 
 // Helper functions
-func newTestConnector()(connector *Connector) {
-        _, cur_path, _, _ := runtime.Caller(0)
-        xml_path := path.Join(path.Dir(cur_path), "./test/xml/Test.xml")
-        participant_profile := "MyParticipantLibrary::Zero"
-        connector, _ = NewConnector(participant_profile, xml_path)
-        return connector
+func newTestConnector() (connector *Connector) {
+	_, cur_path, _, _ := runtime.Caller(0)
+	xml_path := path.Join(path.Dir(cur_path), "./test/xml/Test.xml")
+	participant_profile := "MyParticipantLibrary::Zero"
+	connector, _ = NewConnector(participant_profile, xml_path)
+	return connector
 }
 
-func newTestInput(connector *Connector)(input *Input) {
+func newTestInput(connector *Connector) (input *Input) {
 	input, _ = connector.GetInput("MySubscriber::MyReader")
 	return input
 }
 
-func newTestOutput(connector *Connector)(output *Output) {
+func newTestOutput(connector *Connector) (output *Output) {
 	output, _ = connector.GetOutput("MyPublisher::MyWriter")
 	return output
 }
@@ -38,18 +38,18 @@ func TestInvalidXMLPath(t *testing.T) {
 }
 
 func TestInvalidParticipantProfile(t *testing.T) {
-        _, cur_path, _, _ := runtime.Caller(0)
-        xml_path := path.Join(path.Dir(cur_path), "./test/xml/Test.xml")
+	_, cur_path, _, _ := runtime.Caller(0)
+	xml_path := path.Join(path.Dir(cur_path), "./test/xml/Test.xml")
 	invalid_participant_profile := "InvalidParticipantProfile"
 
-        connector, err := NewConnector(invalid_participant_profile, xml_path)
-        assert.Nil(t, connector)
-        assert.NotNil(t, err)
+	connector, err := NewConnector(invalid_participant_profile, xml_path)
+	assert.Nil(t, connector)
+	assert.NotNil(t, err)
 }
 
 func TestMultipleConnectorCreation(t *testing.T) {
 	_, cur_path, _, _ := runtime.Caller(0)
-        xml_path := path.Join(path.Dir(cur_path), "./test/xml/Test.xml")
+	xml_path := path.Join(path.Dir(cur_path), "./test/xml/Test.xml")
 	participant_profile := "MyParticipantLibrary::Zero"
 	var connectors [5]*Connector
 	for i := 0; i < 5; i++ {
@@ -71,24 +71,24 @@ func TestConnectorDeletion(t *testing.T) {
 
 // Input tests
 func TestInvalidDR(t *testing.T) {
-        invalidReaderName := "invalidDR"
+	invalidReaderName := "invalidDR"
 
-        connector := newTestConnector()
-        input, err := connector.GetInput(invalidReaderName)
-        assert.Nil(t, input)
-        assert.NotNil(t, err)
+	connector := newTestConnector()
+	input, err := connector.GetInput(invalidReaderName)
+	assert.Nil(t, input)
+	assert.NotNil(t, err)
 }
 
 func TestCreateDR(t *testing.T) {
-        readerName := "MySubscriber::MyReader"
+	readerName := "MySubscriber::MyReader"
 
-        connector := newTestConnector()
+	connector := newTestConnector()
 	defer connector.Delete()
-        input, err := connector.GetInput(readerName)
-        assert.NotNil(t, input)
-        assert.NotNil(t, input.Samples)
-        assert.NotNil(t, input.Infos)
-        assert.Nil(t, err)
+	input, err := connector.GetInput(readerName)
+	assert.NotNil(t, input)
+	assert.NotNil(t, input.Samples)
+	assert.NotNil(t, input.Infos)
+	assert.Nil(t, err)
 
 	var null_connector *Connector
 	input, err = null_connector.GetInput(readerName)
@@ -100,29 +100,29 @@ func TestCreateDR(t *testing.T) {
 
 // Output tests
 func TestInvalidWriter(t *testing.T) {
-        invalidWriterName := "invalidWriter"
+	invalidWriterName := "invalidWriter"
 
-        connector := newTestConnector()
+	connector := newTestConnector()
 	defer connector.Delete()
-        output, err := connector.GetOutput(invalidWriterName)
-        assert.Nil(t, output)
-        assert.NotNil(t, err)
+	output, err := connector.GetOutput(invalidWriterName)
+	assert.Nil(t, output)
+	assert.NotNil(t, err)
 }
 
 func TestCreateWriter(t *testing.T) {
-        writerName := "MyPublisher::MyWriter"
+	writerName := "MyPublisher::MyWriter"
 
-        connector := newTestConnector()
+	connector := newTestConnector()
 	defer connector.Delete()
-        output, err := connector.GetOutput(writerName)
-        assert.NotNil(t, output)
-        assert.NotNil(t, output.Instance)
-        assert.Nil(t, err)
+	output, err := connector.GetOutput(writerName)
+	assert.NotNil(t, output)
+	assert.NotNil(t, output.Instance)
+	assert.Nil(t, err)
 
-        var null_connector *Connector
-        output, err = null_connector.GetOutput(writerName)
-        assert.Nil(t, output)
-        assert.NotNil(t, err)
+	var null_connector *Connector
+	output, err = null_connector.GetOutput(writerName)
+	assert.Nil(t, output)
+	assert.NotNil(t, err)
 }
 
 // Data flow tests
@@ -148,27 +148,27 @@ func TestDataFlow(t *testing.T) {
 	b := true
 	st := "test"
 
-        output.Instance.SetUint8("c", c)
-        output.Instance.SetByte("c", c)
-        output.Instance.SetString("st", st)
-        output.Instance.SetBoolean("b", b)
-        output.Instance.SetInt16("s", s)
-        output.Instance.SetUint16("us", us)
-        output.Instance.SetInt32("l", l)
-        output.Instance.SetUint32("ul", ul)
+	output.Instance.SetUint8("c", c)
+	output.Instance.SetByte("c", c)
+	output.Instance.SetString("st", st)
+	output.Instance.SetBoolean("b", b)
+	output.Instance.SetInt16("s", s)
+	output.Instance.SetUint16("us", us)
+	output.Instance.SetInt32("l", l)
+	output.Instance.SetUint32("ul", ul)
 	output.Instance.SetInt("l", int(l))
 	output.Instance.SetUint("ul", uint(ul))
 	output.Instance.SetRune("l", rune(l))
-        //output.Instance.SetInt64("ll", ll)
-        //output.Instance.SetUint64("ull", ull)
-        output.Instance.SetFloat32("f", f)
-        output.Instance.SetFloat64("d", d)
+	//output.Instance.SetInt64("ll", ll)
+	//output.Instance.SetUint64("ull", ull)
+	output.Instance.SetFloat32("f", f)
+	output.Instance.SetFloat64("d", d)
 
 	output.Write()
 
 	err := connector.Wait(-1)
-        assert.Nil(t, err)
-        input.Take()
+	assert.Nil(t, err)
+	input.Take()
 
 	sample_length := input.Samples.GetLength()
 	assert.Equal(t, sample_length, 1)
@@ -191,10 +191,10 @@ func TestDataFlow(t *testing.T) {
 	assert.Equal(t, input.Samples.GetUint(0, "ul"), uint(ul))
 	assert.Equal(t, input.Samples.GetRune(0, "l"), rune(l))
 	assert.Equal(t, input.Samples.GetUint32(0, "ul"), ul)
-        //assert.Equal(t, input.Samples.GetInt64(0, "ll"), ll)
-        //assert.Equal(t, input.Samples.GetUint64(0, "ull"), ull)
+	//assert.Equal(t, input.Samples.GetInt64(0, "ll"), ll)
+	//assert.Equal(t, input.Samples.GetUint64(0, "ull"), ull)
 	assert.Equal(t, input.Samples.GetFloat32(0, "f"), f)
-        assert.Equal(t, input.Samples.GetFloat64(0, "d"), d)
+	assert.Equal(t, input.Samples.GetFloat64(0, "d"), d)
 
 	output.ClearMembers()
 	output.Write()
@@ -204,5 +204,5 @@ func TestDataFlow(t *testing.T) {
 
 	// Testing Wait TimeOut
 	err = connector.Wait(5)
-        assert.NotNil(t, err)
+	assert.NotNil(t, err)
 }

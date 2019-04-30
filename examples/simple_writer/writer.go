@@ -12,10 +12,10 @@ package main
 
 import (
 	"github.com/rticommunity/rticonnextdds-connector-go"
+	"log"
 	"path"
 	"runtime"
 	"time"
-	"log"
 )
 
 func main() {
