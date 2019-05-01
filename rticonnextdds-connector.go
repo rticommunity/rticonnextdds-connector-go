@@ -66,7 +66,7 @@ type Samples struct {
 	input *Input
 }
 
-// Infoss is a sequence of info samples used by an input to read DDS meta data
+// Infos is a sequence of info samples used by an input to read DDS meta data
 type Infos struct {
 	input *Input
 }
@@ -215,13 +215,13 @@ func (connector *Connector) GetInput(inputName string) (input *Input, err error)
 }
 
 // Wait is a function to block until data is available on an input
-func (connector *Connector) Wait(timeout_ms int) (err error) {
+func (connector *Connector) Wait(timeoutMs int) (err error) {
 	if connector == nil {
 		err = errors.New("Connector is null")
 		return err
 	}
 
-	retcode := int(C.RTIDDSConnector_wait(unsafe.Pointer(connector.native), (C.int)(timeout_ms)))
+	retcode := int(C.RTIDDSConnector_wait(unsafe.Pointer(connector.native), (C.int)(timeoutMs)))
 	if retcode == 10 /* DDS_RETCODE_TIMEOUT */ {
 		err = errors.New("Timeout")
 		return err
@@ -348,10 +348,10 @@ func (instance *Instance) SetString(fieldName string, value string) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	value_c_str := C.CString(value)
-	defer C.free(unsafe.Pointer(value_c_str))
+	valueCStr := C.CString(value)
+	defer C.free(unsafe.Pointer(valueCStr))
 
-	C.RTIDDSConnector_setStringIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, value_c_str)
+	C.RTIDDSConnector_setStringIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, valueCStr)
 
 	return nil
 }
@@ -387,10 +387,10 @@ func (instance *Instance) SetBoolean(fieldName string, value bool) error {
 }
 
 func (instance *Instance) SetJson(json []byte) error {
-	json_c_str := C.CString(string(json))
-	defer C.free(unsafe.Pointer(json_c_str))
+	jsonCStr := C.CString(string(json))
+	defer C.free(unsafe.Pointer(jsonCStr))
 
-	C.RTIDDSConnector_setJSONInstance(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, json_c_str)
+	C.RTIDDSConnector_setJSONInstance(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, jsonCStr)
 	return nil
 }
 
@@ -554,9 +554,8 @@ func (samples *Samples) GetBoolean(index int, fieldName string) bool {
 	value := int(C.RTIDDSConnector_getBooleanFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
 	if value != 0 {
 		return true
-	} else {
-		return false
-	}
+	} 
+	return false
 }
 
 func (samples *Samples) GetString(index int, fieldName string) (value string) {
