@@ -46,7 +46,7 @@ type Output struct {
 	Instance  *Instance
 }
 
-// Data instance needed to write by an output
+// Instance is used by an output to write DDS data
 type Instance struct {
 	output *Output
 }
@@ -61,12 +61,12 @@ type Input struct {
 	Infos     *Infos
 }
 
-// Data sample needed to read by an input
+// Samples is a sequence of data samples used by an input to read DDS data
 type Samples struct {
 	input *Input
 }
 
-// Info sample needed to read by an input
+// Infoss is a sequence of info samples used by an input to read DDS meta data
 type Infos struct {
 	input *Input
 }
@@ -147,6 +147,7 @@ func newInfos(input *Input) (infos *Infos) {
 * Public Functions *
 *******************/
 
+// NewConnector is a constructor of Connector
 func NewConnector(configName string, fileName string) (connector *Connector, err error) {
 	connector = new(Connector)
 
@@ -164,6 +165,7 @@ func NewConnector(configName string, fileName string) (connector *Connector, err
 	return connector, nil
 }
 
+// Delete is a destructor of Connector
 func (connector *Connector) Delete() (err error) {
 	if connector == nil {
 		err = errors.New("Connector is null")
@@ -184,6 +186,7 @@ func (connector *Connector) Delete() (err error) {
 	return nil
 }
 
+// GetOutput returns an output object
 func (connector *Connector) GetOutput(outputName string) (output *Output, err error) {
 	if connector == nil {
 		err = errors.New("Connector is null")
@@ -197,6 +200,7 @@ func (connector *Connector) GetOutput(outputName string) (output *Output, err er
 	return output, nil
 }
 
+// GetInput returns an input object
 func (connector *Connector) GetInput(inputName string) (input *Input, err error) {
 	if connector == nil {
 		err = errors.New("Connector is null")
@@ -210,6 +214,7 @@ func (connector *Connector) GetInput(inputName string) (input *Input, err error)
 	return input, nil
 }
 
+// Wait is a function to block until data is available on an input
 func (connector *Connector) Wait(timeout_ms int) (err error) {
 	if connector == nil {
 		err = errors.New("Connector is null")
@@ -227,6 +232,7 @@ func (connector *Connector) Wait(timeout_ms int) (err error) {
 	return nil
 }
 
+// Write is a function to write a DDS data instance in an output
 func (output *Output) Write() error {
 	// The C function does not return errors. In the futurue, we will check erros this when supported in the C layer
 	// CON-24 (for more information)
@@ -234,6 +240,7 @@ func (output *Output) Write() error {
 	return nil
 }
 
+// ClearMembers is function to initialize a DDS data instance in an output
 func (output *Output) ClearMembers() error {
 	// The C function does not return errors. In the futurue, we will check erros when supported in C the C layer
 	C.RTIDDSConnector_clear(unsafe.Pointer(output.connector.native), output.nameCStr)
