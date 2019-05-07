@@ -1,6 +1,7 @@
 package rti
 
 import (
+	"github.com/rticommunity/rticonnextdds-connector-go/types"
 	"github.com/stretchr/testify/assert"
 	"math"
 	"path"
@@ -205,4 +206,26 @@ func TestDataFlow(t *testing.T) {
 	// Testing Wait TimeOut
 	err = connector.Wait(5)
 	assert.NotNil(t, err)
+}
+
+func TestJSON(t *testing.T) {
+	connector := newTestConnector()
+	defer connector.Delete()
+	input := newTestInput(connector)
+	output := newTestOutput(connector)
+
+	var output_test_data types.Test
+	output_test_data.St = "test"
+	output.Instance.Set(&output_test_data)
+	output.Write()
+
+	err := connector.Wait(-1)
+	assert.Nil(t, err)
+	input.Take()
+
+	var input_test_data types.Test
+	input.Samples.Get(0, &input_test_data)
+
+	assert.Equal(t, input_test_data.St, output_test_data.St)
+
 }

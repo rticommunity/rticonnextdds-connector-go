@@ -554,7 +554,7 @@ func (samples *Samples) GetBoolean(index int, fieldName string) bool {
 	value := int(C.RTIDDSConnector_getBooleanFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
 	if value != 0 {
 		return true
-	} 
+	}
 	return false
 }
 
