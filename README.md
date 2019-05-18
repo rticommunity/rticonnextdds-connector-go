@@ -4,20 +4,21 @@ rticonnextdds-connector-go
 [![Go Report Card](https://goreportcard.com/badge/github.com/rticommunity/rticonnextdds-connector-go)](https://goreportcard.com/report/github.com/rticommunity/rticonnextdds-connector-go)
 
 ### RTI Connector for Connext DDS
-RTI Connector for Connext DDS is a quick and easy way to access the power and
+*RTI Connector* for Connext DDS is a quick and easy way to access the power and
 functionality of [RTI Connext DDS](http://www.rti.com/products/index.html).
-It is based on [XML App Creation](https://community.rti.com/static/documentation/connext-dds/5.3.1/doc/manuals/connext_dds/xml_application_creation/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted.pdf) and Dynamic Data.
+It is based on [XML-Based Application Creation](https://community.rti.com/static/documentation/connext-dds/5.3.1/doc/manuals/connext_dds/xml_application_creation/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted.pdf) and Dynamic Data.
 
-RTI Connector was created by the RTI Research Group to quickly and easily develop demos
-and proof of concept. We think that it can be useful for anybody that needs
-a quick way to develop an application communicating over DDS databus. 
+*Connector* was created by the RTI Research Group to quickly and easily develop demos
+and proofs of concept. It can be useful for anybody that needs
+a quick way to develop an application communicating over the Connext Databus.
 Thanks to the binding with multiple programming languages, you can integrate
-with tons of other available technologies.
+with many other available technologies.
 
-The RTI Connector library is provided in binary form for selected architectures. Language bindings and examples are provided in source format.
+The *Connector* library is provided in binary form for [select architectures](https://github.com/rticommunity/rticonnextdds-connector/tree/master/lib). Language bindings and examples are provided in source format.
 
-For **Go Connector**, we leveraged [cgo](https://golang.org/cmd/cgo) to call our C library, but we try to hide
-that from you using a nice Go wrapper. We tested with Go v1.12, v1.11, v1.10 and v1.9.
+=======
+Go *Connector* leverages [cgo](https://golang.org/cmd/cgo) to call its C library;
+this detail is hidden in a Go wrapper. RTI tested with Go v.12, v1.11, v1.10, and v1.9.
 
 ### Getting started
 Be sure you have Go installed and set your go workspace ($GOPATH). Then run:
@@ -26,13 +27,13 @@ Be sure you have Go installed and set your go workspace ($GOPATH). Then run:
 $ go get github.com/rticommunity/rticonnextdds-connector-go
 ```
 
-Check out the Go Connector repository is cloned properly at the following location.
-$GOPATH/src/github.com/rticommunity/rticonnextdds-connector-go
+Check that the Go *Connector* repository is cloned properly at the following location:
+$GOPATH/src/github.com/rticommunity/rticonnextdds-connector-go.
 
-Then, take a look at [this document](examples/README.md) to build and run examples!
+Then take a look at [this document](examples/README.md) to build and run examples.
 
 ### Platform support
-We are building our library for few architectures only. Check them out [here](https://github.com/rticommunity/rticonnextdds-connector/tree/master/lib). If you need another architecture, please contact your RTI account manager or sales@rti.com.
+Go *Connector* builds its library for few [select architectures](https://github.com/rticommunity/rticonnextdds-connector/tree/master/lib). If you need another architecture, please contact your RTI account manager or sales@rti.com.
 
 If you want to check the version of the libraries you can run the following command:
 
@@ -41,17 +42,17 @@ strings librtiddsconnector.so | grep BUILD
 ```
 
 ### Threading model
-The RTI Connext DDS Connector Native API do not yet implement any mechanism for thread safety. Originally the Connector native code was built to work with RTI DDS Prototyper and Lua. That was a single threaded loop. We then introduced support for javascript, python, and Go. For now the responsibility of protecting calls to the Connector are left to the user. This may change in the future.
+The *Connector* Native API does not yet implement any mechanism for thread safety. Originally, the *Connector* native code was built to work with *RTI Prototyper* and Lua. That was a single-threaded loop. RTI then introduced support for JavaScript, Python, and Go. For now, you are responsible for protecting calls to *Connector*. Thread safety
+may be implemented in the future.
 
 ### Support
-This is an experimental RTI product. As such we do offer support through the [RTI Community Forum](https://community.rti.com/forums/technical-questions) where fellow users and RTI engineers can help you.
-We'd love your feedback.
+*Connector* is an experimental RTI product. If you have questions, use the [RTI Community Forum](https://community.rti.com/forums/technical-questions).
 
 ### Documentation
-We do not have much documentation yet. But we promise you: if you look at the
-examples you'll see that is very easy to use.
+The best way to get started with *Connector* is to look at the
+examples; you will see that it is very easy to use.
 
-For an overview of the API, check this [page](https://godoc.org/github.com/rticommunity/rticonnextdds-connector-go).
+See [an overview of the API](https://godoc.org/github.com/rticommunity/rticonnextdds-connector-go).
 
 ### License
 With the sole exception of the contents of the "examples" subdirectory, all use of this product is subject to the RTI Software License Agreement included at the top level of this repository. Files within the "examples" subdirectory are licensed as marked within the file.
