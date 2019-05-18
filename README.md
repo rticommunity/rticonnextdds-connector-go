@@ -16,7 +16,6 @@ with many other available technologies.
 
 The *Connector* library is provided in binary form for [select architectures](https://github.com/rticommunity/rticonnextdds-connector/tree/master/lib). Language bindings and examples are provided in source format.
 
-=======
 Go *Connector* leverages [cgo](https://golang.org/cmd/cgo) to call its C library;
 this detail is hidden in a Go wrapper. RTI tested with Go v.12, v1.11, v1.10, and v1.9.
 
