@@ -39,7 +39,7 @@ func main() {
 		numOfSamples := input.Samples.GetLength()
 		for j := 0; j < numOfSamples; j++ {
 			if input.Infos.IsValid(j) {
-				json, err := input.Samples.GetJson(j)
+				json, err := input.Samples.GetJSON(j)
 				if err != nil {
 					log.Println(err)
 				} else {

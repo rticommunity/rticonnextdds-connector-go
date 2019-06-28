@@ -11,10 +11,10 @@ import (
 
 // Helper functions
 func newTestConnector() (connector *Connector) {
-	_, cur_path, _, _ := runtime.Caller(0)
-	xml_path := path.Join(path.Dir(cur_path), "./test/xml/Test.xml")
-	participant_profile := "MyParticipantLibrary::Zero"
-	connector, _ = NewConnector(participant_profile, xml_path)
+	_, curPath, _, _ := runtime.Caller(0)
+	xmlPath := path.Join(path.Dir(curPath), "./test/xml/Test.xml")
+	participantProfile := "MyParticipantLibrary::Zero"
+	connector, _ = NewConnector(participantProfile, xmlPath)
 	return connector
 }
 
@@ -30,31 +30,31 @@ func newTestOutput(connector *Connector) (output *Output) {
 
 // Connector test
 func TestInvalidXMLPath(t *testing.T) {
-	participant_profile := "MyParticipantLibrary::Zero"
-	invalid_xml_path := "invalid/path/to/xml"
+	participantProfile := "MyParticipantLibrary::Zero"
+	invalidXMLPath := "invalid/path/to/xml"
 
-	connector, err := NewConnector(participant_profile, invalid_xml_path)
+	connector, err := NewConnector(participantProfile, invalidXMLPath)
 	assert.Nil(t, connector)
 	assert.NotNil(t, err)
 }
 
 func TestInvalidParticipantProfile(t *testing.T) {
-	_, cur_path, _, _ := runtime.Caller(0)
-	xml_path := path.Join(path.Dir(cur_path), "./test/xml/Test.xml")
-	invalid_participant_profile := "InvalidParticipantProfile"
+	_, curPath, _, _ := runtime.Caller(0)
+	xmlPath := path.Join(path.Dir(curPath), "./test/xml/Test.xml")
+	invalidParticipantProfile := "InvalidParticipantProfile"
 
-	connector, err := NewConnector(invalid_participant_profile, xml_path)
+	connector, err := NewConnector(invalidParticipantProfile, xmlPath)
 	assert.Nil(t, connector)
 	assert.NotNil(t, err)
 }
 
 func TestMultipleConnectorCreation(t *testing.T) {
-	_, cur_path, _, _ := runtime.Caller(0)
-	xml_path := path.Join(path.Dir(cur_path), "./test/xml/Test.xml")
-	participant_profile := "MyParticipantLibrary::Zero"
+	_, curPath, _, _ := runtime.Caller(0)
+	xmlPath := path.Join(path.Dir(curPath), "./test/xml/Test.xml")
+	participantProfile := "MyParticipantLibrary::Zero"
 	var connectors [5]*Connector
 	for i := 0; i < 5; i++ {
-		connectors[i], _ = NewConnector(participant_profile, xml_path)
+		connectors[i], _ = NewConnector(participantProfile, xmlPath)
 		assert.NotNil(t, connectors[i])
 	}
 
@@ -65,8 +65,8 @@ func TestMultipleConnectorCreation(t *testing.T) {
 }
 
 func TestConnectorDeletion(t *testing.T) {
-	var null_connector *Connector
-	err := null_connector.Delete()
+	var nullConnector *Connector
+	err := nullConnector.Delete()
 	assert.NotNil(t, err)
 }
 
@@ -91,11 +91,11 @@ func TestCreateDR(t *testing.T) {
 	assert.NotNil(t, input.Infos)
 	assert.Nil(t, err)
 
-	var null_connector *Connector
-	input, err = null_connector.GetInput(readerName)
+	var nullConnector *Connector
+	input, err = nullConnector.GetInput(readerName)
 	assert.Nil(t, input)
 	assert.NotNil(t, err)
-	err = null_connector.Wait(-1)
+	err = nullConnector.Wait(-1)
 	assert.NotNil(t, err)
 }
 
@@ -120,8 +120,8 @@ func TestCreateWriter(t *testing.T) {
 	assert.NotNil(t, output.Instance)
 	assert.Nil(t, err)
 
-	var null_connector *Connector
-	output, err = null_connector.GetOutput(writerName)
+	var nullConnector *Connector
+	output, err = nullConnector.GetOutput(writerName)
 	assert.Nil(t, output)
 	assert.NotNil(t, err)
 }
@@ -171,11 +171,11 @@ func TestDataFlow(t *testing.T) {
 	assert.Nil(t, err)
 	input.Take()
 
-	sample_length := input.Samples.GetLength()
-	assert.Equal(t, sample_length, 1)
+	sampleLength := input.Samples.GetLength()
+	assert.Equal(t, sampleLength, 1)
 
-	info_length := input.Infos.GetLength()
-	assert.Equal(t, info_length, 1)
+	infoLength := input.Infos.GetLength()
+	assert.Equal(t, infoLength, 1)
 
 	valid := input.Infos.IsValid(0)
 	assert.Equal(t, valid, true)
@@ -214,18 +214,18 @@ func TestJSON(t *testing.T) {
 	input := newTestInput(connector)
 	output := newTestOutput(connector)
 
-	var output_test_data types.Test
-	output_test_data.St = "test"
-	output.Instance.Set(&output_test_data)
+	var outputTestData types.Test
+	outputTestData.St = "test"
+	output.Instance.Set(&outputTestData)
 	output.Write()
 
 	err := connector.Wait(-1)
 	assert.Nil(t, err)
 	input.Take()
 
-	var input_test_data types.Test
-	input.Samples.Get(0, &input_test_data)
+	var inputTestData types.Test
+	input.Samples.Get(0, &inputTestData)
 
-	assert.Equal(t, input_test_data.St, output_test_data.St)
+	assert.Equal(t, inputTestData.St, outputTestData.St)
 
 }

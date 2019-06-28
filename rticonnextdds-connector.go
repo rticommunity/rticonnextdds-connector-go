@@ -234,19 +234,20 @@ func (connector *Connector) Wait(timeoutMs int) (err error) {
 
 // Write is a function to write a DDS data instance in an output
 func (output *Output) Write() error {
-	// The C function does not return errors. In the futurue, we will check erros this when supported in the C layer
+	// The C function does not return errors. In the future, we will check errors when supported in the C layer
 	// CON-24 (for more information)
 	C.RTIDDSConnector_write(unsafe.Pointer(output.connector.native), output.nameCStr, nil)
 	return nil
 }
 
-// ClearMembers is function to initialize a DDS data instance in an output
+// ClearMembers is a function to initialize a DDS data instance in an output
 func (output *Output) ClearMembers() error {
-	// The C function does not return errors. In the futurue, we will check erros when supported in C the C layer
+	// The C function does not return errors. In the future, we will check errors when supported in the C layer
 	C.RTIDDSConnector_clear(unsafe.Pointer(output.connector.native), output.nameCStr)
 	return nil
 }
 
+// SetUint8 is a function to set a value of type uint8 into samples
 func (instance *Instance) SetUint8(fieldName string, value uint8) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -255,6 +256,7 @@ func (instance *Instance) SetUint8(fieldName string, value uint8) error {
 	return nil
 }
 
+// SetUint16 is a function to set a value of type uint16 into samples
 func (instance *Instance) SetUint16(fieldName string, value uint16) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -263,6 +265,7 @@ func (instance *Instance) SetUint16(fieldName string, value uint16) error {
 	return nil
 }
 
+// SetUint32 is a function to set a value of type uint32 into samples
 func (instance *Instance) SetUint32(fieldName string, value uint32) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -271,6 +274,7 @@ func (instance *Instance) SetUint32(fieldName string, value uint32) error {
 	return nil
 }
 
+// SetUint64 is a function to set a value of type uint64 into samples
 func (instance *Instance) SetUint64(fieldName string, value uint64) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -279,6 +283,7 @@ func (instance *Instance) SetUint64(fieldName string, value uint64) error {
 	return nil
 }
 
+// SetInt8 is a function to set a value of type int8 into samples
 func (instance *Instance) SetInt8(fieldName string, value int8) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -287,6 +292,7 @@ func (instance *Instance) SetInt8(fieldName string, value int8) error {
 	return nil
 }
 
+// SetInt16 is a function to set a value of type int16 into samples
 func (instance *Instance) SetInt16(fieldName string, value int16) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -295,6 +301,7 @@ func (instance *Instance) SetInt16(fieldName string, value int16) error {
 	return nil
 }
 
+// SetInt32 is a function to set a value of type int32 into samples
 func (instance *Instance) SetInt32(fieldName string, value int32) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -303,6 +310,7 @@ func (instance *Instance) SetInt32(fieldName string, value int32) error {
 	return nil
 }
 
+// SetInt64 is a function to set a value of type int64 into samples
 func (instance *Instance) SetInt64(fieldName string, value int64) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -311,6 +319,7 @@ func (instance *Instance) SetInt64(fieldName string, value int64) error {
 	return nil
 }
 
+// SetUint is a function to set a value of type uint into samples
 func (instance *Instance) SetUint(fieldName string, value uint) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -319,6 +328,7 @@ func (instance *Instance) SetUint(fieldName string, value uint) error {
 	return nil
 }
 
+// SetInt is a function to set a value of type int into samples
 func (instance *Instance) SetInt(fieldName string, value int) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -327,6 +337,7 @@ func (instance *Instance) SetInt(fieldName string, value int) error {
 	return nil
 }
 
+// SetFloat32 is a function to set a value of type float32 into samples
 func (instance *Instance) SetFloat32(fieldName string, value float32) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -335,6 +346,7 @@ func (instance *Instance) SetFloat32(fieldName string, value float32) error {
 	return nil
 }
 
+// SetFloat64 is a function to set a value of type float64 into samples
 func (instance *Instance) SetFloat64(fieldName string, value float64) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -343,6 +355,7 @@ func (instance *Instance) SetFloat64(fieldName string, value float64) error {
 	return nil
 }
 
+// SetString is a function that set a string to a fieldname of the samples
 func (instance *Instance) SetString(fieldName string, value string) error {
 
 	fieldNameCStr := C.CString(fieldName)
@@ -356,6 +369,7 @@ func (instance *Instance) SetString(fieldName string, value string) error {
 	return nil
 }
 
+// SetByte is a function to set a byte to a fieldname of the samples
 func (instance *Instance) SetByte(fieldName string, value byte) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -364,6 +378,7 @@ func (instance *Instance) SetByte(fieldName string, value byte) error {
 	return nil
 }
 
+// SetRune is a function to set rune to a fieldname of the samples
 func (instance *Instance) SetRune(fieldName string, value rune) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -372,21 +387,23 @@ func (instance *Instance) SetRune(fieldName string, value rune) error {
 	return nil
 }
 
+// SetBoolean is a function to set boolean to a fieldname of the samples
 func (instance *Instance) SetBoolean(fieldName string, value bool) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	var int_value int
+	var intValue int
 	if value == true {
-		int_value = 1
+		intValue = 1
 	} else {
-		int_value = 0
+		intValue = 0
 	}
-	C.RTIDDSConnector_setBooleanIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.int(int_value))
+	C.RTIDDSConnector_setBooleanIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.int(intValue))
 	return nil
 }
 
-func (instance *Instance) SetJson(json []byte) error {
+// SetJSON is a function to set JSON string in the form of slice of bytes into Instance
+func (instance *Instance) SetJSON(json []byte) error {
 	jsonCStr := C.CString(string(json))
 	defer C.free(unsafe.Pointer(jsonCStr))
 
@@ -394,14 +411,16 @@ func (instance *Instance) SetJson(json []byte) error {
 	return nil
 }
 
-// TODO - think about a new name for this function (e.g. SetType, SetFromType, FromType)
+// Set is a function that consumes an interface
+// of multiple samples with different types and value
+// TODO - think about a new name for this a function (e.g. SetType, SetFromType, FromType)
 func (instance *Instance) Set(v interface{}) (err error) {
 	jsonData, err := json.Marshal(v)
 	if err != nil {
 		return err
 	}
 
-	err = instance.SetJson(jsonData)
+	err = instance.SetJSON(jsonData)
 	if err != nil {
 		return err
 	}
@@ -409,32 +428,36 @@ func (instance *Instance) Set(v interface{}) (err error) {
 	return nil
 }
 
+// Read is a function to initialize to read the DDS messages
 func (input *Input) Read() (err error) {
 	if input == nil {
 		err = errors.New("Input is null")
 		return err
 	}
 
-	// The C function does not return errors. In the futurue, we will update this when supported in the C layer
+	// The C function does not return errors. In the future, we will update this when supported in the C layer
 	C.RTIDDSConnector_read(unsafe.Pointer(input.connector.native), input.nameCStr)
 	return nil
 }
 
+// Take is a function to initialize to read and take the DDS messages
 func (input *Input) Take() (err error) {
 	if input == nil {
 		err = errors.New("Input is null")
 		return err
 	}
-	// The C function does not return errors. In the futurue, we will update this when supported in the C layer
+	// The C function does not return errors. In the future, we will update this when supported in the C layer
 	C.RTIDDSConnector_take(unsafe.Pointer(input.connector.native), input.nameCStr)
 	return nil
 }
 
+// GetLength is a function to get the number of samples
 func (samples *Samples) GetLength() (length int) {
 	length = int(C.RTIDDSConnector_getSamplesLength(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr))
 	return length
 }
 
+// GetUint8 is a function to retrieve a value of type uint8 from the samples
 func (samples *Samples) GetUint8(index int, fieldName string) (value uint8) {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -443,6 +466,7 @@ func (samples *Samples) GetUint8(index int, fieldName string) (value uint8) {
 	return value
 }
 
+// GetUint16 is a function to retrieve a value of type uint16 from the samples
 func (samples *Samples) GetUint16(index int, fieldName string) (value uint16) {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -451,6 +475,7 @@ func (samples *Samples) GetUint16(index int, fieldName string) (value uint16) {
 	return value
 }
 
+// GetUint32 is a function to retrieve a value of type uint32 from the samples
 func (samples *Samples) GetUint32(index int, fieldName string) (value uint32) {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -459,6 +484,7 @@ func (samples *Samples) GetUint32(index int, fieldName string) (value uint32) {
 	return value
 }
 
+// GetUint64 is a function to retrieve a value of type uint64 from the samples
 func (samples *Samples) GetUint64(index int, fieldName string) (value uint64) {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -467,6 +493,7 @@ func (samples *Samples) GetUint64(index int, fieldName string) (value uint64) {
 	return value
 }
 
+// GetInt8 is a function to retrieve a value of type int8 from the samples
 func (samples *Samples) GetInt8(index int, fieldName string) (value int8) {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -475,6 +502,7 @@ func (samples *Samples) GetInt8(index int, fieldName string) (value int8) {
 	return value
 }
 
+// GetInt16 is a function to retrieve a value of type int16 from the samples
 func (samples *Samples) GetInt16(index int, fieldName string) (value int16) {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -483,6 +511,7 @@ func (samples *Samples) GetInt16(index int, fieldName string) (value int16) {
 	return value
 }
 
+// GetInt32 is a function to retrieve a value of type int32 from the samples
 func (samples *Samples) GetInt32(index int, fieldName string) (value int32) {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -491,6 +520,7 @@ func (samples *Samples) GetInt32(index int, fieldName string) (value int32) {
 	return value
 }
 
+// GetInt64 is a function to retrieve a value of type int64 from the samples
 func (samples *Samples) GetInt64(index int, fieldName string) (value int64) {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -499,6 +529,7 @@ func (samples *Samples) GetInt64(index int, fieldName string) (value int64) {
 	return value
 }
 
+// GetFloat32 is a function to retrieve a value of type float32 from the samples
 func (samples *Samples) GetFloat32(index int, fieldName string) (value float32) {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -507,6 +538,7 @@ func (samples *Samples) GetFloat32(index int, fieldName string) (value float32) 
 	return value
 }
 
+// GetFloat64 is a function to retrieve a value of type float64 from the samples
 func (samples *Samples) GetFloat64(index int, fieldName string) (value float64) {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -515,6 +547,7 @@ func (samples *Samples) GetFloat64(index int, fieldName string) (value float64) 
 	return value
 }
 
+// GetInt is a function to retrieve a value of type int from the samples
 func (samples *Samples) GetInt(index int, fieldName string) (value int) {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -523,6 +556,7 @@ func (samples *Samples) GetInt(index int, fieldName string) (value int) {
 	return value
 }
 
+// GetUint is a function to retrieve a value of type uint from the samples
 func (samples *Samples) GetUint(index int, fieldName string) (value uint) {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -531,6 +565,7 @@ func (samples *Samples) GetUint(index int, fieldName string) (value uint) {
 	return value
 }
 
+// GetByte is a function to retrieve a value of type byte from the samples
 func (samples *Samples) GetByte(index int, fieldName string) (value byte) {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -539,6 +574,7 @@ func (samples *Samples) GetByte(index int, fieldName string) (value byte) {
 	return value
 }
 
+// GetRune is a function to retrieve a value of type rune from the samples
 func (samples *Samples) GetRune(index int, fieldName string) (value rune) {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -547,6 +583,7 @@ func (samples *Samples) GetRune(index int, fieldName string) (value rune) {
 	return value
 }
 
+// GetBoolean is a function to retrieve a value of type boolean from the samples
 func (samples *Samples) GetBoolean(index int, fieldName string) bool {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -558,6 +595,7 @@ func (samples *Samples) GetBoolean(index int, fieldName string) bool {
 	return false
 }
 
+// GetString is a function to retrieve a value of type string from the samples
 func (samples *Samples) GetString(index int, fieldName string) (value string) {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
@@ -566,7 +604,8 @@ func (samples *Samples) GetString(index int, fieldName string) (value string) {
 	return value
 }
 
-func (samples *Samples) GetJson(index int) (json []byte, e error) {
+// GetJSON is a function to retrieve a slice of bytes of a JSON string from the samples
+func (samples *Samples) GetJSON(index int) (json []byte, e error) {
 	jsonCStr := C.RTIDDSConnector_getJSONSample(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1))
 	defer C.RTIDDSConnector_freeString((*C.char)(jsonCStr))
 
@@ -575,8 +614,10 @@ func (samples *Samples) GetJson(index int) (json []byte, e error) {
 	return json, e
 }
 
+// Get is a function to retrieve all the information
+// of the samples and put it into an interface
 func (samples *Samples) Get(index int, v interface{}) (e error) {
-	jsonData, e := samples.GetJson(index)
+	jsonData, e := samples.GetJSON(index)
 	if e != nil {
 		return e
 	}
@@ -589,6 +630,7 @@ func (samples *Samples) Get(index int, v interface{}) (e error) {
 	return e
 }
 
+// IsValid is a function to check validity of the element and return a boolean
 func (infos *Infos) IsValid(index int) (valid bool) {
 	memberNameCStr := C.CString("valid_data")
 	defer C.free(unsafe.Pointer(memberNameCStr))
@@ -601,6 +643,7 @@ func (infos *Infos) IsValid(index int) (valid bool) {
 	return valid
 }
 
+// GetLength is a function to return the length of the
 func (infos *Infos) GetLength() (length int) {
 	length = int(C.RTIDDSConnector_getInfosLength(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr))
 	return length
