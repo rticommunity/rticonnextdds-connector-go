@@ -428,7 +428,9 @@ func (instance *Instance) Set(v interface{}) (err error) {
 	return nil
 }
 
-// Read is a function to initialize to read the DDS messages
+// Read is a function to read DDS samples from the DDS DataReader 
+// and allow access them via the Connector Samples. The Read function 
+// does not remove DDS samples from the DDS DataReader's receive queue.
 func (input *Input) Read() (err error) {
 	if input == nil {
 		err = errors.New("Input is null")
@@ -440,7 +442,9 @@ func (input *Input) Read() (err error) {
 	return nil
 }
 
-// Take is a function to initialize to read and take the DDS messages
+// Take is a function to take DDS samples from the DDS DataReader 
+// and allow access them via the Connector Samples. The Take 
+// function removes DDS samples from the DDS DataReader's receive queue.
 func (input *Input) Take() (err error) {
 	if input == nil {
 		err = errors.New("Input is null")
