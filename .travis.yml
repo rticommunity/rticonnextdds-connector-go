@@ -1,5 +1,16 @@
 language: go
 
+os:
+  - linux
+  - osx
+
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+    - os: linux
+      dist: xenial
+
 go:
   - "1.9.x"
   - "1.10.x"
