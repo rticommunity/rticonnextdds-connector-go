@@ -2,6 +2,8 @@ language: go
 
 os:
   - linux
+  
+compiler: gcc
 
 matrix:
   include:
