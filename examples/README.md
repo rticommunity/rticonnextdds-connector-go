@@ -59,7 +59,7 @@ output.Write();
 ```
 
 #### Setting the fields in a sample instance:
-The content of an instance can be set using a dictionary that matches the original type, or field by field:
+The content of an instance can be set using a Go type that matches the original DDS type, or field by field:
 
 * **Using a Go type with JSON encoding**:
 
