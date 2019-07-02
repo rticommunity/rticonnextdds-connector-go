@@ -61,7 +61,7 @@ This software is an experimental (aka "pre-production") product. The Software is
 ### Contributing
 Contributions to the code, examples, documentation are really appreciated. Please follow the steps below for contributions. 
 
-1. [Sign the CLA](CONTRIBUTING).
+1. [Sign the CLA](CONTRIBUTING.md).
 1. Create a fork and make your changes.
 1. Run tests (use [run_test.sh](run_test.sh)).
 1. Push your branch.
