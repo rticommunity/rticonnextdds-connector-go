@@ -20,6 +20,9 @@ go:
 
 before_install:
   - go get -v github.com/stretchr/testify
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+      brew install git-lfs
+    fi
 
 script:
   - cd $TRAVIS_BUILD_DIR; bash run_test.sh
