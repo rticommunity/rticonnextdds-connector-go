@@ -1,39 +1,33 @@
 RTI Connext Go Connector Examples
 ========
 
-### Installation and Platform support
-Check [here](https://github.com/rticommunity/rticonnextdds-connector-go#getting-started-with-go) for installation and [here](https://github.com/rticommunity/rticonnextdds-connector#platform-support) for platform support.
-
-If you still have any issue, please leave your question at [RTI Community Forum](https://community.rti.com/forums/technical-questions)
-
 ### Building and running examples
 ``` bash
 $ go build $GOPATH/src/github.com/rticommunity/rticonnextdds-connector-go/examples/simple_reader/reader.go
 ```
 After the go build command, you can find an executable for reader at your current path. 
-Currently, Go Connector links to DDS library dynamically so the path to the dynamic library needs to be added to your library path. 
-
+Currently, the Go Connector links to the Connector C library dynamically so the path to the dynamic library needs to be added to your library path. 
 ``` bash
 $ export LD_LIBRARY_PATH=$GOPATH/src/github.com/rticommunity/rticonnextdds-connector-go/rticonnextdds-connector/lib/x64Linux2.6gcc4.4.5:$LD_LIBRARY_PATH
 $ ./reader
 ```
 
-### API Overview
+### Example Overview
 #### Import the Connector library
-If you want to use the RTI Connext Go Connector, you have to import the package.
+If you want to use the Go Connector, you have to import the package.
 
 ```go
-import "github.com/kyoungho/rticonnextdds-connector"
+import "github.com/rticommunity/rticonnextdds-connector"
 ```
 
 #### Instantiate a new connector
-To create a new connector you have to pass a location of an XML configuration file and a configuration name in XML. For more information on the XML format check the [XML App Creation guide](https://community.rti.com/static/documentation/connext-dds/5.3.1/doc/manuals/connext_dds/xml_application_creation/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted.pdf) or take a look at the [ShapeExample.xml](ShapeExample.xml) file included in this directory.  
+To create a new connector you have to pass a location of an XML configuration file and a configuration name in XML. For more information on the XML format check the [XML App Creation guide](https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/xml_application_creation/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted.pdf) or take a look at the [ShapeExample.xml](ShapeExample.xml).
 
 ```go
 connector, err := rti.NewConnector("MyParticipantLibrary::Zero", filepath)
 ```
 #### Delete a connector
-To destroy all the DDS entities created by a connector, you should call the ```Delete``` function.
+To destroy all the DDS entities created by a connector, you should call the `Delete()`.
 
 ```go
 connector, err := rti.NewConnector("MyParticipantLibrary::Zero", filepath)
@@ -67,7 +61,7 @@ output.Write();
 #### Setting the fields in a sample instance:
 The content of an instance can be set using a dictionary that matches the original type, or field by field:
 
-* **Using a Go type object via JSON encoding**:
+* **Using a Go type with JSON encoding**:
 
 ```go
 // Define a Go type for shape data
@@ -91,10 +85,9 @@ output.Instance.Set(&shape)
 output.Instance.SetInt("y", 2);
 ```
 
-Nested fields can be accessed with the dot notation: `"x.y.z"`, and array or sequences with square brakets: `"x.y[1].z"`. For more info on how to access fields, check Section 6.4 'Data Access API' of the
-[RTI Prototyper Getting Started Guide](https://community.rti.com/rti-doc/510/ndds.5.1.0/doc/pdf/RTI_CoreLibrariesAndUtilities_Prototyper_GettingStarted.pdf)
+Nested fields can be accessed with the dot notation: `"x.y.z"`, and array or sequences with square brakets: `"x.y[1].z"`. 
 
-#### reading/taking data
+#### Reading/taking samples
 To read/take samples first you have to get a reference to the input port:
 
 ```go
@@ -113,7 +106,10 @@ input.Read();
 input.Take();
 ```
 
-The read or take operation can return multiple samples. So we have to iterate on an array:
+ * **Field by field**:
+You can access each field individually like the example below. 
+A `Read()` or `Take()` can return multiple samples. They are stored in an array. 
+Every time you try to access a specific sample you have to specify an index (j in the example below).
 
 ```go
 input.Take()
@@ -133,12 +129,8 @@ for j := 0; j < numOfSamples; j++ {
 }
 ```
 
-#### accessing samples fields after a read/take
-A `read()` or `take()` operation can return multiple samples. They are stored in an array. Every time you try to access a specific sample you have to specify an index (j in the example below).
-
-You can access the date by getting a copy in a deserialized Go type object or you can access each field individually like the example above:
-
- * **Using a Go type object via JSON decoding**:
+ * **Using a Go type with JSON decoding**:
+You can access sample data in a deserialized Go type object.  
 
 ```go
 // Define a Go type for shape data
