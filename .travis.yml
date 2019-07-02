@@ -23,6 +23,11 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
       brew install git-lfs
     fi
+    
+before_script:
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+      git lfs pull
+    fi
 
 script:
   - cd $TRAVIS_BUILD_DIR; bash run_test.sh
