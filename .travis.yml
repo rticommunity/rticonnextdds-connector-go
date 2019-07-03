@@ -2,6 +2,7 @@ language: go
 
 os:
   - linux
+  - osx
   
 compiler: gcc
 
@@ -9,8 +10,6 @@ matrix:
   include:
     - os: linux
       dist: xenial
-    - os: osx
-      osx_image: xcode8
 
 go:
   - "1.9.x"
