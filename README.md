@@ -20,7 +20,7 @@ Go *Connector* leverages [cgo](https://golang.org/cmd/cgo) to call its C library
 this detail is hidden in a Go wrapper. 
 
 ### Getting started
-RTI Go Connector requires Git Large File Storage (LFS) to check out the Connector C library properly. 
+RTI Go Connector requires [Git LFS](https://github.com/git-lfs/git-lfs/wiki/Installation) to check out the Connector C library properly. 
 
 Be sure you have golang installed (we tested with golang v1.9 above). 
 
