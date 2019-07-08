@@ -17,7 +17,6 @@ go:
   - "1.12.x"
 
 before_install:
-  - go get -v github.com/stretchr/testify
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install git-lfs; fi
     
 before_script:
