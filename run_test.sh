@@ -1,7 +1,7 @@
 #!/bin/bash
 
 go get -v github.com/stretchr/testify
-go get -v github.com/golangci/golangci-lint/cmd/golangci-lint
+curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.17.1
 
 golangci-lint run
 
