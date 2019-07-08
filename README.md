@@ -50,7 +50,7 @@ The *Connector* Native API does not yet implement any mechanism for thread safet
 may be implemented in the future.
 
 ### Support
-*Connector* is an experimental RTI product. If you have questions, use the [RTI Community Forum](https://community.rti.com/forums/technical-questions) or create an [issue](https://github.com/rticommunity/rticonnextdds-connector-go/issues).
+*Connector* is an experimental RTI product. If you have questions, please use the [RTI Community Forum](https://community.rti.com/forums/technical-questions). If you would like to report a bug or have a feature request, please create an [issue](https://github.com/rticommunity/rticonnextdds-connector-go/issues).
 
 ### Documentation
 The best way to get started with *Connector* is to look at the
