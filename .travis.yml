@@ -21,9 +21,11 @@ before_install:
     
 before_script:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then git lfs pull; fi
+  - go get -v github.com/golangci/golangci-lint/cmd/golangci-lint
 
 script:
   - cd $TRAVIS_BUILD_DIR; bash run_test.sh
 
 after_success:
+  - golangci-lint run
   - bash <(curl -s https://codecov.io/bash)
