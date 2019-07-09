@@ -149,10 +149,10 @@ func newInfos(input *Input) (infos *Infos) {
 
 // NewConnector is a constructor of Connector
 // url is the location of XML documents in URL format. For example:
-// File specification: file:///usr/local/default_dds.xml
-// String specification: str://"<dds><qos_library>…</qos_library></dds>"
+//  File specification: file:///usr/local/default_dds.xml
+//  String specification: str://"<dds><qos_library>…</qos_library></dds>"
 // If you omit the URL schema name, Connector will assume a file name. For example:
-// File Specification: /usr/local/default_dds.xml
+//  File Specification: /usr/local/default_dds.xml
 func NewConnector(configName string, url string) (connector *Connector, err error) {
 	connector = new(Connector)
 
