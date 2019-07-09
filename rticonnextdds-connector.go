@@ -148,15 +148,20 @@ func newInfos(input *Input) (infos *Infos) {
 *******************/
 
 // NewConnector is a constructor of Connector
-func NewConnector(configName string, fileName string) (connector *Connector, err error) {
+// url is the location of XML documents in URL format. For example:
+// File specification: file:///usr/local/default_dds.xml
+// String specification: str://"<dds><qos_library>…</qos_library></dds>"
+// If you omit the URL schema name, Connector will assume a file name. For example:
+// File Specification: /usr/local/default_dds.xml
+func NewConnector(configName string, url string) (connector *Connector, err error) {
 	connector = new(Connector)
 
 	configNameCStr := C.CString(configName)
 	defer C.free(unsafe.Pointer(configNameCStr))
-	fileNameCStr := C.CString(fileName)
-	defer C.free(unsafe.Pointer(fileNameCStr))
+	urlCStr := C.CString(url)
+	defer C.free(unsafe.Pointer(urlCStr))
 
-	connector.native = C.RTIDDSConnector_new(configNameCStr, fileNameCStr, nil)
+	connector.native = C.RTIDDSConnector_new(configNameCStr, urlCStr, nil)
 	if connector.native == nil {
 		err = errors.New("Invalid participant profile, xml path or xml profile")
 		return nil, err
@@ -428,8 +433,8 @@ func (instance *Instance) Set(v interface{}) (err error) {
 	return nil
 }
 
-// Read is a function to read DDS samples from the DDS DataReader 
-// and allow access them via the Connector Samples. The Read function 
+// Read is a function to read DDS samples from the DDS DataReader
+// and allow access them via the Connector Samples. The Read function
 // does not remove DDS samples from the DDS DataReader's receive queue.
 func (input *Input) Read() (err error) {
 	if input == nil {
@@ -442,8 +447,8 @@ func (input *Input) Read() (err error) {
 	return nil
 }
 
-// Take is a function to take DDS samples from the DDS DataReader 
-// and allow access them via the Connector Samples. The Take 
+// Take is a function to take DDS samples from the DDS DataReader
+// and allow access them via the Connector Samples. The Take
 // function removes DDS samples from the DDS DataReader's receive queue.
 func (input *Input) Take() (err error) {
 	if input == nil {
