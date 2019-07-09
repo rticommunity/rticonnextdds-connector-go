@@ -147,7 +147,8 @@ func newInfos(input *Input) (infos *Infos) {
 * Public Functions *
 *******************/
 
-// NewConnector is a constructor of Connector
+// NewConnector is a constructor of Connector.
+//
 // url is the location of XML documents in URL format. For example:
 //  File specification: file:///usr/local/default_dds.xml
 //  String specification: str://"<dds><qos_library>…</qos_library></dds>"
