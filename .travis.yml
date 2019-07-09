@@ -21,8 +21,10 @@ before_install:
     
 before_script:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then git lfs pull; fi
+  - if [ "$TRAVIS_OS_VERSION" == "1.12.x"]; then curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.17.1; fi
 
 script:
+  - if [ "$TRAVIS_OS_VERSION" == "1.12.x"]; then golangci-lint run; fi
   - cd $TRAVIS_BUILD_DIR; bash run_test.sh
 
 after_success:
