@@ -1,6 +1,6 @@
 package types
 
-// Data type for testing
+// Test is the struct for testing
 type Test struct {
 	St  string  `json:"st"`
 	B   bool    `json:"b"`
