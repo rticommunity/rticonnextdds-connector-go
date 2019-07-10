@@ -399,7 +399,7 @@ func (instance *Instance) SetBoolean(fieldName string, value bool) error {
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
 	var intValue int
-	if value == true {
+	if value {
 		intValue = 1
 	} else {
 		intValue = 0
@@ -599,10 +599,7 @@ func (samples *Samples) GetBoolean(index int, fieldName string) bool {
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
 	value := int(C.RTIDDSConnector_getBooleanFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
-	if value != 0 {
-		return true
-	}
-	return false
+	return value != 0
 }
 
 // GetString is a function to retrieve a value of type string from the samples
