@@ -71,6 +71,8 @@ type Infos struct {
 	input *Input
 }
 
+type SampleHandler func(samples *Samples, infos *Infos)
+
 /********************
 * Private Functions *
 ********************/
@@ -458,6 +460,24 @@ func (input *Input) Take() (err error) {
 	}
 	// The C function does not return errors. In the future, we will update this when supported in the C layer
 	C.RTIDDSConnector_take(unsafe.Pointer(input.connector.native), input.nameCStr)
+	return nil
+}
+
+func (input *Input) AsyncTake(cb SampleHandler) (err error) {
+	if input == nil {
+		err = errors.New("Input is null")
+		return err
+	}
+
+	//input.mu.Lock()
+	//defer input.mu.Unlock()
+	go func() {
+		for {
+			input.connector.Wait(-1)
+			input.Take()
+			cb(input.Samples, input.Infos)
+		}
+	}()
 	return nil
 }
 
