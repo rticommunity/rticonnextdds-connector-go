@@ -463,12 +463,11 @@ func (input *Input) Take() (err error) {
 	return nil
 }
 
-func (input *Input) AsyncTake(cb SampleHandler) (err error) {
+func (input *Input) AsyncSubscribe(cb SampleHandler) (err error) {
 	if input == nil {
 		err = errors.New("Input is null")
 		return err
 	}
-
 	//input.mu.Lock()
 	//defer input.mu.Unlock()
 	go func() {
@@ -476,6 +475,23 @@ func (input *Input) AsyncTake(cb SampleHandler) (err error) {
 			input.connector.Wait(-1)
 			input.Take()
 			cb(input.Samples, input.Infos)
+		}
+	}()
+	return nil
+}
+
+func (input *Input) ChannelSubscribe(samples chan *Samples) (err error) {
+	if input == nil {
+		err = errors.New("Input is null")
+		return err
+	}
+	//input.mu.Lock()
+	//defer input.mu.Unlock()
+	go func() {
+		for {
+			input.connector.Wait(-1)
+			input.Take()
+			samples <- input.Samples
 		}
 	}()
 	return nil

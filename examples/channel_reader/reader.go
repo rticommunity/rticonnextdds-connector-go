@@ -46,15 +46,8 @@ func main() {
 		log.Panic(err)
 	}
 
-	input.AsyncSubscribe(func(samples *rti.Samples, infos *rti.Infos) {
-		numOfSamples := samples.GetLength()
-		for i := 0; i < numOfSamples; i++ {
-			if infos.IsValid(i) {
-				json, _ := samples.GetJSON(i)
-				log.Printf("---Received Sample---\n, %s", json)
-			}
-		}
-	})
+	ch := make(chan *rti.Samples, 100)
+	input.ChannelSubscribe(ch)
 
 	run := true
 
@@ -64,6 +57,14 @@ func main() {
 		case sig := <-sigchan:
 			log.Printf("Received signal %v: terminating\n", sig)
 			run = false
+		case samples := <-ch:
+			numOfSamples := samples.GetLength()
+			for i := 0; i < numOfSamples; i++ {
+				//if infos.IsValid(i) {
+				json, _ := samples.GetJSON(i)
+				log.Printf("---Received Sample---\n, %s", json)
+				//}
+			}
 		}
 	}
 }
