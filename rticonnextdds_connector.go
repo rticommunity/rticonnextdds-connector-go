@@ -71,6 +71,8 @@ type Infos struct {
 	input *Input
 }
 
+type SampleHandler func(samples *Samples, infos *Infos)
+
 /********************
 * Private Functions *
 ********************/
@@ -458,6 +460,46 @@ func (input *Input) Take() (err error) {
 	}
 	// The C function does not return errors. In the future, we will update this when supported in the C layer
 	C.RTIDDSConnector_take(unsafe.Pointer(input.connector.native), input.nameCStr)
+	return nil
+}
+
+// AsyncSubscribe is a function to subscribe DDS samples in an asynchronous way.
+// Internllay, it takes DDS samples from the DDS DataReader when they arrive.
+// Then, it invokes the callback function (cb SampleHandler) that will handle received samples.
+func (input *Input) AsyncSubscribe(cb SampleHandler) (err error) {
+	if input == nil {
+		err = errors.New("Input is null")
+		return err
+	}
+	//input.mu.Lock()
+	//defer input.mu.Unlock()
+	go func() {
+		for {
+			input.connector.Wait(-1)
+			input.Take()
+			cb(input.Samples, input.Infos)
+		}
+	}()
+	return nil
+}
+
+// ChannleSubscribe is a function to subscribe DDS samples with a Go channel.
+// Internally, it taks DDS samples from the DDS DataReader when they arrive.
+// Then, it sends arrived DDS samples to the channel (samples chan *Samples).
+func (input *Input) ChannelSubscribe(samples chan *Samples) (err error) {
+	if input == nil {
+		err = errors.New("Input is null")
+		return err
+	}
+	//input.mu.Lock()
+	//defer input.mu.Unlock()
+	go func() {
+		for {
+			input.connector.Wait(-1)
+			input.Take()
+			samples <- input.Samples
+		}
+	}()
 	return nil
 }
 
