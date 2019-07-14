@@ -1,6 +1,8 @@
 package rti
 
 import (
+	"fmt"
+	"github.com/rticommunity/rticonnextdds-connector-go/types"
 	"path"
 	"runtime"
 )
@@ -41,4 +43,85 @@ func ExampleConnector_GetOutput() {
 		// Handle an error
 	}
 	// Output:
+}
+
+func ExampleInput_AsyncSubscribe() {
+	connector := newTestConnector()
+	defer connector.Delete()
+	input := newTestInput(connector)
+	output := newTestOutput(connector)
+	done := make(chan bool)
+
+	var outputTestData types.Test
+	outputTestData.St = "test"
+	output.Instance.Set(&outputTestData)
+	output.Write()
+
+	input.AsyncSubscribe(func(samples *Samples, infos *Infos) {
+		numOfSamples := samples.GetLength()
+		for i := 0; i < numOfSamples; i++ {
+			if infos.IsValid(i) {
+				json, _ := samples.GetJSON(i)
+				fmt.Printf("---Received Sample---\n%s", json)
+				done <- true
+			}
+		}
+	})
+
+	<-done
+	// Output:
+	//  ---Received Sample---
+	//{
+	//"st":"test",
+	//"b":false,
+	//"c":0,
+	//"s":0,
+	//"us":0,
+	//"l":0,
+	//"ul":0,
+	//"ll":0,
+	//"ull":0,
+	//"f":0,
+	//"d":0
+	//}
+}
+
+func ExampleInput_ChannelSubscribe() {
+	connector := newTestConnector()
+	defer connector.Delete()
+	input := newTestInput(connector)
+	output := newTestOutput(connector)
+
+	ch := make(chan *Samples)
+	input.ChannelSubscribe(ch)
+
+	var outputTestData types.Test
+	outputTestData.St = "test"
+	output.Instance.Set(&outputTestData)
+	output.Write()
+
+	for {
+		samples := <-ch
+		numOfSamples := samples.GetLength()
+		for i := 0; i < numOfSamples; i++ {
+			json, _ := samples.GetJSON(i)
+			fmt.Printf("---Received Sample---\n%s", json)
+			return
+		}
+	}
+	// Output:
+	//  ---Received Sample---
+	//{
+	//"st":"test",
+	//"b":false,
+	//"c":0,
+	//"s":0,
+	//"us":0,
+	//"l":0,
+	//"ul":0,
+	//"ll":0,
+	//"ull":0,
+	//"f":0,
+	//"d":0
+	//}
 }
