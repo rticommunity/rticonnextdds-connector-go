@@ -106,7 +106,13 @@ func ExampleInput_ChannelSubscribe() {
 		for i := 0; i < numOfSamples; i++ {
 			json, _ := samples.GetJSON(i)
 			fmt.Printf("---Received Sample---\n%s", json)
+
+			// ---
+			// This return should not be in your actual code,
+			// but for example test, we need to break out of
+			// infinite for loop
 			return
+			// ---
 		}
 	}
 	// Output:
