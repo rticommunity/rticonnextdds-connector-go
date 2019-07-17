@@ -71,6 +71,8 @@ type Infos struct {
 	input *Input
 }
 
+// SampleHandler is an User defined function type that takes in pointers of
+// Samples and Infos and will handle received samples.
 type SampleHandler func(samples *Samples, infos *Infos)
 
 /********************
@@ -483,7 +485,7 @@ func (input *Input) AsyncSubscribe(cb SampleHandler) (err error) {
 	return nil
 }
 
-// ChannleSubscribe is a function to subscribe DDS samples with a Go channel.
+// ChannelSubscribe is a function to subscribe DDS samples with a Go channel.
 // Internally, it taks DDS samples from the DDS DataReader when they arrive.
 // Then, it sends arrived DDS samples to the channel (samples chan *Samples).
 func (input *Input) ChannelSubscribe(samples chan *Samples) (err error) {
