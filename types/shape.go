@@ -23,3 +23,16 @@ type ShapeSlice struct {
 	Y         []int  `json:"y"`
 	Shapesize int    `json:"shapesize"`
 }
+
+// Position is a position struct for shapes
+type Position struct {
+	X int `json:"x"`
+	Y int `json:"y"`
+}
+
+// ShapeModule is a shape struct including another struct (Position)
+type ShapeModule struct {
+	Color     string   `json:"color"`
+	Pos       Position `json:"pos"`
+	Shapesize int      `json:"shapesize"`
+}
