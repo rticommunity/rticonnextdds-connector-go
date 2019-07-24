@@ -14,6 +14,21 @@ This code contains trade secrets of Real-Time Innovations, Inc.
         <transport_builtin>
           <mask>UDPV4 | SHMEM</mask>
         </transport_builtin>
+        <!-- Turn on monitoring -->
+        <!-- Begin Monitoring
+				<property>
+					<value>
+						<element>
+							<name>rti.monitor.library</name>
+							<value>rtimonitoring</value>
+						</element>
+						<element>
+							<name>rti.monitor.create_function_ptr</name>
+							<value>$(NDDS_MONITOR)</value>
+						</element>
+					</value>
+				</property>
+				 End Monitoring -->
       </participant_qos>
     </qos_profile>
   </qos_library>
@@ -21,8 +36,8 @@ This code contains trade secrets of Real-Time Innovations, Inc.
   <types>
     <struct name="ShapeType" extensibility="extensible">
       <member name="color" stringMaxLength="128" id="0" type="string" key="true"/>
-      <member name="x" id="1" type="long"/>
-      <member name="y" id="2" type="long"/>
+      <member name="x" sequenceMaxLength="-1" id="1" type="long"/>
+      <member name="y" sequenceMaxLength="-1" id="2" type="long"/>
       <member name="shapesize" id="3" type="long"/>
     </struct>
     <enum name="ShapeFillKind" extensibility="extensible">
