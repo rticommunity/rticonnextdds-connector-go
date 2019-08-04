@@ -58,12 +58,12 @@ func main() {
 		default:
 			input.Take()
 			numOfSamples := input.Samples.GetLength()
-			for j := 0; j < numOfSamples; j++ {
+			for i := 0; i < numOfSamples; i++ {
 				if input.Infos.IsValid(j) {
-					color := input.Samples.GetString(j, "color")
-					x := input.Samples.GetInt(j, "x")
-					y := input.Samples.GetInt(j, "y")
-					shapesize := input.Samples.GetInt(j, "shapesize")
+					color := input.Samples.GetString(i, "color")
+					x := input.Samples.GetInt(i, "x")
+					y := input.Samples.GetInt(i, "y")
+					shapesize := input.Samples.GetInt(i, "shapesize")
 
 					log.Println("---Received Sample---")
 					log.Printf("color: %s\n", color)
