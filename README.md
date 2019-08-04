@@ -2,6 +2,7 @@ rticonnextdds-connector-go
 =======
 [![GoDoc](https://godoc.org/github.com/rticommunity/rticonnextdds-connector-go?status.png)](https://godoc.org/github.com/rticommunity/rticonnextdds-connector-go) [![Build Status](https://travis-ci.org/rticommunity/rticonnextdds-connector-go.svg?branch=master)](https://travis-ci.org/rticommunity/rticonnextdds-connector-go) [![Coverage](https://codecov.io/gh/rticommunity/rticonnextdds-connector-go/branch/master/graph/badge.svg)](https://codecov.io/gh/rticommunity/rticonnextdds-connector-go)
 [![Go Report Card](https://goreportcard.com/badge/github.com/rticommunity/rticonnextdds-connector-go)](https://goreportcard.com/report/github.com/rticommunity/rticonnextdds-connector-go)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Frticommunity%2Frticonnextdds-connector-go.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Frticommunity%2Frticonnextdds-connector-go?ref=badge_shield)
 
 ### RTI Connector for Connext DDS
 *RTI Connector* for Connext DDS is a quick and easy way to access the power and
@@ -79,3 +80,7 @@ Contributions to the code, examples, documentation are really appreciated. Pleas
 1. Run tests (use [run_test.sh](run_test.sh)).
 1. Push your branch.
 1. Open a new [pull request](https://github.com/rticommunity/rticonnextdds-connector-go/compare).
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Frticommunity%2Frticonnextdds-connector-go.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Frticommunity%2Frticonnextdds-connector-go?ref=badge_large)
