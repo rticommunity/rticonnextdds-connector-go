@@ -59,7 +59,7 @@ func main() {
 			input.Take()
 			numOfSamples := input.Samples.GetLength()
 			for i := 0; i < numOfSamples; i++ {
-				if input.Infos.IsValid(j) {
+				if input.Infos.IsValid(i) {
 					color := input.Samples.GetString(i, "color")
 					x := input.Samples.GetInt(i, "x")
 					y := input.Samples.GetInt(i, "y")
