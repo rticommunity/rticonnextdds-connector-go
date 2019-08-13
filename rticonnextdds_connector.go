@@ -461,6 +461,7 @@ func (input *Input) Take() (err error) {
 	return nil
 }
 
+/*
 // AsyncSubscribe is a function to subscribe DDS samples in an asynchronous way.
 // Internllay, it takes DDS samples from the DDS DataReader when they arrive.
 // Then, it invokes the callback function (cb SampleHandler) that will handle received samples.
@@ -500,6 +501,7 @@ func (input *Input) ChannelSubscribe(samples chan *Samples) (err error) {
 	}()
 	return nil
 }
+*/
 
 // GetLength is a function to get the number of samples
 func (samples *Samples) GetLength() (length int) {

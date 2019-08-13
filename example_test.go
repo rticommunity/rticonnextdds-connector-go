@@ -1,8 +1,6 @@
 package rti
 
 import (
-	"fmt"
-	"github.com/rticommunity/rticonnextdds-connector-go/types"
 	"path"
 	"runtime"
 )
@@ -44,13 +42,12 @@ func ExampleConnector_GetOutput() {
 	}
 	// Output:
 }
-
+/*
 func ExampleInput_AsyncSubscribe() {
 	connector := newTestConnector()
 	defer connector.Delete()
 	input := newTestInput(connector)
 	output := newTestOutput(connector)
-	done := make(chan bool)
 
 	var outputTestData types.Test
 	outputTestData.St = "test"
@@ -63,12 +60,11 @@ func ExampleInput_AsyncSubscribe() {
 			if infos.IsValid(i) {
 				json, _ := samples.GetJSON(i)
 				fmt.Printf("---Received Sample---\n%s", json)
-				done <- true
+				return
 			}
 		}
 	})
 
-	<-done
 	// Output:
 	//  ---Received Sample---
 	//{
@@ -131,3 +127,4 @@ func ExampleInput_ChannelSubscribe() {
 	//"d":0
 	//}
 }
+*/
