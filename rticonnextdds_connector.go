@@ -67,6 +67,12 @@ type Infos struct {
 	input *Input
 }
 
+// Identity is the structure for identifying 
+type Identity struct {
+	WriterGuid [16]byte `json:"writer_guid"`
+	SequenceNumber uint `json:"sequence_number"`
+}
+
 // SampleHandler is an User defined function type that takes in pointers of
 // Samples and Infos and will handle received samples.
 type SampleHandler func(samples *Samples, infos *Infos)
@@ -683,13 +689,34 @@ func (samples *Samples) Get(index int, v interface{}) (e error) {
 func (infos *Infos) IsValid(index int) (valid bool) {
 	memberNameCStr := C.CString("valid_data")
 	defer C.free(unsafe.Pointer(memberNameCStr))
+	var retVal C.int
 
-	if int(C.RTIDDSConnector_getBooleanFromInfos(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr, C.int(index+1), memberNameCStr)) != 0 {
+	C.RTI_Connector_get_boolean_from_infos(unsafe.Pointer(infos.input.connector.native), &retVal, infos.input.nameCStr, C.int(index+1), memberNameCStr)
+
+	if retVal != 0 {
 		valid = true
 	} else {
 		valid = false
 	}
 	return valid
+}
+
+// GetIdentity is a function to get the identity of a writer that sent the sample
+func (infos *Infos) GetIdentity(index int) (writerId Identity) {
+	memberNameCStr := C.CString("identity")
+	defer C.free(unsafe.Pointer(memberNameCStr))
+
+	var jsonStr string
+	jsonCStr := C.CString(jsonStr)
+	defer C.free(unsafe.Pointer(jsonCStr))
+
+
+	C.RTI_Connector_get_json_from_infos(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr, C.int(index+1), memberNameCStr, &jsonCStr)
+
+	jsonByte := []byte(C.GoString((*C.char)(jsonCStr)))
+	json.Unmarshal(jsonByte, &writerId)
+
+	return writerId
 }
 
 // GetLength is a function to return the length of the

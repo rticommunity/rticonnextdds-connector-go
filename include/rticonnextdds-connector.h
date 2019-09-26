@@ -22,6 +22,21 @@ void RTIDDSConnector_take(void *connector, char *name);
 double RTIDDSConnector_getSamplesLength(void *connector, char *name);
 double RTIDDSConnector_getInfosLength(void *connector, char *name);
 int RTIDDSConnector_getBooleanFromInfos(void *connector, char *name, int index, char *field_name);
+
+int RTI_Connector_get_json_from_infos(
+        void *self,
+        const char *entity_name,
+        int index,
+        const char *name,
+        char **return_value);
+
+int RTI_Connector_get_boolean_from_infos(
+        void *self,
+        int *return_value,
+        const char *entity_name,
+        int index,
+        const char *name);
+
 void* RTIDDSConnector_getJSONSample(void *connector, char *name, int index);
 double RTIDDSConnector_getNumberFromSamples(void *connector, char *name, int index, char *field_name);
 int RTIDDSConnector_getBooleanFromSamples(void *connector, char *name, int index, char *field_name);

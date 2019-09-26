@@ -3,6 +3,8 @@ package rti
 import (
 	"path"
 	"runtime"
+	"fmt"
+	"github.com/rticommunity/rticonnextdds-connector-go/types"
 )
 
 func ExampleNewConnector() {
@@ -42,6 +44,29 @@ func ExampleConnector_GetOutput() {
 	}
 	// Output:
 }
+
+func ExampleInfos_GetIdentity() {
+	// Create Connector
+	connector := newTestConnector()
+	defer connector.Delete()
+
+    input := newTestInput(connector)
+    output := newTestOutput(connector)
+
+	var outputTestData types.Test
+	outputTestData.St = "test"
+	output.Instance.Set(&outputTestData)
+	output.Write()
+
+    connector.Wait(-1)
+	input.Take()
+	writerId := input.Infos.GetIdentity(0)
+	//fmt.Printf("wrtier_guid: %x\n", writerId.WriterGuid)
+	fmt.Printf("seuqnece_number: %d\n", writerId.SequenceNumber)
+	// Output:
+	//seuqnece_number: 1
+}
+
 /*
 func ExampleInput_AsyncSubscribe() {
 	connector := newTestConnector()

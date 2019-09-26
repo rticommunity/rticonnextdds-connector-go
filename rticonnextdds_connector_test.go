@@ -198,14 +198,16 @@ func TestDataFlow(t *testing.T) {
 	assert.Equal(t, input.Samples.GetFloat64(0, "d"), d)
 
 	output.ClearMembers()
-	output.Write()
-	connector.Wait(-1)
-	input.Read()
-	assert.NotEqual(t, input.Samples.GetString(0, "st"), st)
 
 	// Testing Wait TimeOut
 	err = connector.Wait(5)
 	assert.NotNil(t, err)
+
+	// Testing Read
+	output.Write()
+	connector.Wait(-1)
+	input.Read()
+	assert.NotEqual(t, input.Samples.GetString(0, "st"), st)
 }
 
 func TestJSON(t *testing.T) {
@@ -227,5 +229,4 @@ func TestJSON(t *testing.T) {
 	input.Samples.Get(0, &inputTestData)
 
 	assert.Equal(t, inputTestData.St, outputTestData.St)
-
 }
