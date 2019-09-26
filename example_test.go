@@ -1,10 +1,10 @@
 package rti
 
 import (
-	"path"
-	"runtime"
 	"fmt"
 	"github.com/rticommunity/rticonnextdds-connector-go/types"
+	"path"
+	"runtime"
 )
 
 func ExampleNewConnector() {
@@ -50,15 +50,15 @@ func ExampleInfos_GetIdentity() {
 	connector := newTestConnector()
 	defer connector.Delete()
 
-    input := newTestInput(connector)
-    output := newTestOutput(connector)
+	input := newTestInput(connector)
+	output := newTestOutput(connector)
 
 	var outputTestData types.Test
 	outputTestData.St = "test"
 	output.Instance.Set(&outputTestData)
 	output.Write()
 
-    connector.Wait(-1)
+	connector.Wait(-1)
 	input.Take()
 	writerId := input.Infos.GetIdentity(0)
 	//fmt.Printf("wrtier_guid: %x\n", writerId.WriterGuid)

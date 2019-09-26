@@ -67,10 +67,10 @@ type Infos struct {
 	input *Input
 }
 
-// Identity is the structure for identifying 
+// Identity is the structure for identifying
 type Identity struct {
-	WriterGuid [16]byte `json:"writer_guid"`
-	SequenceNumber uint `json:"sequence_number"`
+	WriterGuid     [16]byte `json:"writer_guid"`
+	SequenceNumber uint     `json:"sequence_number"`
 }
 
 // SampleHandler is an User defined function type that takes in pointers of
@@ -709,7 +709,6 @@ func (infos *Infos) GetIdentity(index int) (writerId Identity) {
 	var jsonStr string
 	jsonCStr := C.CString(jsonStr)
 	defer C.free(unsafe.Pointer(jsonCStr))
-
 
 	C.RTI_Connector_get_json_from_infos(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr, C.int(index+1), memberNameCStr, &jsonCStr)
 
