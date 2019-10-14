@@ -60,7 +60,7 @@ func ExampleInfos_GetIdentity() {
 
 	connector.Wait(-1)
 	input.Take()
-	writerId := input.Infos.GetIdentity(0)
+	writerId, _ := input.Infos.GetIdentity(0)
 	//fmt.Printf("wrtier_guid: %x\n", writerId.WriterGuid)
 	fmt.Printf("seuqnece_number: %d\n", writerId.SequenceNumber)
 	// Output:

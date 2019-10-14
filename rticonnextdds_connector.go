@@ -686,7 +686,7 @@ func (samples *Samples) Get(index int, v interface{}) (e error) {
 }
 
 // IsValid is a function to check validity of the element and return a boolean
-func (infos *Infos) IsValid(index int) (valid bool) {
+func (infos *Infos) IsValid(index int) bool {
 	memberNameCStr := C.CString("valid_data")
 	defer C.free(unsafe.Pointer(memberNameCStr))
 	var retVal C.int
@@ -694,15 +694,13 @@ func (infos *Infos) IsValid(index int) (valid bool) {
 	C.RTI_Connector_get_boolean_from_infos(unsafe.Pointer(infos.input.connector.native), &retVal, infos.input.nameCStr, C.int(index+1), memberNameCStr)
 
 	if retVal != 0 {
-		valid = true
-	} else {
-		valid = false
+		return true
 	}
-	return valid
+	return false
 }
 
 // GetIdentity is a function to get the identity of a writer that sent the sample
-func (infos *Infos) GetIdentity(index int) (writerId Identity) {
+func (infos *Infos) GetIdentity(index int) (writerId Identity, err error) {
 	memberNameCStr := C.CString("identity")
 	defer C.free(unsafe.Pointer(memberNameCStr))
 
@@ -710,12 +708,20 @@ func (infos *Infos) GetIdentity(index int) (writerId Identity) {
 	jsonCStr := C.CString(jsonStr)
 	defer C.free(unsafe.Pointer(jsonCStr))
 
-	C.RTI_Connector_get_json_from_infos(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr, C.int(index+1), memberNameCStr, &jsonCStr)
+	retcode := C.RTI_Connector_get_json_from_infos(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr, C.int(index+1), memberNameCStr, &jsonCStr)
+	if retcode != 0 /* DDS_RETCODE_OK */ {
+		err = errors.New("RTI_Connector_get_json_from_infos failed")
+		return writerId, err
+	}
 
 	jsonByte := []byte(C.GoString((*C.char)(jsonCStr)))
-	json.Unmarshal(jsonByte, &writerId)
+	err = json.Unmarshal(jsonByte, &writerId)
+	if err != nil {
+		err = errors.New("JSON Unmarshal failed")
+		return writerId, err
+	}
 
-	return writerId
+	return writerId, nil
 }
 
 // GetLength is a function to return the length of the
