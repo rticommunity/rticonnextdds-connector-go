@@ -1,0 +1,38 @@
+output:
+  format: tab
+
+linters-settings:
+  golint:
+    min-confidence: 0
+  maligned:
+    suggest-new: true
+  misspell:
+    locale: US
+  lll:
+    line-length: 145
+  goimports:
+    local-prefixes: github.com/golangci/golangci-lint
+
+linters:
+  enable-all: true
+
+# issues:
+#   exclude-rules:
+#     # md5 library 
+#     - text: "Blacklisted import `crypto/md5`: weak cryptographic primitive"
+#       linters:
+#         - gosec
+#     - text: "Use of weak cryptographic primitive"
+#       linters:
+#         - gosec
+#     # URL as variable
+#     - text: "Potential HTTP request made with variable url"
+#       linters:
+#         - gosec
+
+# golangci.com configuration
+# https://github.com/golangci/golangci/wiki/Configuration
+service:
+  golangci-lint-version: 1.19.1 # use the fixed version to not introduce new linters unexpectedly
+  prepare:
+    - echo "here I can run custom commands, but no preparation needed for this repo"
