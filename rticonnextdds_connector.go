@@ -22,7 +22,6 @@ import "errors"
 import "unsafe"
 import "encoding/json"
 import "strconv"
-//import "fmt"
 
 
 /********
@@ -703,7 +702,7 @@ func (infos *Infos) IsValid(index int) bool {
 }
 
 // GetSourceTimestamp is a function to get the source timestamp of a sample
-func (infos *Infos) GetSourceTimestamp(index int) (ts int, err error) {
+func (infos *Infos) GetSourceTimestamp(index int) (ts int64, err error) {
 	memberNameCStr := C.CString("source_timestamp")
 	defer C.free(unsafe.Pointer(memberNameCStr))
 
@@ -717,7 +716,7 @@ func (infos *Infos) GetSourceTimestamp(index int) (ts int, err error) {
         return ts, err
     }
 
-	ts, err = strconv.Atoi(C.GoString((*C.char)(jsonCStr)))
+	ts, err = strconv.ParseInt(C.GoString((*C.char)(jsonCStr)), 10, 64)
 	if err != nil {
 		err = errors.New("String conversion failed")
 		return ts, err
@@ -727,7 +726,7 @@ func (infos *Infos) GetSourceTimestamp(index int) (ts int, err error) {
 }
 
 // GetReceptionTimestamp is a function to get the reception timestamp of a sample
-func (infos *Infos) GetReceptionTimestamp(index int) (ts int, err error) {
+func (infos *Infos) GetReceptionTimestamp(index int) (ts int64, err error) {
 	memberNameCStr := C.CString("reception_timestamp")
 	defer C.free(unsafe.Pointer(memberNameCStr))
 
@@ -741,7 +740,7 @@ func (infos *Infos) GetReceptionTimestamp(index int) (ts int, err error) {
         return ts, err
     }
 
-	ts, err = strconv.Atoi(C.GoString((*C.char)(jsonCStr)))
+	ts, err = strconv.ParseInt(C.GoString((*C.char)(jsonCStr)), 10, 64)
 	if err != nil {
 		err = errors.New("String conversion failed")
 		return ts, err
