@@ -22,6 +22,12 @@ this detail is hidden in a Go wrapper.
 ### Getting started
 RTI Go Connector requires [Git LFS](https://github.com/git-lfs/git-lfs/wiki/Installation) to check out the Connector C library files properly. 
 
+```bash
+$ curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+$ sudo apt-get install git-lfs
+$ git lfs install
+```
+
 Be sure you have golang installed (we tested with golang v1.10 above). 
 
 Install:
