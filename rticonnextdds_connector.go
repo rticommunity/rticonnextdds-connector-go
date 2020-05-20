@@ -21,6 +21,8 @@ import "C"
 import "errors"
 import "unsafe"
 import "encoding/json"
+import "strconv"
+
 
 /********
 * Types *
@@ -65,6 +67,12 @@ type Samples struct {
 // Infos is a sequence of info samples used by an input to read DDS meta data
 type Infos struct {
 	input *Input
+}
+
+// Identity is the structure for identifying
+type Identity struct {
+	WriterGuid     [16]byte `json:"writer_guid"`
+	SequenceNumber uint     `json:"sequence_number"`
 }
 
 // SampleHandler is an User defined function type that takes in pointers of
@@ -680,16 +688,90 @@ func (samples *Samples) Get(index int, v interface{}) (e error) {
 }
 
 // IsValid is a function to check validity of the element and return a boolean
-func (infos *Infos) IsValid(index int) (valid bool) {
+func (infos *Infos) IsValid(index int) bool {
 	memberNameCStr := C.CString("valid_data")
 	defer C.free(unsafe.Pointer(memberNameCStr))
+	var retVal C.int
 
-	if int(C.RTIDDSConnector_getBooleanFromInfos(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr, C.int(index+1), memberNameCStr)) != 0 {
-		valid = true
-	} else {
-		valid = false
+	C.RTI_Connector_get_boolean_from_infos(unsafe.Pointer(infos.input.connector.native), &retVal, infos.input.nameCStr, C.int(index+1), memberNameCStr)
+
+	if retVal != 0 {
+		return true
 	}
-	return valid
+	return false
+}
+
+// GetSourceTimestamp is a function to get the source timestamp of a sample
+func (infos *Infos) GetSourceTimestamp(index int) (ts int64, err error) {
+	memberNameCStr := C.CString("source_timestamp")
+	defer C.free(unsafe.Pointer(memberNameCStr))
+
+    var jsonStr string
+    jsonCStr := C.CString(jsonStr)
+    defer C.free(unsafe.Pointer(jsonCStr))
+
+	retcode := C.RTI_Connector_get_json_from_infos(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr, C.int(index+1), memberNameCStr, &jsonCStr)
+    if retcode != 0 /* DDS_RETCODE_OK */ {
+        err = errors.New("RTI_Connector_get_json_from_infos failed")
+        return ts, err
+    }
+
+	ts, err = strconv.ParseInt(C.GoString((*C.char)(jsonCStr)), 10, 64)
+	if err != nil {
+		err = errors.New("String conversion failed")
+		return ts, err
+	}
+
+	return ts, err
+}
+
+// GetReceptionTimestamp is a function to get the reception timestamp of a sample
+func (infos *Infos) GetReceptionTimestamp(index int) (ts int64, err error) {
+	memberNameCStr := C.CString("reception_timestamp")
+	defer C.free(unsafe.Pointer(memberNameCStr))
+
+    var jsonStr string
+    jsonCStr := C.CString(jsonStr)
+    defer C.free(unsafe.Pointer(jsonCStr))
+
+	retcode := C.RTI_Connector_get_json_from_infos(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr, C.int(index+1), memberNameCStr, &jsonCStr)
+    if retcode != 0 /* DDS_RETCODE_OK */ {
+        err = errors.New("RTI_Connector_get_json_from_infos failed")
+        return ts, err
+    }
+
+	ts, err = strconv.ParseInt(C.GoString((*C.char)(jsonCStr)), 10, 64)
+	if err != nil {
+		err = errors.New("String conversion failed")
+		return ts, err
+	}
+
+	return ts, err
+}
+
+// GetIdentity is a function to get the identity of a writer that sent the sample
+func (infos *Infos) GetIdentity(index int) (writerId Identity, err error) {
+	memberNameCStr := C.CString("identity")
+	defer C.free(unsafe.Pointer(memberNameCStr))
+
+	var jsonStr string
+	jsonCStr := C.CString(jsonStr)
+	defer C.free(unsafe.Pointer(jsonCStr))
+
+	retcode := C.RTI_Connector_get_json_from_infos(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr, C.int(index+1), memberNameCStr, &jsonCStr)
+	if retcode != 0 /* DDS_RETCODE_OK */ {
+		err = errors.New("RTI_Connector_get_json_from_infos failed")
+		return writerId, err
+	}
+
+	jsonByte := []byte(C.GoString((*C.char)(jsonCStr)))
+	err = json.Unmarshal(jsonByte, &writerId)
+	if err != nil {
+		err = errors.New("JSON Unmarshal failed")
+		return writerId, err
+	}
+
+	return writerId, nil
 }
 
 // GetLength is a function to return the length of the
