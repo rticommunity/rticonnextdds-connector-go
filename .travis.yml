@@ -15,8 +15,8 @@ matrix:
       dist: xenial
       go: 1.12.x
       script:
-        - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.17.1
-        - golangci-lint run --disable errcheck --enable golint --exclude 'SA4008'; 
+        - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.31.0
+        - golangci-lint run
 
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install git-lfs; fi
