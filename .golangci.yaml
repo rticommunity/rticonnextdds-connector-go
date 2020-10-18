@@ -114,3 +114,45 @@ linters:
   # - prealloc
   # - testpackage
   # - wsl
+
+issues:
+  exclude-rules:
+    # Package comment is not necessary
+    - linters:
+        - stylecheck
+      text: "ST1000: at least one file in a package should have a package comment"
+    - linters:
+        - golint
+      text: "should have a package comment, unless it's in another file for this package"
+
+    # Ignore example and test codes' returns to get cwd
+    - path: (rticonnextdds_connector_test|example_test).go
+      linter:
+        - dogsled
+      text: "declaration has 3 blank identifiers"
+
+    # This is ignore because it is fine (within test) to have a failure in delete
+    - path: rticonnextdds_connector_test.go
+      linter:
+        - errcheck
+      text: "Error return value of `connector.Delete` is not checked"
+    
+    # This is ignore because it is fine (within test) to have a failure in delete
+    - path: rticonnextdds_connector_test.go
+      linter:
+        - errcheck
+      text: "Error return value of `connector.Delete` is not checked"
+
+    # Ignore complicated function that gocritic is suspecting
+    - path: rticonnextdds_connector.go
+      linter:
+        - gocritic
+      text: "dupSubExpr: suspicious identical LHS and RHS for `==` operator"
+
+    # Ignore length of function in test
+    - path: rticonnextdds_connector_test.go
+      linters:
+        - funlen
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0

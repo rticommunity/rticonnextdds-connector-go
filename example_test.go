@@ -2,9 +2,10 @@ package rti
 
 import (
 	"fmt"
-	"github.com/rticommunity/rticonnextdds-connector-go/types"
 	"path"
 	"runtime"
+
+	"github.com/rticommunity/rticonnextdds-connector-go/types"
 )
 
 func ExampleNewConnector() {
@@ -12,19 +13,28 @@ func ExampleNewConnector() {
 	_, curPath, _, _ := runtime.Caller(0)
 	xmlPath := path.Join(path.Dir(curPath), "./test/xml/Test.xml")
 
-	participantProfile := "MyParticipantLibrary::Zero"
+	participantProfile := "MyParticipantLibrary::Zero" //nolint // Example
 	connector, err := NewConnector(participantProfile, xmlPath)
 	if err != nil {
 		// Handle an error
 	}
-	connector.Delete()
+	if err := connector.Delete(); err != nil {
+		// Handle an error
+	}
 	// Output:
 }
 
 func ExampleConnector_GetInput() {
 	// Create Connector
-	connector := newTestConnector()
-	defer connector.Delete()
+	connector, err := newTestConnector()
+	if err != nil {
+		// Handle an error
+	}
+	defer func() {
+		if err := connector.Delete(); err != nil {
+			// Handle an error
+		}
+	}()
 
 	input, err := connector.GetInput("MySubscriber::MyReader")
 	if input == nil || err != nil {
@@ -35,8 +45,15 @@ func ExampleConnector_GetInput() {
 
 func ExampleConnector_GetOutput() {
 	// Create Connector
-	connector := newTestConnector()
-	defer connector.Delete()
+	connector, err := newTestConnector()
+	if err != nil {
+		// Handle an error
+	}
+	defer func() {
+		if err := connector.Delete(); err != nil {
+			// Handle an error
+		}
+	}()
 
 	output, err := connector.GetInput("MyPublisher::MyWriter")
 	if output == nil || err != nil {
@@ -47,109 +64,46 @@ func ExampleConnector_GetOutput() {
 
 func ExampleInfos_GetIdentity() {
 	// Create Connector
-	connector := newTestConnector()
-	defer connector.Delete()
-
-	input := newTestInput(connector)
-	output := newTestOutput(connector)
-
-	var outputTestData types.Test
-	outputTestData.St = "test"
-	output.Instance.Set(&outputTestData)
-	output.Write()
-
-	connector.Wait(-1)
-	input.Take()
-	writerId, _ := input.Infos.GetIdentity(0)
-	//fmt.Printf("wrtier_guid: %x\n", writerId.WriterGuid)
-	fmt.Printf("seuqnece_number: %d\n", writerId.SequenceNumber)
-	// Output:
-	//seuqnece_number: 1
-}
-
-/*
-func ExampleInput_AsyncSubscribe() {
-	connector := newTestConnector()
-	defer connector.Delete()
-	input := newTestInput(connector)
-	output := newTestOutput(connector)
-
-	var outputTestData types.Test
-	outputTestData.St = "test"
-	output.Instance.Set(&outputTestData)
-	output.Write()
-
-	input.AsyncSubscribe(func(samples *Samples, infos *Infos) {
-		numOfSamples := samples.GetLength()
-		for i := 0; i < numOfSamples; i++ {
-			if infos.IsValid(i) {
-				json, _ := samples.GetJSON(i)
-				fmt.Printf("---Received Sample---\n%s", json)
-				return
-			}
-		}
-	})
-
-	// Output:
-	//  ---Received Sample---
-	//{
-	//"st":"test",
-	//"b":false,
-	//"c":0,
-	//"s":0,
-	//"us":0,
-	//"l":0,
-	//"ul":0,
-	//"ll":0,
-	//"ull":0,
-	//"f":0,
-	//"d":0
-	//}
-}
-
-func ExampleInput_ChannelSubscribe() {
-	connector := newTestConnector()
-	defer connector.Delete()
-	input := newTestInput(connector)
-	output := newTestOutput(connector)
-
-	ch := make(chan *Samples)
-	input.ChannelSubscribe(ch)
-
-	var outputTestData types.Test
-	outputTestData.St = "test"
-	output.Instance.Set(&outputTestData)
-	output.Write()
-
-	for {
-		samples := <-ch
-		numOfSamples := samples.GetLength()
-		for i := 0; i < numOfSamples; i++ {
-			json, _ := samples.GetJSON(i)
-			fmt.Printf("---Received Sample---\n%s", json)
-
-			// ---
-			// This return should not be in your actual code,
-			// but for example test, we need to break out of
-			// infinite for loop
-			return
-			// ---
-		}
+	connector, err := newTestConnector()
+	if err != nil {
+		// Handle an error
 	}
+	defer func() {
+		if err := connector.Delete(); err != nil {
+			// Handle an error
+		}
+	}()
+
+	input, err := newTestInput(connector)
+	if err != nil {
+		// Handle an error
+	}
+	output, err := newTestOutput(connector)
+	if err != nil {
+		// Handle an error
+	}
+
+	var outputTestData types.Test
+	outputTestData.St = "test" //nolint // Example
+	if err := output.Instance.Set(&outputTestData); err != nil {
+		// Handle an error
+	}
+	if err := output.Write(); err != nil {
+		// Handle an error
+	}
+
+	if err := connector.Wait(-1); err != nil {
+		// Handle an error
+	}
+	if err := input.Take(); err != nil {
+		// Handle an error
+	}
+	writerID, err := input.Infos.GetIdentity(0)
+	if err != nil {
+		// Handle an error
+	}
+	fmt.Printf("wrtier_guid: %x\n", writerID.WriterGUID)
+	fmt.Printf("seuqnece_number: %d\n", writerID.SequenceNumber)
 	// Output:
-	//  ---Received Sample---
-	//{
-	//"st":"test",
-	//"b":false,
-	//"c":0,
-	//"s":0,
-	//"us":0,
-	//"l":0,
-	//"ul":0,
-	//"ll":0,
-	//"ull":0,
-	//"f":0,
-	//"d":0
-	//}
+	// seuqnece_number: 1
 }
-*/
