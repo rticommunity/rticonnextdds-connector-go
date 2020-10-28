@@ -81,6 +81,8 @@ type Identity struct {
 type SampleHandler func(samples *Samples, infos *Infos)
 
 const (
+	// DDSRetCodeNoData is a Return Code from CGO for no data return
+	DDSRetCodeNoData = 11
 	// DDSRetCodeTimeout is a Return Code from CGO for timeout code
 	DDSRetCodeTimeout = 10
 	// DDSRetCodeOK is a Return Code from CGO for good state
@@ -228,6 +230,8 @@ func (connector *Connector) Wait(timeoutMs int) error {
 		return nil
 	case DDSRetCodeTimeout:
 		return errors.New("timeout")
+	case DDSRetCodeNoData:
+		return errors.New("no data")
 	default:
 	}
 	return errors.New("RTIDDSConnector_wait error")
