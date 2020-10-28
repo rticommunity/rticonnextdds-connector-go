@@ -9,6 +9,7 @@ import (
 )
 
 func ExampleNewConnector() {
+	// Create Connector
 	// Get the path for test XML configs
 	_, curPath, _, _ := runtime.Caller(0)
 	xmlPath := path.Join(path.Dir(curPath), "./test/xml/Test.xml")
@@ -26,7 +27,12 @@ func ExampleNewConnector() {
 
 func ExampleConnector_GetInput() {
 	// Create Connector
-	connector, err := newTestConnector()
+	// Get the path for test XML configs
+	_, curPath, _, _ := runtime.Caller(0)
+	xmlPath := path.Join(path.Dir(curPath), "./test/xml/Test.xml")
+
+	participantProfile := "MyParticipantLibrary::Zero" //nolint // Example
+	connector, err := NewConnector(participantProfile, xmlPath)
 	if err != nil {
 		// Handle an error
 	}
@@ -45,7 +51,12 @@ func ExampleConnector_GetInput() {
 
 func ExampleConnector_GetOutput() {
 	// Create Connector
-	connector, err := newTestConnector()
+	// Get the path for test XML configs
+	_, curPath, _, _ := runtime.Caller(0)
+	xmlPath := path.Join(path.Dir(curPath), "./test/xml/Test.xml")
+
+	participantProfile := "MyParticipantLibrary::Zero" //nolint // Example
+	connector, err := NewConnector(participantProfile, xmlPath)
 	if err != nil {
 		// Handle an error
 	}
@@ -64,7 +75,12 @@ func ExampleConnector_GetOutput() {
 
 func ExampleInfos_GetIdentity() {
 	// Create Connector
-	connector, err := newTestConnector()
+	// Get the path for test XML configs
+	_, curPath, _, _ := runtime.Caller(0)
+	xmlPath := path.Join(path.Dir(curPath), "./test/xml/Test.xml")
+
+	participantProfile := "MyParticipantLibrary::Zero" //nolint // Example
+	connector, err := NewConnector(participantProfile, xmlPath)
 	if err != nil {
 		// Handle an error
 	}
@@ -74,11 +90,11 @@ func ExampleInfos_GetIdentity() {
 		}
 	}()
 
-	input, err := newTestInput(connector)
+	input, err := connector.GetInput("MySubscriber::MyReader")
 	if err != nil {
 		// Handle an error
 	}
-	output, err := newTestOutput(connector)
+	output, err := connector.GetOutput("MyPublisher::MyWriter")
 	if err != nil {
 		// Handle an error
 	}
