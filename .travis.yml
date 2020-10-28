@@ -4,9 +4,10 @@ os:
   - linux
   
 go:
-  - "1.10.x"
   - "1.11.x"
   - "1.12.x"
+  - "1.13.x"
+  - "1.14.x"
 
 matrix:
   include:
@@ -23,6 +24,7 @@ before_install:
     
 before_script:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then git lfs pull; fi
+  - go mod download
 
 script:
   - cd $TRAVIS_BUILD_DIR; bash run_test.sh
