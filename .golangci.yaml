@@ -1,0 +1,158 @@
+---
+# golangci-lint configuration file
+# for documentation, see golangci-lint repository
+# https://github.com/golangci/golangci-lint#config-file
+run:
+  deadline: 1m
+  issues-exit-code: 1
+  tests: true
+output:
+  format: tab
+  print-issued-lines: true
+  print-linter-name: true
+linters-settings:
+  errcheck:
+    check-type-assertions: false
+    check-blank: true
+  golint:
+    min-confidence: 0
+  gofmt:
+    simplify: true
+  gocyclo:
+    min-complexity: 15
+  maligned:
+    suggest-new: true
+  dupl:
+    threshold: 100
+  goconst:
+    min-len: 2
+    min-occurrences: 2
+  misspell:
+    locale: US
+  lll:
+    line-length: 160
+    tab-width: 1
+  unused:
+    check-exported: false
+  unparam:
+    check-exported: false
+  nakedret:
+    max-func-lines: 30
+  prealloc:
+    simple: true
+    range-loops: true
+    for-loops: false
+  gocritic:
+    enabled-tags:
+      - performance
+      - style
+      - diagnostic
+      - opinionated
+    disabled-checks:
+      - wrapperFunc
+      - dupImport
+      - ifElseChain
+      - octalLiteral
+    settings:
+      captLocal:
+        paramsOnly: true
+      rangeValCopy:
+        sizeThreshold: 256
+
+linters:
+  disable-all: true
+  enable:
+    - bodyclose
+    - deadcode
+    - depguard
+    - dogsled
+    - dupl
+    - errcheck
+    - exhaustive
+    - funlen
+    - gochecknoinits
+    - goconst
+    - gocritic
+    - gocyclo
+    - gofmt
+    - goimports
+    - golint
+    - gomnd
+    - goprintffuncname
+    - gosec
+    - gosimple
+    - govet
+    - ineffassign
+    - interfacer
+    - lll
+    - misspell
+    - nakedret
+    - noctx
+    - nolintlint
+    - rowserrcheck
+    - scopelint
+    - staticcheck
+    - structcheck
+    - stylecheck
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - varcheck
+    - whitespace
+
+
+  # don't enable:
+  # - asciicheck
+  # - gochecknoglobals
+  # - gocognit
+  # - godot
+  # - godox
+  # - goerr113
+  # - maligned
+  # - nestif
+  # - prealloc
+  # - testpackage
+  # - wsl
+
+issues:
+  exclude-rules:
+    # Package comment is not necessary
+    - linters:
+        - stylecheck
+      text: "ST1000: at least one file in a package should have a package comment"
+    - linters:
+        - golint
+      text: "should have a package comment, unless it's in another file for this package"
+
+    # Ignore example and test codes' returns to get cwd
+    - path: (rticonnextdds_connector_test|example_test).go
+      linter:
+        - dogsled
+      text: "declaration has 3 blank identifiers"
+
+    # This is ignore because it is fine (within test) to have a failure in delete
+    - path: rticonnextdds_connector_test.go
+      linter:
+        - errcheck
+      text: "Error return value of `connector.Delete` is not checked"
+    
+    # This is ignore because it is fine (within test) to have a failure in delete
+    - path: rticonnextdds_connector_test.go
+      linter:
+        - errcheck
+      text: "Error return value of `connector.Delete` is not checked"
+
+    # Ignore complicated function that gocritic is suspecting
+    - path: rticonnextdds_connector.go
+      linter:
+        - gocritic
+      text: "dupSubExpr: suspicious identical LHS and RHS for `==` operator"
+
+    # Ignore length of function in test
+    - path: rticonnextdds_connector_test.go
+      linters:
+        - funlen
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
