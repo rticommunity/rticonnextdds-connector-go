@@ -4,8 +4,6 @@ os:
   - linux
   
 go:
-  - "1.11.x"
-  - "1.12.x"
   - "1.13.x"
   - "1.14.x"
 
@@ -14,9 +12,10 @@ matrix:
     - os: linux
       name: "GolangCI-Lint"
       dist: xenial
-      go: 1.12.x
+      go: 1.14.x
       script:
         - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.31.0
+        - go mod download
         - golangci-lint run
 
 before_install:
