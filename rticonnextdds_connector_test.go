@@ -10,11 +10,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	participantProfile        = "MyParticipantLibrary::Zero"
+	invalidParticipantProfile = "InvalidParticipantProfile"
+)
+
 // Helper functions
 func newTestConnector() (*Connector, error) {
 	_, curPath, _, _ := runtime.Caller(0)
 	xmlPath := path.Join(path.Dir(curPath), "./test/xml/Test.xml")
-	participantProfile := "MyParticipantLibrary::Zero"
 	return NewConnector(participantProfile, xmlPath)
 }
 
@@ -28,7 +32,6 @@ func newTestOutput(connector *Connector) (*Output, error) {
 
 // Connector test
 func TestInvalidXMLPath(t *testing.T) {
-	participantProfile := "MyParticipantLibrary::Zero"
 	invalidXMLPath := "invalid/path/to/xml"
 
 	connector, err := NewConnector(participantProfile, invalidXMLPath)
@@ -39,7 +42,6 @@ func TestInvalidXMLPath(t *testing.T) {
 func TestInvalidParticipantProfile(t *testing.T) {
 	_, curPath, _, _ := runtime.Caller(0)
 	xmlPath := path.Join(path.Dir(curPath), "./test/xml/Test.xml")
-	invalidParticipantProfile := "InvalidParticipantProfile"
 
 	connector, err := NewConnector(invalidParticipantProfile, xmlPath)
 	assert.Nil(t, connector)
@@ -49,7 +51,6 @@ func TestInvalidParticipantProfile(t *testing.T) {
 func TestMultipleConnectorCreation(t *testing.T) {
 	_, curPath, _, _ := runtime.Caller(0)
 	xmlPath := path.Join(path.Dir(curPath), "./test/xml/Test.xml")
-	participantProfile := "MyParticipantLibrary::Zero"
 	var (
 		connectors [5]*Connector
 		err        error
@@ -218,7 +219,7 @@ func TestJSON(t *testing.T) {
 	assert.Nil(t, err)
 
 	var outputTestData types.Test
-	outputTestData.St = "test"
+	outputTestData.St = "output_test"
 	assert.Nil(t, output.Instance.Set(&outputTestData))
 	assert.Nil(t, output.Write())
 	assert.Nil(t, connector.Wait(-1))
