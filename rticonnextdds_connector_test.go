@@ -150,6 +150,7 @@ func TestDataFlow(t *testing.T) {
 	l := int32(math.MaxInt32)
 	ll := int64(123)
 	ul := uint32(math.MaxUint32)
+	ull := uint64(456)
 	f := float32(math.MaxFloat32)
 	d := float64(math.MaxFloat64)
 
@@ -168,6 +169,7 @@ func TestDataFlow(t *testing.T) {
 	assert.Nil(t, output.Instance.SetUint32("ul", ul))
 	assert.Nil(t, output.Instance.SetInt("l", int(l)))
 	assert.Nil(t, output.Instance.SetInt64("ll", ll))
+	assert.Nil(t, output.Instance.SetUint64("ull", ull))
 	assert.Nil(t, output.Instance.SetUint("ul", uint(ul)))
 	assert.Nil(t, output.Instance.SetRune("l", rune(l))) //nolint //this is because "l" rune is still an int32
 	assert.Nil(t, output.Instance.SetFloat32("f", f))
@@ -200,6 +202,7 @@ func TestDataFlow(t *testing.T) {
 	assert.Equal(t, input.Samples.GetUint(0, "ul"), uint(ul))
 	assert.Equal(t, input.Samples.GetRune(0, "l"), rune(l)) //nolint //this is because "l" rune is still an int32
 	assert.Equal(t, input.Samples.GetUint32(0, "ul"), ul)
+	assert.Equal(t, input.Samples.GetUint64(0, "ull"), ull)
 	assert.Equal(t, input.Samples.GetFloat32(0, "f"), f)
 	assert.Equal(t, input.Samples.GetFloat64(0, "d"), d)
 
