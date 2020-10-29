@@ -5,6 +5,7 @@ import (
 	"path"
 	"runtime"
 	"testing"
+	"time"
 
 	"github.com/rticommunity/rticonnextdds-connector-go/types"
 	"github.com/stretchr/testify/assert"
@@ -144,10 +145,13 @@ func TestDataFlow(t *testing.T) {
 	// Take any pre-existing samples from cache
 	assert.Nil(t, input.Take())
 
+	xs := int8(math.MaxInt8)
 	s := int16(math.MaxInt16)
 	us := uint16(math.MaxUint16)
 	l := int32(math.MaxInt32)
+	ll := int64(123)
 	ul := uint32(math.MaxUint32)
+	ull := uint64(456)
 	f := float32(math.MaxFloat32)
 	d := float64(math.MaxFloat64)
 
@@ -155,6 +159,7 @@ func TestDataFlow(t *testing.T) {
 	b := true
 	st := "test"
 
+	assert.Nil(t, output.Instance.SetInt8("xs", xs))
 	assert.Nil(t, output.Instance.SetUint8("c", c))
 	assert.Nil(t, output.Instance.SetByte("c", c))
 	assert.Nil(t, output.Instance.SetString("st", st))
@@ -164,6 +169,8 @@ func TestDataFlow(t *testing.T) {
 	assert.Nil(t, output.Instance.SetInt32("l", l))
 	assert.Nil(t, output.Instance.SetUint32("ul", ul))
 	assert.Nil(t, output.Instance.SetInt("l", int(l)))
+	assert.Nil(t, output.Instance.SetInt64("ll", ll))
+	assert.Nil(t, output.Instance.SetUint64("ull", ull))
 	assert.Nil(t, output.Instance.SetUint("ul", uint(ul)))
 	assert.Nil(t, output.Instance.SetRune("l", rune(l))) //nolint //this is because "l" rune is still an int32
 	assert.Nil(t, output.Instance.SetFloat32("f", f))
@@ -187,13 +194,16 @@ func TestDataFlow(t *testing.T) {
 
 	assert.Equal(t, input.Samples.GetUint8(0, "c"), c)
 	assert.Equal(t, input.Samples.GetByte(0, "c"), c)
+	assert.Equal(t, input.Samples.GetInt8(0, "xs"), xs)
 	assert.Equal(t, input.Samples.GetInt16(0, "s"), s)
 	assert.Equal(t, input.Samples.GetUint16(0, "us"), us)
 	assert.Equal(t, input.Samples.GetInt32(0, "l"), l)
 	assert.Equal(t, input.Samples.GetInt(0, "l"), int(l))
+	assert.Equal(t, input.Samples.GetInt64(0, "ll"), ll)
 	assert.Equal(t, input.Samples.GetUint(0, "ul"), uint(ul))
 	assert.Equal(t, input.Samples.GetRune(0, "l"), rune(l)) //nolint //this is because "l" rune is still an int32
 	assert.Equal(t, input.Samples.GetUint32(0, "ul"), ul)
+	assert.Equal(t, input.Samples.GetUint64(0, "ull"), ull)
 	assert.Equal(t, input.Samples.GetFloat32(0, "f"), f)
 	assert.Equal(t, input.Samples.GetFloat64(0, "d"), d)
 
@@ -206,7 +216,25 @@ func TestDataFlow(t *testing.T) {
 	assert.Nil(t, output.Write())
 	assert.Nil(t, connector.Wait(-1))
 	assert.Nil(t, input.Read())
+
 	assert.NotEqual(t, input.Samples.GetString(0, "st"), st)
+
+	id, err := input.Infos.GetIdentity(0)
+	assert.Nil(t, err)
+	assert.Equal(t, id.SequenceNumber, uint(2))
+	// UUID can not be checked because it is unique to each run
+
+	ts, err := input.Infos.GetReceptionTimestamp(0)
+	assert.Nil(t, err)
+	assert.NotNil(t, ts)               // Unique time per each run
+	assert.NotNil(t, time.Unix(0, ts)) // Unique time per each run
+	assert.NotEqual(t, ts, 0)          // Unique time per each run
+
+	gt, err := input.Infos.GetSourceTimestamp(0)
+	assert.Nil(t, err)
+	assert.NotNil(t, gt)               // Unique time per each run
+	assert.NotNil(t, time.Unix(0, gt)) // Unique time per each run
+	assert.NotEqual(t, gt, 0)          // Unique time per each run
 }
 
 func TestJSON(t *testing.T) {
