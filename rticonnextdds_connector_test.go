@@ -144,6 +144,7 @@ func TestDataFlow(t *testing.T) {
 	// Take any pre-existing samples from cache
 	assert.Nil(t, input.Take())
 
+	xs := int8(math.MaxInt8)
 	s := int16(math.MaxInt16)
 	us := uint16(math.MaxUint16)
 	l := int32(math.MaxInt32)
@@ -155,6 +156,7 @@ func TestDataFlow(t *testing.T) {
 	b := true
 	st := "test"
 
+	assert.Nil(t, output.Instance.SetInt8("xs", xs))
 	assert.Nil(t, output.Instance.SetUint8("c", c))
 	assert.Nil(t, output.Instance.SetByte("c", c))
 	assert.Nil(t, output.Instance.SetString("st", st))
@@ -187,6 +189,7 @@ func TestDataFlow(t *testing.T) {
 
 	assert.Equal(t, input.Samples.GetUint8(0, "c"), c)
 	assert.Equal(t, input.Samples.GetByte(0, "c"), c)
+	assert.Equal(t, input.Samples.GetInt8(0, "xs"), xs)
 	assert.Equal(t, input.Samples.GetInt16(0, "s"), s)
 	assert.Equal(t, input.Samples.GetUint16(0, "us"), us)
 	assert.Equal(t, input.Samples.GetInt32(0, "l"), l)
