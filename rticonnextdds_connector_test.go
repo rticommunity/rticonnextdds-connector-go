@@ -221,6 +221,11 @@ func TestDataFlow(t *testing.T) {
 	assert.Equal(t, id.SequenceNumber, uint(2))
 	// UUID can not be checked because it is unique to each run
 
+	ts, err := input.Infos.GetReceptionTimestamp(0)
+	assert.Nil(t, err)
+	assert.NotNil(t, ts)      // Unique time per each run
+	assert.NotEqual(t, ts, 0) // Unique time per each run
+
 	assert.NotEqual(t, input.Samples.GetString(0, "st"), st)
 }
 
