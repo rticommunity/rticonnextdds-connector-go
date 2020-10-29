@@ -5,6 +5,7 @@ import (
 	"path"
 	"runtime"
 	"testing"
+	"time"
 
 	"github.com/rticommunity/rticonnextdds-connector-go/types"
 	"github.com/stretchr/testify/assert"
@@ -216,6 +217,8 @@ func TestDataFlow(t *testing.T) {
 	assert.Nil(t, connector.Wait(-1))
 	assert.Nil(t, input.Read())
 
+	assert.NotEqual(t, input.Samples.GetString(0, "st"), st)
+
 	id, err := input.Infos.GetIdentity(0)
 	assert.Nil(t, err)
 	assert.Equal(t, id.SequenceNumber, uint(2))
@@ -223,15 +226,15 @@ func TestDataFlow(t *testing.T) {
 
 	ts, err := input.Infos.GetReceptionTimestamp(0)
 	assert.Nil(t, err)
-	assert.NotNil(t, ts)      // Unique time per each run
-	assert.NotEqual(t, ts, 0) // Unique time per each run
+	assert.NotNil(t, ts)               // Unique time per each run
+	assert.NotNil(t, time.Unix(0, ts)) // Unique time per each run
+	assert.NotEqual(t, ts, 0)          // Unique time per each run
 
 	gt, err := input.Infos.GetSourceTimestamp(0)
 	assert.Nil(t, err)
-	assert.NotNil(t, gt)      // Unique time per each run
-	assert.NotEqual(t, gt, 0) // Unique time per each run
-
-	assert.NotEqual(t, input.Samples.GetString(0, "st"), st)
+	assert.NotNil(t, gt)               // Unique time per each run
+	assert.NotNil(t, time.Unix(0, gt)) // Unique time per each run
+	assert.NotEqual(t, gt, 0)          // Unique time per each run
 }
 
 func TestJSON(t *testing.T) {
