@@ -1,6 +1,6 @@
 FROM golang:1.14-buster
 
-RUN apt-get update && apt-get install -y curl git-lfs git && git lfs install
+RUN apt-get update && apt-get install -y curl git-lfs git && git lfs install && rm -rf /var/lib/apt/lists/*
 
 RUN git clone https://github.com/rticommunity/rticonnextdds-connector-go.git /rticonnextdds-connector-go
 
@@ -8,6 +8,6 @@ RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/i
 
 RUN cd /rticonnextdds-connector-go && go mod download
 
-CMD golangci-lint run -v && bash run_test.sh
+ENTRYPOINT golangci-lint run -v 
 
 WORKDIR /rticonnextdds-connector-go
