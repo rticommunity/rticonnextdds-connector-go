@@ -82,6 +82,6 @@ Contributions to the code, examples, documentation are really appreciated. Pleas
 
 1. [Sign the CLA](CONTRIBUTING.md).
 1. Create a fork and make your changes.
-1. Run tests (use [run_test.sh](run_test.sh)).
+1. Run tests and linters (make test lint).
 1. Push your branch.
 1. Open a new [pull request](https://github.com/rticommunity/rticonnextdds-connector-go/compare).
