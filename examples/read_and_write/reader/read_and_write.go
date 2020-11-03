@@ -11,12 +11,13 @@
 package main
 
 import (
-	"github.com/rticommunity/rticonnextdds-connector-go"
-	"github.com/rticommunity/rticonnextdds-connector-go/types"
 	"log"
 	"path"
 	"runtime"
 	"time"
+
+	rti "github.com/rticommunity/rticonnextdds-connector-go"
+	"github.com/rticommunity/rticonnextdds-connector-go/types"
 )
 
 func main() {
@@ -41,9 +42,10 @@ func main() {
 
 	for i := 0; i < 500; i++ {
 		input.Take()
-		numOfSamples := input.Samples.GetLength()
+		numOfSamples, _ := input.Samples.GetLength()
 		for j := 0; j < numOfSamples; j++ {
-			if input.Infos.IsValid(j) {
+			valid, _ := input.Infos.IsValid(j)
+			if valid {
 				var shape types.Shape
 				err := input.Samples.Get(j, &shape)
 				if err != nil {
