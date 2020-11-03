@@ -687,8 +687,7 @@ func (infos *Infos) GetIdentity(index int) (Identity, error) {
 	jsonByte := []byte(C.GoString(retVal))
 	err = json.Unmarshal(jsonByte, &writerID)
 	if err != nil {
-		err = errors.New("JSON Unmarshal failed: " + err.Error())
-		return writerID, err
+		return writerID, errors.New("JSON Unmarshal failed: " + err.Error())
 	}
 
 	return writerID, nil
