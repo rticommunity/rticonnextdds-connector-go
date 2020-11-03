@@ -18,11 +18,12 @@ package rti
 // #include "rticonnextdds-connector.h"
 // #include <stdlib.h>
 import "C"
-import "errors"
-import "unsafe"
-import "encoding/json"
-import "strconv"
-
+import (
+	"encoding/json"
+	"errors"
+	"strconv"
+	"unsafe"
+)
 
 /********
 * Types *
@@ -71,7 +72,7 @@ type Infos struct {
 
 // Identity is the structure for identifying
 type Identity struct {
-	WriterGuid     [16]byte `json:"writer_guid"`
+	WriterGUID     [16]byte `json:"writer_guid"`
 	SequenceNumber uint     `json:"sequence_number"`
 }
 
@@ -80,36 +81,36 @@ type Identity struct {
 type SampleHandler func(samples *Samples, infos *Infos)
 
 const (
-    RetCodeOk = 0
-    RetCodeTimeout = 10
-    RetCodeNodata = 11
+	// DDSRetCodeNoData is a Return Code from CGO for no data return
+	DDSRetCodeNoData = 11
+	// DDSRetCodeTimeout is a Return Code from CGO for timeout code
+	DDSRetCodeTimeout = 10
+	// DDSRetCodeOK is a Return Code from CGO for good state
+	DDSRetCodeOK = 0
 )
 
 /********************
 * Private Functions *
 ********************/
 
-func newInstance(output *Output) (instance *Instance) {
+func newInstance(output *Output) *Instance {
 	// Error checking for the output is skipped because it was already checked
-
-	instance = new(Instance)
-	instance.output = output
-
-	return instance
+	return &Instance{
+		output: output,
+	}
 }
 
-func newOutput(connector *Connector, outputName string) (output *Output, err error) {
+func newOutput(connector *Connector, outputName string) (*Output, error) {
 	// Error checking for the connector is skipped because it was already checked
 
-	output = new(Output)
+	output := new(Output)
 	output.connector = connector
 
 	output.nameCStr = C.CString(outputName)
 
 	output.native = C.RTI_Connector_get_datawriter(unsafe.Pointer(connector.native), output.nameCStr)
 	if output.native == nil {
-		err = errors.New("Invalid Publication::DataWriter name")
-		return nil, err
+		return nil, errors.New("invalid Publication::DataWriter name")
 	}
 	output.name = outputName
 	output.Instance = newInstance(output)
@@ -119,18 +120,17 @@ func newOutput(connector *Connector, outputName string) (output *Output, err err
 	return output, nil
 }
 
-func newInput(connector *Connector, inputName string) (input *Input, err error) {
+func newInput(connector *Connector, inputName string) (*Input, error) {
 	// Error checking for the connector is skipped because it was already checked
 
-	input = new(Input)
+	input := new(Input)
 	input.connector = connector
 
 	input.nameCStr = C.CString(inputName)
 
 	input.native = C.RTI_Connector_get_datareader(unsafe.Pointer(connector.native), input.nameCStr)
 	if input.native == nil {
-		err = errors.New("Invalid Subscription::DataReader name")
-		return nil, err
+		return nil, errors.New("invalid Subscription::DataReader name")
 	}
 	input.name = inputName
 	input.Samples = newSamples(input)
@@ -141,36 +141,33 @@ func newInput(connector *Connector, inputName string) (input *Input, err error) 
 	return input, nil
 }
 
-func newSamples(input *Input) (samples *Samples) {
+func newSamples(input *Input) *Samples {
 	// Error checking for the input is skipped because it was already checked
-
-	samples = new(Samples)
-	samples.input = input
-	return samples
+	return &Samples{
+		input: input,
+	}
 }
 
-func newInfos(input *Input) (infos *Infos) {
+func newInfos(input *Input) *Infos {
 	// Error checking for the input is skipped because it was already checked
-
-	infos = new(Infos)
-	infos.input = input
-	return infos
+	return &Infos{
+		input: input,
+	}
 }
 
 // checkRetcode is a function to check return code
 func checkRetcode(retcode int) (err error) {
-    switch retcode {
-	case RetCodeOk:
-	    return nil
-	case RetCodeNodata:
-	    return nil
-	case RetCodeTimeout:
-	    err = errors.New("DDS Exception: Timeout")
-	    return err
+	switch retcode {
+	case DDSRetCodeOK:
+		err = nil
+	case DDSRetCodeNoData:
+		err = errors.New("DDS Exceptrion: No Data")
+	case DDSRetCodeTimeout:
+		err = errors.New("DDS Exception: Timeout")
 	default:
-	    err = errors.New("DDS Exception: " + C.GoString((*C.char)(C.RTI_Connector_get_last_error_message)))
-	    return err
-    }
+		err = errors.New("DDS Exception: " + C.GoString((*C.char)(C.RTI_Connector_get_last_error_message)))
+	}
+	return err
 }
 
 // getNumber is a function to return a number in double from a sample
@@ -197,8 +194,8 @@ func (samples *Samples) getNumber(index int, fieldName string, retVal *C.double)
 //  String specification: str://"<dds><qos_library>…</qos_library></dds>"
 // If you omit the URL schema name, Connector will assume a file name. For example:
 //  File Specification: /usr/local/default_dds.xml
-func NewConnector(configName string, url string) (connector *Connector, err error) {
-	connector = new(Connector)
+func NewConnector(configName, url string) (*Connector, error) {
+	connector := new(Connector)
 
 	configNameCStr := C.CString(configName)
 	defer C.free(unsafe.Pointer(configNameCStr))
@@ -207,18 +204,16 @@ func NewConnector(configName string, url string) (connector *Connector, err erro
 
 	connector.native = C.RTI_Connector_new(configNameCStr, urlCStr, nil)
 	if connector.native == nil {
-		err = errors.New("Invalid participant profile, xml path or xml profile")
-		return nil, err
+		return nil, errors.New("invalid participant profile, xml path or xml profile")
 	}
 
 	return connector, nil
 }
 
 // Delete is a destructor of Connector
-func (connector *Connector) Delete() (err error) {
+func (connector *Connector) Delete() error {
 	if connector == nil {
-		err = errors.New("Connector is null")
-		return err
+		return errors.New("connector is null")
 	}
 
 	// Delete memory allocated in C layer
@@ -236,41 +231,30 @@ func (connector *Connector) Delete() (err error) {
 }
 
 // GetOutput returns an output object
-func (connector *Connector) GetOutput(outputName string) (output *Output, err error) {
+func (connector *Connector) GetOutput(outputName string) (*Output, error) {
 	if connector == nil {
-		err = errors.New("Connector is null")
-		return nil, err
+		return nil, errors.New("connector is null")
 	}
 
-	output, err = newOutput(connector, outputName)
-	if err != nil {
-		return nil, err
-	}
-	return output, nil
+	return newOutput(connector, outputName)
 }
 
 // GetInput returns an input object
-func (connector *Connector) GetInput(inputName string) (input *Input, err error) {
+func (connector *Connector) GetInput(inputName string) (*Input, error) {
 	if connector == nil {
-		err = errors.New("Connector is null")
-		return nil, err
+		return nil, errors.New("connector is null")
 	}
 
-	input, err = newInput(connector, inputName)
-	if err != nil {
-		return nil, err
-	}
-	return input, nil
+	return newInput(connector, inputName)
 }
 
 // Wait is a function to block until data is available on an input
-func (connector *Connector) Wait(timeoutMs int) (err error) {
+func (connector *Connector) Wait(timeoutMs int) error {
 	if connector == nil {
-		err = errors.New("Connector is null")
-		return err
+		return errors.New("connector is null")
 	}
 
-	retcode := int(C.RTI_Connector_wait_for_data(unsafe.Pointer(connector.native), (C.int)(timeoutMs)))
+	retcode := int(C.RTI_Connector_wait_for_data(unsafe.Pointer(connector.native), C.int(timeoutMs)))
 	return checkRetcode(retcode)
 }
 
@@ -395,8 +379,7 @@ func (instance *Instance) SetFloat64(fieldName string, value float64) error {
 }
 
 // SetString is a function that set a string to a fieldname of the samples
-func (instance *Instance) SetString(fieldName string, value string) error {
-
+func (instance *Instance) SetString(fieldName, value string) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
@@ -430,19 +413,17 @@ func (instance *Instance) SetBoolean(fieldName string, value bool) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	var intValue int
+	intValue := 0
 	if value {
 		intValue = 1
-	} else {
-		intValue = 0
 	}
 	retcode := int(C.RTI_Connector_set_boolean_into_samples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.int(intValue)))
 	return checkRetcode(retcode)
 }
 
 // SetJSON is a function to set JSON string in the form of slice of bytes into Instance
-func (instance *Instance) SetJSON(json []byte) error {
-	jsonCStr := C.CString(string(json))
+func (instance *Instance) SetJSON(blob []byte) error {
+	jsonCStr := C.CString(string(blob))
 	defer C.free(unsafe.Pointer(jsonCStr))
 
 	retcode := int(C.RTI_Connector_set_json_instance(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, jsonCStr))
@@ -451,27 +432,21 @@ func (instance *Instance) SetJSON(json []byte) error {
 
 // Set is a function that consumes an interface
 // of multiple samples with different types and value
-func (instance *Instance) Set(v interface{}) (err error) {
+// TODO - think about a new name for this a function (e.g. SetType, SetFromType, FromType)
+func (instance *Instance) Set(v interface{}) error {
 	jsonData, err := json.Marshal(v)
 	if err != nil {
 		return err
 	}
-
-	err = instance.SetJSON(jsonData)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return instance.SetJSON(jsonData)
 }
 
 // Read is a function to read DDS samples from the DDS DataReader
 // and allow access them via the Connector Samples. The Read function
 // does not remove DDS samples from the DDS DataReader's receive queue.
-func (input *Input) Read() (err error) {
+func (input *Input) Read() error {
 	if input == nil {
-		err = errors.New("Input is null")
-		return err
+		return errors.New("input is null")
 	}
 
 	retcode := int(C.RTI_Connector_read(unsafe.Pointer(input.connector.native), input.nameCStr))
@@ -481,98 +456,55 @@ func (input *Input) Read() (err error) {
 // Take is a function to take DDS samples from the DDS DataReader
 // and allow access them via the Connector Samples. The Take
 // function removes DDS samples from the DDS DataReader's receive queue.
-func (input *Input) Take() (err error) {
+func (input *Input) Take() error {
 	if input == nil {
-		err = errors.New("Input is null")
-		return err
+		return errors.New("input is null")
 	}
 
 	retcode := int(C.RTI_Connector_take(unsafe.Pointer(input.connector.native), input.nameCStr))
 	return checkRetcode(retcode)
 }
 
-/*
-// AsyncSubscribe is a function to subscribe DDS samples in an asynchronous way.
-// Internllay, it takes DDS samples from the DDS DataReader when they arrive.
-// Then, it invokes the callback function (cb SampleHandler) that will handle received samples.
-func (input *Input) AsyncSubscribe(cb SampleHandler) (err error) {
-	if input == nil {
-		err = errors.New("Input is null")
-		return err
-	}
-	//input.mu.Lock()
-	//defer input.mu.Unlock()
-	go func() {
-		for {
-			input.connector.Wait(-1)
-			input.Take()
-			cb(input.Samples, input.Infos)
-		}
-	}()
-	return nil
-}
-
-// ChannelSubscribe is a function to subscribe DDS samples with a Go channel.
-// Internally, it taks DDS samples from the DDS DataReader when they arrive.
-// Then, it sends arrived DDS samples to the channel (samples chan *Samples).
-func (input *Input) ChannelSubscribe(samples chan *Samples) (err error) {
-	if input == nil {
-		err = errors.New("Input is null")
-		return err
-	}
-	//input.mu.Lock()
-	//defer input.mu.Unlock()
-	go func() {
-		for {
-			input.connector.Wait(-1)
-			input.Take()
-			samples <- input.Samples
-		}
-	}()
-	return nil
-}
-*/
-
 // GetLength is a function to get the number of samples
-func (samples *Samples) GetLength() (length int, err error) {
+func (samples *Samples) GetLength() (int, error) {
 	var retVal C.double
 	retcode := int(C.RTI_Connector_get_sample_count(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, &retVal))
-	err = checkRetcode(retcode)
+	err := checkRetcode(retcode)
 	return int(retVal), err
 }
 
-
-func (samples *Samples) GetUint8(index int, fieldName string) (value uint8, err error) {
+// GetUint8 is a function to retrieve a value of type uint8 from the samples
+func (samples *Samples) GetUint8(index int, fieldName string) (uint8, error) {
 	var retVal C.double
-	err = samples.getNumber(index, fieldName, &retVal)
+	err := samples.getNumber(index, fieldName, &retVal)
 	return uint8(retVal), err
 }
 
 // GetUint16 is a function to retrieve a value of type uint16 from the samples
-func (samples *Samples) GetUint16(index int, fieldName string) (value uint16, err error) {
+func (samples *Samples) GetUint16(index int, fieldName string) (uint16, error) {
 	var retVal C.double
-	err = samples.getNumber(index, fieldName, &retVal)
+	err := samples.getNumber(index, fieldName, &retVal)
 	return uint16(retVal), err
 }
 
 // GetUint32 is a function to retrieve a value of type uint32 from the samples
-func (samples *Samples) GetUint32(index int, fieldName string) (value uint32, err error) {
+func (samples *Samples) GetUint32(index int, fieldName string) (uint32, error) {
 	var retVal C.double
-	err = samples.getNumber(index, fieldName, &retVal)
+	err := samples.getNumber(index, fieldName, &retVal)
 	return uint32(retVal), err
 }
 
 // GetUint64 is a function to retrieve a value of type uint64 from the samples
-func (samples *Samples) GetUint64(index int, fieldName string) (value uint64, err error) {
+func (samples *Samples) GetUint64(index int, fieldName string) (uint64, error) {
 	var retVal C.double
-	err = samples.getNumber(index, fieldName, &retVal)
+	err := samples.getNumber(index, fieldName, &retVal)
 	return uint64(retVal), err
 }
 
 // GetInt8 is a function to retrieve a value of type int8 from the samples
-func (samples *Samples) GetInt8(index int, fieldName string) (value int8, err error) {
+func (samples *Samples) GetInt8(index int, fieldName string) (int8, error) {
 	var retVal C.double
-	err = samples.getNumber(index, fieldName, &retVal)
+	err := samples.getNumber(index, fieldName, &retVal)
 	return int8(retVal), err
 }
 
@@ -640,154 +572,134 @@ func (samples *Samples) GetRune(index int, fieldName string) (value rune, err er
 }
 
 // GetBoolean is a function to retrieve a value of type boolean from the samples
-func (samples *Samples) GetBoolean(index int, fieldName string) (value bool, err error) {
+func (samples *Samples) GetBoolean(index int, fieldName string) (bool, error) {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
 	var retVal C.int
 
 	retcode := int(C.RTI_Connector_get_boolean_from_sample(unsafe.Pointer(samples.input.connector.native), &retVal, samples.input.nameCStr, C.int(index+1), fieldNameCStr))
-	err = checkRetcode(retcode)
+	err := checkRetcode(retcode)
 
-	if retVal != 0 {
-	    value = true
-	} else {
-	    value = false
-	}
-
-	return value, err
+	return (retVal != 0), err
 }
 
 // GetString is a function to retrieve a value of type string from the samples
-func (samples *Samples) GetString(index int, fieldName string) (value string, err error) {
+func (samples *Samples) GetString(index int, fieldName string) (string, error) {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
 	var retVal *C.char
 
 	retcode := int(C.RTI_Connector_get_string_from_sample(unsafe.Pointer(samples.input.connector.native), &retVal, samples.input.nameCStr, C.int(index+1), fieldNameCStr))
-	err = checkRetcode(retcode)
+	err := checkRetcode(retcode)
 
-	value = C.GoString((*C.char)(retVal))
-
-	return value, err
+	return C.GoString(retVal), err
 }
 
 // GetJSON is a function to retrieve a slice of bytes of a JSON string from the samples
-func (samples *Samples) GetJSON(index int) (json []byte, err error) {
+func (samples *Samples) GetJSON(index int) ([]byte, error) {
 	var retVal *C.char
 
 	retcode := int(C.RTI_Connector_get_json_sample(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), &retVal))
-	err = checkRetcode(retcode)
+	err := checkRetcode(retcode)
 
-	json = []byte(C.GoString((*C.char)(retVal)))
-
-	return json, err
+	return []byte(C.GoString(retVal)), err
 }
 
 // Get is a function to retrieve all the information
 // of the samples and put it into an interface
-func (samples *Samples) Get(index int, v interface{}) (err error) {
+func (samples *Samples) Get(index int, v interface{}) error {
 	jsonData, err := samples.GetJSON(index)
 	if err != nil {
 		return err
 	}
 
-	err = json.Unmarshal(jsonData, &v)
-	if err != nil {
-		return err
-	}
-
-	return err
+	return json.Unmarshal(jsonData, &v)
 }
 
 // IsValid is a function to check validity of the element and return a boolean
-func (infos *Infos) IsValid(index int) (value bool, err error) {
+func (infos *Infos) IsValid(index int) (bool, error) {
 	memberNameCStr := C.CString("valid_data")
 	defer C.free(unsafe.Pointer(memberNameCStr))
 	var retVal C.int
 
 	retcode := int(C.RTI_Connector_get_boolean_from_infos(unsafe.Pointer(infos.input.connector.native), &retVal, infos.input.nameCStr, C.int(index+1), memberNameCStr))
-	err = checkRetcode(retcode)
+	err := checkRetcode(retcode)
 
-	if retVal != 0 {
-	    value = true
-	} else {
-	    value = false
-	}
-
-	return value, err
+	return (retVal != 0), err
 }
 
 // GetSourceTimestamp is a function to get the source timestamp of a sample
-func (infos *Infos) GetSourceTimestamp(index int) (ts int64, err error) {
+func (infos *Infos) GetSourceTimestamp(index int) (int64, error) {
 	memberNameCStr := C.CString("source_timestamp")
 	defer C.free(unsafe.Pointer(memberNameCStr))
 
 	var retVal *C.char
 
 	retcode := int(C.RTI_Connector_get_json_from_infos(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr, C.int(index+1), memberNameCStr, &retVal))
-	err = checkRetcode(retcode)
+	err := checkRetcode(retcode)
 	if err != nil {
-	    return ts, err
+		return 0, err
 	}
 
-	ts, err = strconv.ParseInt(C.GoString((*C.char)(retVal)), 10, 64)
+	ts, err := strconv.ParseInt(C.GoString(retVal), 10, 64)
 	if err != nil {
-		return ts, err
+		return 0, err
 	}
 
-	return ts, err
+	return ts, nil
 }
 
 // GetReceptionTimestamp is a function to get the reception timestamp of a sample
-func (infos *Infos) GetReceptionTimestamp(index int) (ts int64, err error) {
+func (infos *Infos) GetReceptionTimestamp(index int) (int64, error) {
 	memberNameCStr := C.CString("reception_timestamp")
 	defer C.free(unsafe.Pointer(memberNameCStr))
 
 	var retVal *C.char
 
 	retcode := int(C.RTI_Connector_get_json_from_infos(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr, C.int(index+1), memberNameCStr, &retVal))
-	err = checkRetcode(retcode)
+	err := checkRetcode(retcode)
 	if err != nil {
-	    return ts, err
+		return 0, err
 	}
 
-	ts, err = strconv.ParseInt(C.GoString((*C.char)(retVal)), 10, 64)
+	ts, err := strconv.ParseInt(C.GoString(retVal), 10, 64)
 	if err != nil {
-		return ts, err
+		return 0, err
 	}
 
 	return ts, err
 }
 
 // GetIdentity is a function to get the identity of a writer that sent the sample
-func (infos *Infos) GetIdentity(index int) (writerId Identity, err error) {
+func (infos *Infos) GetIdentity(index int) (Identity, error) {
 	memberNameCStr := C.CString("identity")
 	defer C.free(unsafe.Pointer(memberNameCStr))
 
 	var retVal *C.char
+	var writerID Identity
 
 	retcode := int(C.RTI_Connector_get_json_from_infos(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr, C.int(index+1), memberNameCStr, &retVal))
-	err = checkRetcode(retcode)
+	err := checkRetcode(retcode)
 	if err != nil {
-		return writerId, err
+		return writerID, err
 	}
 
-	jsonByte := []byte(C.GoString((*C.char)(retVal)))
-	err = json.Unmarshal(jsonByte, &writerId)
+	jsonByte := []byte(C.GoString(retVal))
+	err = json.Unmarshal(jsonByte, &writerID)
 	if err != nil {
-		err = errors.New("JSON Unmarshal failed")
-		return writerId, err
+		err = errors.New("JSON Unmarshal failed: " + err.Error())
+		return writerID, err
 	}
 
-	return writerId, nil
+	return writerID, nil
 }
 
 // GetLength is a function to return the length of the
-func (infos *Infos) GetLength() (length int, err error) {
+func (infos *Infos) GetLength() (int, error) {
 	var retVal C.double
 	retcode := int(C.RTI_Connector_get_sample_count(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr, &retVal))
-	err = checkRetcode(retcode)
+	err := checkRetcode(retcode)
 	return int(retVal), err
 }

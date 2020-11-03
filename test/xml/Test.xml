@@ -65,6 +65,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
                         <member name="st" stringMaxLength="128" type="string" key="true"/>
                         <member name="b" type="boolean"/>
                         <member name="c" type="uint8"/>
+                        <member name="xs" type="int8"/>
                         <member name="s" type="int16"/>
                         <member name="us" type="uint16"/>
                         <member name="l" type="int32"/>
@@ -73,7 +74,6 @@ This code contains trade secrets of Real-Time Innovations, Inc.
                         <member name="ull" type="uint64"/>
                         <member name="f" type="float32"/>
                         <member name="d" type="float64"/>
-
                 </struct>
     </types>
 

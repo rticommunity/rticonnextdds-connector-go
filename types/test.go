@@ -5,6 +5,7 @@ type Test struct {
 	St  string  `json:"st"`
 	B   bool    `json:"b"`
 	C   uint8   `json:"c"`
+	Xs  int8    `json:"xs"`
 	S   int16   `json:"s"`
 	Us  uint16  `json:"us"`
 	L   int32   `json:"l"`

@@ -4,28 +4,29 @@ os:
   - linux
   
 go:
-  - "1.10.x"
-  - "1.11.x"
-  - "1.12.x"
+  - "1.13.x"
+  - "1.14.x"
 
 matrix:
   include:
     - os: linux
       name: "GolangCI-Lint"
       dist: xenial
-      go: 1.12.x
+      go: 1.14.x
       script:
-        - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.17.1
-        - golangci-lint run --disable errcheck --enable golint --exclude 'SA4008'; 
+        - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.31.0
+        - go mod download
+        - golangci-lint run
 
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install git-lfs; fi
     
 before_script:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then git lfs pull; fi
+  - go mod download
 
 script:
-  - cd $TRAVIS_BUILD_DIR; bash run_test.sh
+  - cd $TRAVIS_BUILD_DIR; make test-local
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
