@@ -171,14 +171,12 @@ func checkRetcode(retcode int) (err error) {
 }
 
 // getNumber is a function to return a number in double from a sample
-func (samples *Samples) getNumber(index int, fieldName string, retVal *C.double) (err error) {
+func (samples *Samples) getNumber(index int, fieldName string, retVal *C.double) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
 	retcode := int(C.RTI_Connector_get_number_from_sample(unsafe.Pointer(samples.input.connector.native), retVal, samples.input.nameCStr, C.int(index+1), fieldNameCStr))
-	err = checkRetcode(retcode)
-
-	return err
+	return checkRetcode(retcode)
 }
 
 // GetUint8 is a function to retrieve a value of type uint8 from the samples
