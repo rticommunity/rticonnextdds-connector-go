@@ -142,9 +142,6 @@ func TestDataFlow(t *testing.T) {
 	output, err := newTestOutput(connector)
 	assert.Nil(t, err)
 
-	// Take any pre-existing samples from cache
-	// err = input.Take()
-
 	xs := int8(math.MaxInt8)
 	s := int16(math.MaxInt16)
 	us := uint16(math.MaxUint16)
