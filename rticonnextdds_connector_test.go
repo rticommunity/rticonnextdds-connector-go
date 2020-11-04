@@ -160,53 +160,37 @@ func TestDataFlow(t *testing.T) {
 	b := true
 	st := "test"
 
-	err = output.Instance.SetInt8("xs", xs)
-	assert.Nil(t, err)
+	assert.Nil(t, output.Instance.SetInt8("xs", xs))
 
-	err = output.Instance.SetUint8("c", c)
-	assert.Nil(t, err)
+	assert.Nil(t, output.Instance.SetUint8("c", c))
 
-	err = output.Instance.SetByte("c", c)
-	assert.Nil(t, err)
+	assert.Nil(t, output.Instance.SetByte("c", c))
 
-	err = output.Instance.SetString("st", st)
-	assert.Nil(t, err)
+	assert.Nil(t, output.Instance.SetString("st", st))
 
-	err = output.Instance.SetBoolean("b", b)
-	assert.Nil(t, err)
+	assert.Nil(t, output.Instance.SetBoolean("b", b))
 
-	err = output.Instance.SetInt16("s", s)
-	assert.Nil(t, err)
+	assert.Nil(t, output.Instance.SetInt16("s", s))
 
-	err = output.Instance.SetUint16("us", us)
-	assert.Nil(t, err)
+	assert.Nil(t, output.Instance.SetUint16("us", us))
 
-	err = output.Instance.SetInt32("l", l)
-	assert.Nil(t, err)
+	assert.Nil(t, output.Instance.SetInt32("l", l))
 
-	err = output.Instance.SetUint32("ul", ul)
-	assert.Nil(t, err)
+	assert.Nil(t, output.Instance.SetUint32("ul", ul))
 
-	err = output.Instance.SetInt("l", int(l))
-	assert.Nil(t, err)
+	assert.Nil(t, output.Instance.SetInt("l", int(l)))
 
-	err = output.Instance.SetUint("ul", uint(ul))
-	assert.Nil(t, err)
+	assert.Nil(t, output.Instance.SetUint("ul", uint(ul)))
 
-	err = output.Instance.SetRune("l", l)
-	assert.Nil(t, err)
+	assert.Nil(t, output.Instance.SetRune("l", l))
 
-	err = output.Instance.SetInt64("ll", ll)
-	assert.Nil(t, err)
+	assert.Nil(t, output.Instance.SetInt64("ll", ll))
 
-	err = output.Instance.SetUint64("ull", ull)
-	assert.Nil(t, err)
+	assert.Nil(t, output.Instance.SetUint64("ull", ull))
 
-	err = output.Instance.SetFloat32("f", f)
-	assert.Nil(t, err)
+	assert.Nil(t, output.Instance.SetFloat32("f", f))
 
-	err = output.Instance.SetFloat64("d", d)
-	assert.Nil(t, err)
+	assert.Nil(t, output.Instance.SetFloat64("d", d))
 
 	err = output.Write()
 	assert.Nil(t, err)
