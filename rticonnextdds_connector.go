@@ -157,17 +157,17 @@ func newInfos(input *Input) *Infos {
 
 // checkRetcode is a function to check return code
 func checkRetcode(retcode int) error {
- 	switch retcode {
- 	case DDSRetCodeOK:
- 	case DDSRetCodeNoData:
- 		return errors.New("DDS Exceptrion: No Data")
- 	case DDSRetCodeTimeout:
- 		return errors.New("DDS Exception: Timeout")
- 	default:
- 		return errors.New("DDS Exception: " + C.GoString((*C.char)(C.RTI_Connector_get_last_error_message)))
- 	}
- 	return nil
- }
+	switch retcode {
+	case DDSRetCodeOK:
+	case DDSRetCodeNoData:
+		return errors.New("DDS Exceptrion: No Data")
+	case DDSRetCodeTimeout:
+		return errors.New("DDS Exception: Timeout")
+	default:
+		return errors.New("DDS Exception: " + C.GoString((*C.char)(C.RTI_Connector_get_last_error_message)))
+	}
+	return nil
+}
 
 // getNumber is a function to return a number in double from a sample
 func (samples *Samples) getNumber(index int, fieldName string, retVal *C.double) error {
@@ -506,65 +506,65 @@ func (samples *Samples) GetInt8(index int, fieldName string) (int8, error) {
 }
 
 // GetInt16 is a function to retrieve a value of type int16 from the samples
-func (samples *Samples) GetInt16(index int, fieldName string) (value int16, err error) {
+func (samples *Samples) GetInt16(index int, fieldName string) (int16, error) {
 	var retVal C.double
-	err = samples.getNumber(index, fieldName, &retVal)
+	err := samples.getNumber(index, fieldName, &retVal)
 	return int16(retVal), err
 }
 
 // GetInt32 is a function to retrieve a value of type int32 from the samples
-func (samples *Samples) GetInt32(index int, fieldName string) (value int32, err error) {
+func (samples *Samples) GetInt32(index int, fieldName string) (int32, error) {
 	var retVal C.double
-	err = samples.getNumber(index, fieldName, &retVal)
+	err := samples.getNumber(index, fieldName, &retVal)
 	return int32(retVal), err
 }
 
 // GetInt64 is a function to retrieve a value of type int64 from the samples
-func (samples *Samples) GetInt64(index int, fieldName string) (value int64, err error) {
+func (samples *Samples) GetInt64(index int, fieldName string) (int64, error) {
 	var retVal C.double
-	err = samples.getNumber(index, fieldName, &retVal)
+	err := samples.getNumber(index, fieldName, &retVal)
 	return int64(retVal), err
 }
 
 // GetFloat32 is a function to retrieve a value of type float32 from the samples
-func (samples *Samples) GetFloat32(index int, fieldName string) (value float32, err error) {
+func (samples *Samples) GetFloat32(index int, fieldName string) (float32, error) {
 	var retVal C.double
-	err = samples.getNumber(index, fieldName, &retVal)
+	err := samples.getNumber(index, fieldName, &retVal)
 	return float32(retVal), err
 }
 
 // GetFloat64 is a function to retrieve a value of type float64 from the samples
-func (samples *Samples) GetFloat64(index int, fieldName string) (value float64, err error) {
+func (samples *Samples) GetFloat64(index int, fieldName string) (float64, error) {
 	var retVal C.double
-	err = samples.getNumber(index, fieldName, &retVal)
+	err := samples.getNumber(index, fieldName, &retVal)
 	return float64(retVal), err
 }
 
 // GetInt is a function to retrieve a value of type int from the samples
-func (samples *Samples) GetInt(index int, fieldName string) (value int, err error) {
+func (samples *Samples) GetInt(index int, fieldName string) (int, error) {
 	var retVal C.double
-	err = samples.getNumber(index, fieldName, &retVal)
+	err := samples.getNumber(index, fieldName, &retVal)
 	return int(retVal), err
 }
 
 // GetUint is a function to retrieve a value of type uint from the samples
-func (samples *Samples) GetUint(index int, fieldName string) (value uint, err error) {
+func (samples *Samples) GetUint(index int, fieldName string) (uint, error) {
 	var retVal C.double
-	err = samples.getNumber(index, fieldName, &retVal)
+	err := samples.getNumber(index, fieldName, &retVal)
 	return uint(retVal), err
 }
 
 // GetByte is a function to retrieve a value of type byte from the samples
-func (samples *Samples) GetByte(index int, fieldName string) (value byte, err error) {
+func (samples *Samples) GetByte(index int, fieldName string) (byte, error) {
 	var retVal C.double
-	err = samples.getNumber(index, fieldName, &retVal)
+	err := samples.getNumber(index, fieldName, &retVal)
 	return byte(retVal), err
 }
 
 // GetRune is a function to retrieve a value of type rune from the samples
-func (samples *Samples) GetRune(index int, fieldName string) (value rune, err error) {
+func (samples *Samples) GetRune(index int, fieldName string) (rune, error) {
 	var retVal C.double
-	err = samples.getNumber(index, fieldName, &retVal)
+	err := samples.getNumber(index, fieldName, &retVal)
 	return rune(retVal), err
 }
 
