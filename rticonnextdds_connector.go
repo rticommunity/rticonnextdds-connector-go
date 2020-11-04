@@ -156,19 +156,18 @@ func newInfos(input *Input) *Infos {
 }
 
 // checkRetcode is a function to check return code
-func checkRetcode(retcode int) (err error) {
-	switch retcode {
-	case DDSRetCodeOK:
-		err = nil
-	case DDSRetCodeNoData:
-		err = errors.New("DDS Exceptrion: No Data")
-	case DDSRetCodeTimeout:
-		err = errors.New("DDS Exception: Timeout")
-	default:
-		err = errors.New("DDS Exception: " + C.GoString((*C.char)(C.RTI_Connector_get_last_error_message)))
-	}
-	return err
-}
+func checkRetcode(retcode int) error {
+ 	switch retcode {
+ 	case DDSRetCodeOK:
+ 	case DDSRetCodeNoData:
+ 		return errors.New("DDS Exceptrion: No Data")
+ 	case DDSRetCodeTimeout:
+ 		return errors.New("DDS Exception: Timeout")
+ 	default:
+ 		return errors.New("DDS Exception: " + C.GoString((*C.char)(C.RTI_Connector_get_last_error_message)))
+ 	}
+ 	return nil
+ }
 
 // getNumber is a function to return a number in double from a sample
 func (samples *Samples) getNumber(index int, fieldName string, retVal *C.double) error {
