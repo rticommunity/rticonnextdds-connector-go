@@ -120,6 +120,8 @@ int RTI_Connector_get_string_from_sample(
 	const char *entity_name,
 	int index,
 	const char *name);
+
+// We will uncomment the following functions when Go wrapper functions are implemented. 
 /*
 int RTI_Connector_get_any_from_sample(
 	void *self,
