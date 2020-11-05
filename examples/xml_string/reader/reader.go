@@ -11,12 +11,13 @@
 package main
 
 import (
-	"github.com/rticommunity/rticonnextdds-connector-go"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	rti "github.com/rticommunity/rticonnextdds-connector-go"
 )
 
 const xmlString = `str://"<dds><qos_library name="QosLibrary"><qos_profile name="def" base_name="BuiltinQosLibExp::Generic.StrictReliable" is_default_qos="true"/></qos_library>
@@ -66,13 +67,14 @@ func main() {
 			run = false
 		default:
 			input.Take()
-			numOfSamples := input.Samples.GetLength()
+			numOfSamples, _ := input.Samples.GetLength()
 			for j := 0; j < numOfSamples; j++ {
-				if input.Infos.IsValid(j) {
-					color := input.Samples.GetString(j, "color")
-					x := input.Samples.GetInt(j, "x")
-					y := input.Samples.GetInt(j, "y")
-					shapesize := input.Samples.GetInt(j, "shapesize")
+				valid, _ := input.Infos.IsValid(j)
+				if valid {
+					color, _ := input.Samples.GetString(j, "color")
+					x, _ := input.Samples.GetInt(j, "x")
+					y, _ := input.Samples.GetInt(j, "y")
+					shapesize, _ := input.Samples.GetInt(j, "shapesize")
 
 					log.Println("---Received Sample---")
 					log.Printf("color: %s\n", color)

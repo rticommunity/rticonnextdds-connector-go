@@ -11,7 +11,6 @@
 package main
 
 import (
-	"github.com/rticommunity/rticonnextdds-connector-go"
 	"log"
 	"os"
 	"os/signal"
@@ -19,6 +18,8 @@ import (
 	"runtime"
 	"syscall"
 	"time"
+
+	rti "github.com/rticommunity/rticonnextdds-connector-go"
 )
 
 func main() {
@@ -57,13 +58,14 @@ func main() {
 			run = false
 		default:
 			input.Take()
-			numOfSamples := input.Samples.GetLength()
+			numOfSamples, _ := input.Samples.GetLength()
 			for i := 0; i < numOfSamples; i++ {
-				if input.Infos.IsValid(i) {
-					color := input.Samples.GetString(i, "color")
-					x := input.Samples.GetInt(i, "x")
-					y := input.Samples.GetInt(i, "y")
-					shapesize := input.Samples.GetInt(i, "shapesize")
+				valid, _ := input.Infos.IsValid(i)
+				if valid {
+					color, _ := input.Samples.GetString(i, "color")
+					x, _ := input.Samples.GetInt(i, "x")
+					y, _ := input.Samples.GetInt(i, "y")
+					shapesize, _ := input.Samples.GetInt(i, "shapesize")
 
 					log.Println("---Received Sample---")
 					log.Printf("color: %s\n", color)

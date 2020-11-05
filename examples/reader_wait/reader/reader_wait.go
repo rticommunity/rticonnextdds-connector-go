@@ -11,10 +11,11 @@
 package main
 
 import (
-	"github.com/rticommunity/rticonnextdds-connector-go"
 	"log"
 	"path"
 	"runtime"
+
+	rti "github.com/rticommunity/rticonnextdds-connector-go"
 )
 
 func main() {
@@ -36,9 +37,10 @@ func main() {
 	for {
 		connector.Wait(-1)
 		input.Take()
-		numOfSamples := input.Samples.GetLength()
+		numOfSamples, _ := input.Samples.GetLength()
 		for j := 0; j < numOfSamples; j++ {
-			if input.Infos.IsValid(j) {
+			valid, _ := input.Infos.IsValid(j)
+			if valid {
 				json, err := input.Samples.GetJSON(j)
 				if err != nil {
 					log.Println(err)

@@ -142,16 +142,14 @@ func TestDataFlow(t *testing.T) {
 	output, err := newTestOutput(connector)
 	assert.Nil(t, err)
 
-	// Take any pre-existing samples from cache
-	assert.Nil(t, input.Take())
-
 	xs := int8(math.MaxInt8)
 	s := int16(math.MaxInt16)
 	us := uint16(math.MaxUint16)
 	l := int32(math.MaxInt32)
-	ll := int64(123)
 	ul := uint32(math.MaxUint32)
-	ull := uint64(456)
+	// an integral value larger than 2^53 can only be retrieved or set with a dictionary/json string
+	ll := int64(math.Pow(2, 52))
+	ull := uint64(math.Pow(2, 52))
 	f := float32(math.MaxFloat32)
 	d := float64(math.MaxFloat64)
 
@@ -160,52 +158,121 @@ func TestDataFlow(t *testing.T) {
 	st := "test"
 
 	assert.Nil(t, output.Instance.SetInt8("xs", xs))
+
 	assert.Nil(t, output.Instance.SetUint8("c", c))
+
 	assert.Nil(t, output.Instance.SetByte("c", c))
+
 	assert.Nil(t, output.Instance.SetString("st", st))
+
 	assert.Nil(t, output.Instance.SetBoolean("b", b))
+
 	assert.Nil(t, output.Instance.SetInt16("s", s))
+
 	assert.Nil(t, output.Instance.SetUint16("us", us))
+
 	assert.Nil(t, output.Instance.SetInt32("l", l))
+
 	assert.Nil(t, output.Instance.SetUint32("ul", ul))
+
 	assert.Nil(t, output.Instance.SetInt("l", int(l)))
-	assert.Nil(t, output.Instance.SetInt64("ll", ll))
-	assert.Nil(t, output.Instance.SetUint64("ull", ull))
+
 	assert.Nil(t, output.Instance.SetUint("ul", uint(ul)))
-	assert.Nil(t, output.Instance.SetRune("l", rune(l))) //nolint //this is because "l" rune is still an int32
+
+	assert.Nil(t, output.Instance.SetRune("l", l))
+
+	assert.Nil(t, output.Instance.SetInt64("ll", ll))
+
+	assert.Nil(t, output.Instance.SetUint64("ull", ull))
+
 	assert.Nil(t, output.Instance.SetFloat32("f", f))
+
 	assert.Nil(t, output.Instance.SetFloat64("d", d))
 
-	assert.Nil(t, output.Write())
-	assert.Nil(t, connector.Wait(-1))
-	assert.Nil(t, input.Take())
+	err = output.Write()
+	assert.Nil(t, err)
 
-	sampleLength := input.Samples.GetLength()
+	err = connector.Wait(-1)
+	assert.Nil(t, err)
+
+	err = input.Take()
+	assert.Nil(t, err)
+
+	sampleLength, err := input.Samples.GetLength()
+	assert.Nil(t, err)
 	assert.Equal(t, sampleLength, 1)
 
-	infoLength := input.Infos.GetLength()
+	infoLength, err := input.Infos.GetLength()
+	assert.Nil(t, err)
 	assert.Equal(t, infoLength, 1)
 
-	valid := input.Infos.IsValid(0)
+	valid, err := input.Infos.IsValid(0)
+	assert.Nil(t, err)
 	assert.Equal(t, valid, true)
 
-	assert.Equal(t, input.Samples.GetString(0, "st"), st)
-	assert.Equal(t, input.Samples.GetBoolean(0, "b"), b)
+	rst, err := input.Samples.GetString(0, "st")
+	assert.Nil(t, err)
+	assert.Equal(t, rst, st)
 
-	assert.Equal(t, input.Samples.GetUint8(0, "c"), c)
-	assert.Equal(t, input.Samples.GetByte(0, "c"), c)
-	assert.Equal(t, input.Samples.GetInt8(0, "xs"), xs)
-	assert.Equal(t, input.Samples.GetInt16(0, "s"), s)
-	assert.Equal(t, input.Samples.GetUint16(0, "us"), us)
-	assert.Equal(t, input.Samples.GetInt32(0, "l"), l)
-	assert.Equal(t, input.Samples.GetInt(0, "l"), int(l))
-	assert.Equal(t, input.Samples.GetInt64(0, "ll"), ll)
-	assert.Equal(t, input.Samples.GetUint(0, "ul"), uint(ul))
-	assert.Equal(t, input.Samples.GetRune(0, "l"), rune(l)) //nolint //this is because "l" rune is still an int32
-	assert.Equal(t, input.Samples.GetUint32(0, "ul"), ul)
-	assert.Equal(t, input.Samples.GetUint64(0, "ull"), ull)
-	assert.Equal(t, input.Samples.GetFloat32(0, "f"), f)
-	assert.Equal(t, input.Samples.GetFloat64(0, "d"), d)
+	rb, err := input.Samples.GetBoolean(0, "b")
+	assert.Nil(t, err)
+	assert.Equal(t, rb, b)
+
+	rc, err := input.Samples.GetByte(0, "c")
+	assert.Nil(t, err)
+	assert.Equal(t, rc, c)
+
+	rxs, err := input.Samples.GetInt8(0, "xs")
+	assert.Nil(t, err)
+	assert.Equal(t, rxs, xs)
+
+	rc, err = input.Samples.GetUint8(0, "c")
+	assert.Nil(t, err)
+	assert.Equal(t, rc, c)
+
+	rs, err := input.Samples.GetInt16(0, "s")
+	assert.Nil(t, err)
+	assert.Equal(t, rs, s)
+
+	rus, err := input.Samples.GetUint16(0, "us")
+	assert.Nil(t, err)
+	assert.Equal(t, rus, us)
+
+	rl, err := input.Samples.GetInt32(0, "l")
+	assert.Nil(t, err)
+	assert.Equal(t, rl, l)
+
+	rul, err := input.Samples.GetUint32(0, "ul")
+	assert.Nil(t, err)
+	assert.Equal(t, rul, ul)
+
+	ri, err := input.Samples.GetInt(0, "l")
+	assert.Nil(t, err)
+	assert.Equal(t, ri, int(l))
+
+	rui, err := input.Samples.GetUint(0, "ul")
+	assert.Nil(t, err)
+	assert.Equal(t, rui, uint(ul))
+
+	rl, err = input.Samples.GetRune(0, "l")
+	assert.Nil(t, err)
+	assert.Equal(t, rl, l)
+
+	rll, err := input.Samples.GetInt64(0, "ll")
+	assert.Nil(t, err)
+	assert.Equal(t, rll, ll)
+
+	rull, err := input.Samples.GetUint64(0, "ull")
+	assert.Nil(t, err)
+	assert.Equal(t, rull, ull)
+
+	rf, err := input.Samples.GetFloat32(0, "f")
+	assert.Nil(t, err)
+	assert.Equal(t, rf, f)
+
+	rd, err := input.Samples.GetFloat64(0, "d")
+	assert.Nil(t, err)
+	assert.Equal(t, rd, d)
 
 	assert.Nil(t, output.ClearMembers())
 
@@ -213,11 +280,15 @@ func TestDataFlow(t *testing.T) {
 	assert.NotNil(t, connector.Wait(5))
 
 	// Testing Read
-	assert.Nil(t, output.Write())
-	assert.Nil(t, connector.Wait(-1))
-	assert.Nil(t, input.Read())
-
-	assert.NotEqual(t, input.Samples.GetString(0, "st"), st)
+	err = output.Write()
+	assert.Nil(t, err)
+	err = connector.Wait(-1)
+	assert.Nil(t, err)
+	err = input.Read()
+	assert.Nil(t, err)
+	rst, err = input.Samples.GetString(0, "st")
+	assert.Nil(t, err)
+	assert.Equal(t, rst, "")
 
 	id, err := input.Infos.GetIdentity(0)
 	assert.Nil(t, err)

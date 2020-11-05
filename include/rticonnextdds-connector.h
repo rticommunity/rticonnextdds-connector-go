@@ -8,39 +8,196 @@
 *                                                                            *
 *****************************************************************************/
 #include "lua_binding/lua_binding_ddsConnector.h"
+typedef struct RTIDDSConnector RTI_Connector;
 
-void RTIDDSConnector_write(void *connector, char *name, char *param);
-void RTIDDSConnector_clear(void *connector, char *name);
-void RTIDDSConnector_setNumberIntoSamples(void *connector, char *name, char *field_name, double value);
-void RTIDDSConnector_setStringIntoSamples(void *connector, char *name, char *field_name, char *value);
-void RTIDDSConnector_setBooleanIntoSamples(void *connector, char *name, char *field_name, int value);
-void RTIDDSConnector_setJSONInstance(void *connector, char *name, char *json_str);
-void* RTIDDSConnector_getWriter(void *connector, char *name);
-void* RTIDDSConnector_getReader(void *connector, char *name);
-void RTIDDSConnector_read(void *connector, char *name);
-void RTIDDSConnector_take(void *connector, char *name);
-double RTIDDSConnector_getSamplesLength(void *connector, char *name);
-double RTIDDSConnector_getInfosLength(void *connector, char *name);
-int RTIDDSConnector_getBooleanFromInfos(void *connector, char *name, int index, char *field_name);
-
-int RTI_Connector_get_json_from_infos(
-        void *self,
-        const char *entity_name,
-        int index,
-        const char *name,
-        char **return_value);
+int RTI_Connector_get_sample_count(
+	void *self,
+	const char *entity_name,
+	double *value);
 
 int RTI_Connector_get_boolean_from_infos(
-        void *self,
-        int *return_value,
-        const char *entity_name,
-        int index,
-        const char *name);
+	void *self,
+	int *return_value,
+	const char *entity_name,
+	int index,
+	const char *name);
 
-void* RTIDDSConnector_getJSONSample(void *connector, char *name, int index);
-double RTIDDSConnector_getNumberFromSamples(void *connector, char *name, int index, char *field_name);
-int RTIDDSConnector_getBooleanFromSamples(void *connector, char *name, int index, char *field_name);
-void* RTIDDSConnector_getStringFromSamples(void *connector, char *name, int index, char *field_name);
-char* RTIDDSConnector_freeString(char *json);
-int RTIDDSConnector_wait(void *connector, int timeout);
+int RTI_Connector_set_json_instance(
+	void *self,
+	const char *entity_name,
+	const char *json);
 
+int RTI_Connector_set_boolean_into_samples(
+	void *self,
+	const char *entity_name,
+	const char *name,
+	int value);
+
+int RTI_Connector_set_number_into_samples(
+	void *self,
+	const char *entity_name,
+	const char *name,
+	double value);
+
+int RTI_Connector_set_string_into_samples(
+	void *self,
+	const char *entity_name,
+	const char *name,
+	const char *value);
+
+int RTI_Connector_get_json_from_infos(
+	void *self,
+	const char *entity_name,
+	int index,
+	const char *name,
+	char **value);
+
+int RTI_Connector_get_json_sample(
+	void *self,
+	const char *entity_name,
+	int index,
+	char **json_str);
+
+int RTI_Connector_get_json_member(
+	void *self,
+	const char *entity_name,
+	int index,
+	const char *member_name,
+	char **json_str);
+
+int RTI_Connector_clear(
+	void *self,
+	const char *entity_name);
+
+int RTI_Connector_read(
+	void *self,
+	const char *entity_name);
+
+int RTI_Connector_take(
+	void *self,
+	const char *entity_name);
+
+int RTI_Connector_write(
+	void *self,
+	const char *entity_name,
+	const char *params_json);
+
+struct RTI_Connector_Options {
+        /* boolean */ int enable_on_data_event;
+	/* boolean */ int one_based_sequence_indexing;
+};
+
+
+#define RTI_Connector_Options_INITIALIZER { \
+        1, /* enable_on_data_event */ \
+	1  /* one_based_sequence_indexing */ \
+}
+
+RTI_Connector *RTI_Connector_new(
+	const char *config_name,
+	const char *config_file,
+	const struct RTI_Connector_Options *options);
+
+void RTI_Connector_delete(RTI_Connector *self);
+
+int RTI_Connector_get_number_from_sample(
+	void *self,
+	double *return_value,
+	const char *entity_name,
+	int index,
+	const char *name);
+
+int RTI_Connector_get_boolean_from_sample(
+	void *self,
+	int *return_value,
+	const char *entity_name,
+	int index,
+	const char *name);
+
+int RTI_Connector_get_string_from_sample(
+	void *self,
+	char **return_value,
+	const char *entity_name,
+	int index,
+	const char *name);
+
+// We will uncomment the following functions when Go wrapper functions are implemented. 
+/*
+int RTI_Connector_get_any_from_sample(
+	void *self,
+	double *double_value_out,
+	RTIBool *bool_value_out,
+	char **string_value_out,
+	RTI_Connector_AnyValueKind *selected_out,
+	const char *entity_name,
+	int index,
+	const char *name);
+
+int RTI_Connector_get_any_from_info(
+	void *self,
+	double *double_value_out,
+	RTIBool *bool_value_out,
+	char **string_value_out,
+	RTI_Connector_AnyValueKind *selected_out,
+	const char *entity_name,
+	int index,
+	const char *name);
+ */
+
+int RTI_Connector_clear_member(
+	void *self,
+	const char *entity_name,
+	const char *name);
+
+void* RTI_Connector_get_datareader( //DDS_DynamicDataReader
+	void *self,
+	const char *entity_name);
+
+void* RTI_Connector_get_datawriter( //DDS_DynamicDataWriter
+	void *self,
+	const char *entity_name);
+
+const void* RTI_Connector_get_native_sample( //DDS_DynamicData
+	void *self,
+	const char *entity_name,
+	int index);
+
+int RTI_Connector_wait_for_data(void *self, int timeout);
+
+int RTI_Connector_wait_for_data_on_reader(
+	void *self,
+	int ms_timeout);
+
+int RTI_Connector_wait_for_acknowledgments(
+	void *writer,
+	int timeout);
+
+int RTI_Connector_wait_for_matched_publication(
+	void *reader,
+	int ms_timeout,
+	int *current_count_change);
+
+int RTI_Connector_wait_for_matched_subscription(
+	void *writer,
+	int ms_timeout,
+	int *current_count_change);
+
+int RTI_Connector_get_matched_subscriptions(
+	void *writer,
+	char **json_str);
+
+int RTI_Connector_get_matched_publications(
+	void *reader,
+	char **json_str);
+
+char * RTI_Connector_get_last_error_message();
+
+int RTI_Connector_get_native_instance(
+	void *self,
+	const char *entity_name,
+	const void **native_pointer); //DDS_DynamicData
+
+void RTI_Connector_free_string(char *str);
+
+int RTI_Connector_set_max_objects_per_thread(
+	int value);

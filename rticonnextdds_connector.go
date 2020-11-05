@@ -31,7 +31,7 @@ import (
 
 // Connector is a container managing DDS inputs and outputs
 type Connector struct {
-	native  *C.struct_RTIDDSConnector
+	native  *C.RTI_Connector
 	Inputs  []Input
 	Outputs []Output
 }
@@ -108,7 +108,7 @@ func newOutput(connector *Connector, outputName string) (*Output, error) {
 
 	output.nameCStr = C.CString(outputName)
 
-	output.native = C.RTIDDSConnector_getWriter(unsafe.Pointer(connector.native), output.nameCStr)
+	output.native = C.RTI_Connector_get_datawriter(unsafe.Pointer(connector.native), output.nameCStr)
 	if output.native == nil {
 		return nil, errors.New("invalid Publication::DataWriter name")
 	}
@@ -128,7 +128,7 @@ func newInput(connector *Connector, inputName string) (*Input, error) {
 
 	input.nameCStr = C.CString(inputName)
 
-	input.native = C.RTIDDSConnector_getReader(unsafe.Pointer(connector.native), input.nameCStr)
+	input.native = C.RTI_Connector_get_datareader(unsafe.Pointer(connector.native), input.nameCStr)
 	if input.native == nil {
 		return nil, errors.New("invalid Subscription::DataReader name")
 	}
@@ -155,6 +155,31 @@ func newInfos(input *Input) *Infos {
 	}
 }
 
+// checkRetcode is a function to check return code
+func checkRetcode(retcode int) error {
+	switch retcode {
+	case DDSRetCodeOK:
+	case DDSRetCodeNoData:
+		return errors.New("DDS Exceptrion: No Data")
+	case DDSRetCodeTimeout:
+		return errors.New("DDS Exception: Timeout")
+	default:
+		return errors.New("DDS Exception: " + C.GoString((*C.char)(C.RTI_Connector_get_last_error_message)))
+	}
+	return nil
+}
+
+// getNumber is a function to return a number in double from a sample
+func (samples *Samples) getNumber(index int, fieldName string, retVal *C.double) error {
+	fieldNameCStr := C.CString(fieldName)
+	defer C.free(unsafe.Pointer(fieldNameCStr))
+
+	retcode := int(C.RTI_Connector_get_number_from_sample(unsafe.Pointer(samples.input.connector.native), retVal, samples.input.nameCStr, C.int(index+1), fieldNameCStr))
+	return checkRetcode(retcode)
+}
+
+// GetUint8 is a function to retrieve a value of type uint8 from the samples
+
 /*******************
 * Public Functions *
 *******************/
@@ -174,7 +199,7 @@ func NewConnector(configName, url string) (*Connector, error) {
 	urlCStr := C.CString(url)
 	defer C.free(unsafe.Pointer(urlCStr))
 
-	connector.native = C.RTIDDSConnector_new(configNameCStr, urlCStr, nil)
+	connector.native = C.RTI_Connector_new(configNameCStr, urlCStr, nil)
 	if connector.native == nil {
 		return nil, errors.New("invalid participant profile, xml path or xml profile")
 	}
@@ -196,7 +221,7 @@ func (connector *Connector) Delete() error {
 		C.free(unsafe.Pointer(output.nameCStr))
 	}
 
-	C.RTIDDSConnector_delete(connector.native)
+	C.RTI_Connector_delete(connector.native)
 	connector.native = nil
 
 	return nil
@@ -225,31 +250,21 @@ func (connector *Connector) Wait(timeoutMs int) error {
 	if connector == nil {
 		return errors.New("connector is null")
 	}
-	switch int(C.RTIDDSConnector_wait(unsafe.Pointer(connector.native), C.int(timeoutMs))) {
-	case DDSRetCodeOK:
-		return nil
-	case DDSRetCodeTimeout:
-		return errors.New("timeout")
-	case DDSRetCodeNoData:
-		return errors.New("no data")
-	default:
-	}
-	return errors.New("RTIDDSConnector_wait error")
+
+	retcode := int(C.RTI_Connector_wait_for_data(unsafe.Pointer(connector.native), C.int(timeoutMs)))
+	return checkRetcode(retcode)
 }
 
 // Write is a function to write a DDS data instance in an output
 func (output *Output) Write() error {
-	// The C function does not return errors. In the future, we will check errors when supported in the C layer
-	// CON-24 (for more information)
-	C.RTIDDSConnector_write(unsafe.Pointer(output.connector.native), output.nameCStr, nil)
-	return nil
+	retcode := int(C.RTI_Connector_write(unsafe.Pointer(output.connector.native), output.nameCStr, nil))
+	return checkRetcode(retcode)
 }
 
 // ClearMembers is a function to initialize a DDS data instance in an output
 func (output *Output) ClearMembers() error {
-	// The C function does not return errors. In the future, we will check errors when supported in the C layer
-	C.RTIDDSConnector_clear(unsafe.Pointer(output.connector.native), output.nameCStr)
-	return nil
+	retcode := int(C.RTI_Connector_clear(unsafe.Pointer(output.connector.native), output.nameCStr))
+	return checkRetcode(retcode)
 }
 
 // SetUint8 is a function to set a value of type uint8 into samples
@@ -257,8 +272,8 @@ func (instance *Instance) SetUint8(fieldName string, value uint8) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
-	return nil
+	retcode := int(C.RTI_Connector_set_number_into_samples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value)))
+	return checkRetcode(retcode)
 }
 
 // SetUint16 is a function to set a value of type uint16 into samples
@@ -266,8 +281,8 @@ func (instance *Instance) SetUint16(fieldName string, value uint16) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
-	return nil
+	retcode := int(C.RTI_Connector_set_number_into_samples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value)))
+	return checkRetcode(retcode)
 }
 
 // SetUint32 is a function to set a value of type uint32 into samples
@@ -275,8 +290,8 @@ func (instance *Instance) SetUint32(fieldName string, value uint32) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
-	return nil
+	retcode := int(C.RTI_Connector_set_number_into_samples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value)))
+	return checkRetcode(retcode)
 }
 
 // SetUint64 is a function to set a value of type uint64 into samples
@@ -284,8 +299,8 @@ func (instance *Instance) SetUint64(fieldName string, value uint64) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
-	return nil
+	retcode := int(C.RTI_Connector_set_number_into_samples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value)))
+	return checkRetcode(retcode)
 }
 
 // SetInt8 is a function to set a value of type int8 into samples
@@ -293,8 +308,8 @@ func (instance *Instance) SetInt8(fieldName string, value int8) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
-	return nil
+	retcode := int(C.RTI_Connector_set_number_into_samples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value)))
+	return checkRetcode(retcode)
 }
 
 // SetInt16 is a function to set a value of type int16 into samples
@@ -302,8 +317,8 @@ func (instance *Instance) SetInt16(fieldName string, value int16) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
-	return nil
+	retcode := int(C.RTI_Connector_set_number_into_samples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value)))
+	return checkRetcode(retcode)
 }
 
 // SetInt32 is a function to set a value of type int32 into samples
@@ -311,8 +326,8 @@ func (instance *Instance) SetInt32(fieldName string, value int32) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
-	return nil
+	retcode := int(C.RTI_Connector_set_number_into_samples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value)))
+	return checkRetcode(retcode)
 }
 
 // SetInt64 is a function to set a value of type int64 into samples
@@ -320,8 +335,8 @@ func (instance *Instance) SetInt64(fieldName string, value int64) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
-	return nil
+	retcode := int(C.RTI_Connector_set_number_into_samples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value)))
+	return checkRetcode(retcode)
 }
 
 // SetUint is a function to set a value of type uint into samples
@@ -329,8 +344,8 @@ func (instance *Instance) SetUint(fieldName string, value uint) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
-	return nil
+	retcode := int(C.RTI_Connector_set_number_into_samples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value)))
+	return checkRetcode(retcode)
 }
 
 // SetInt is a function to set a value of type int into samples
@@ -338,8 +353,8 @@ func (instance *Instance) SetInt(fieldName string, value int) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
-	return nil
+	retcode := int(C.RTI_Connector_set_number_into_samples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value)))
+	return checkRetcode(retcode)
 }
 
 // SetFloat32 is a function to set a value of type float32 into samples
@@ -347,8 +362,8 @@ func (instance *Instance) SetFloat32(fieldName string, value float32) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
-	return nil
+	retcode := int(C.RTI_Connector_set_number_into_samples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value)))
+	return checkRetcode(retcode)
 }
 
 // SetFloat64 is a function to set a value of type float64 into samples
@@ -356,8 +371,8 @@ func (instance *Instance) SetFloat64(fieldName string, value float64) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
-	return nil
+	retcode := int(C.RTI_Connector_set_number_into_samples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value)))
+	return checkRetcode(retcode)
 }
 
 // SetString is a function that set a string to a fieldname of the samples
@@ -368,9 +383,8 @@ func (instance *Instance) SetString(fieldName, value string) error {
 	valueCStr := C.CString(value)
 	defer C.free(unsafe.Pointer(valueCStr))
 
-	C.RTIDDSConnector_setStringIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, valueCStr)
-
-	return nil
+	retcode := int(C.RTI_Connector_set_string_into_samples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, valueCStr))
+	return checkRetcode(retcode)
 }
 
 // SetByte is a function to set a byte to a fieldname of the samples
@@ -378,8 +392,8 @@ func (instance *Instance) SetByte(fieldName string, value byte) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
-	return nil
+	retcode := int(C.RTI_Connector_set_number_into_samples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value)))
+	return checkRetcode(retcode)
 }
 
 // SetRune is a function to set rune to a fieldname of the samples
@@ -387,8 +401,8 @@ func (instance *Instance) SetRune(fieldName string, value rune) error {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	C.RTIDDSConnector_setNumberIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value))
-	return nil
+	retcode := int(C.RTI_Connector_set_number_into_samples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.double(value)))
+	return checkRetcode(retcode)
 }
 
 // SetBoolean is a function to set boolean to a fieldname of the samples
@@ -400,8 +414,8 @@ func (instance *Instance) SetBoolean(fieldName string, value bool) error {
 	if value {
 		intValue = 1
 	}
-	C.RTIDDSConnector_setBooleanIntoSamples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.int(intValue))
-	return nil
+	retcode := int(C.RTI_Connector_set_boolean_into_samples(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, fieldNameCStr, C.int(intValue)))
+	return checkRetcode(retcode)
 }
 
 // SetJSON is a function to set JSON string in the form of slice of bytes into Instance
@@ -409,8 +423,8 @@ func (instance *Instance) SetJSON(blob []byte) error {
 	jsonCStr := C.CString(string(blob))
 	defer C.free(unsafe.Pointer(jsonCStr))
 
-	C.RTIDDSConnector_setJSONInstance(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, jsonCStr)
-	return nil
+	retcode := int(C.RTI_Connector_set_json_instance(unsafe.Pointer(instance.output.connector.native), instance.output.nameCStr, jsonCStr))
+	return checkRetcode(retcode)
 }
 
 // Set is a function that consumes an interface
@@ -432,9 +446,8 @@ func (input *Input) Read() error {
 		return errors.New("input is null")
 	}
 
-	// The C function does not return errors. In the future, we will update this when supported in the C layer
-	C.RTIDDSConnector_read(unsafe.Pointer(input.connector.native), input.nameCStr)
-	return nil
+	retcode := int(C.RTI_Connector_read(unsafe.Pointer(input.connector.native), input.nameCStr))
+	return checkRetcode(retcode)
 }
 
 // Take is a function to take DDS samples from the DDS DataReader
@@ -444,139 +457,151 @@ func (input *Input) Take() error {
 	if input == nil {
 		return errors.New("input is null")
 	}
-	// The C function does not return errors. In the future, we will update this when supported in the C layer
-	C.RTIDDSConnector_take(unsafe.Pointer(input.connector.native), input.nameCStr)
-	return nil
+
+	retcode := int(C.RTI_Connector_take(unsafe.Pointer(input.connector.native), input.nameCStr))
+	return checkRetcode(retcode)
 }
 
 // GetLength is a function to get the number of samples
-func (samples *Samples) GetLength() int {
-	return int(C.RTIDDSConnector_getSamplesLength(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr))
+func (samples *Samples) GetLength() (int, error) {
+	var retVal C.double
+	retcode := int(C.RTI_Connector_get_sample_count(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, &retVal))
+	err := checkRetcode(retcode)
+	return int(retVal), err
 }
 
 // GetUint8 is a function to retrieve a value of type uint8 from the samples
-func (samples *Samples) GetUint8(index int, fieldName string) uint8 {
-	fieldNameCStr := C.CString(fieldName)
-	defer C.free(unsafe.Pointer(fieldNameCStr))
-	return uint8(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
+func (samples *Samples) GetUint8(index int, fieldName string) (uint8, error) {
+	var retVal C.double
+	err := samples.getNumber(index, fieldName, &retVal)
+	return uint8(retVal), err
 }
 
 // GetUint16 is a function to retrieve a value of type uint16 from the samples
-func (samples *Samples) GetUint16(index int, fieldName string) uint16 {
-	fieldNameCStr := C.CString(fieldName)
-	defer C.free(unsafe.Pointer(fieldNameCStr))
-	return uint16(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
+func (samples *Samples) GetUint16(index int, fieldName string) (uint16, error) {
+	var retVal C.double
+	err := samples.getNumber(index, fieldName, &retVal)
+	return uint16(retVal), err
 }
 
 // GetUint32 is a function to retrieve a value of type uint32 from the samples
-func (samples *Samples) GetUint32(index int, fieldName string) uint32 {
-	fieldNameCStr := C.CString(fieldName)
-	defer C.free(unsafe.Pointer(fieldNameCStr))
-	return uint32(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
+func (samples *Samples) GetUint32(index int, fieldName string) (uint32, error) {
+	var retVal C.double
+	err := samples.getNumber(index, fieldName, &retVal)
+	return uint32(retVal), err
 }
 
 // GetUint64 is a function to retrieve a value of type uint64 from the samples
-func (samples *Samples) GetUint64(index int, fieldName string) uint64 {
-	fieldNameCStr := C.CString(fieldName)
-	defer C.free(unsafe.Pointer(fieldNameCStr))
-	return uint64(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
+func (samples *Samples) GetUint64(index int, fieldName string) (uint64, error) {
+	var retVal C.double
+	err := samples.getNumber(index, fieldName, &retVal)
+	return uint64(retVal), err
 }
 
 // GetInt8 is a function to retrieve a value of type int8 from the samples
-func (samples *Samples) GetInt8(index int, fieldName string) int8 {
-	fieldNameCStr := C.CString(fieldName)
-	defer C.free(unsafe.Pointer(fieldNameCStr))
-	return int8(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
+func (samples *Samples) GetInt8(index int, fieldName string) (int8, error) {
+	var retVal C.double
+	err := samples.getNumber(index, fieldName, &retVal)
+	return int8(retVal), err
 }
 
 // GetInt16 is a function to retrieve a value of type int16 from the samples
-func (samples *Samples) GetInt16(index int, fieldName string) int16 {
-	fieldNameCStr := C.CString(fieldName)
-	defer C.free(unsafe.Pointer(fieldNameCStr))
-	return int16(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
+func (samples *Samples) GetInt16(index int, fieldName string) (int16, error) {
+	var retVal C.double
+	err := samples.getNumber(index, fieldName, &retVal)
+	return int16(retVal), err
 }
 
 // GetInt32 is a function to retrieve a value of type int32 from the samples
-func (samples *Samples) GetInt32(index int, fieldName string) int32 {
-	fieldNameCStr := C.CString(fieldName)
-	defer C.free(unsafe.Pointer(fieldNameCStr))
-	return int32(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
+func (samples *Samples) GetInt32(index int, fieldName string) (int32, error) {
+	var retVal C.double
+	err := samples.getNumber(index, fieldName, &retVal)
+	return int32(retVal), err
 }
 
 // GetInt64 is a function to retrieve a value of type int64 from the samples
-func (samples *Samples) GetInt64(index int, fieldName string) int64 {
-	fieldNameCStr := C.CString(fieldName)
-	defer C.free(unsafe.Pointer(fieldNameCStr))
-	return int64(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
+func (samples *Samples) GetInt64(index int, fieldName string) (int64, error) {
+	var retVal C.double
+	err := samples.getNumber(index, fieldName, &retVal)
+	return int64(retVal), err
 }
 
 // GetFloat32 is a function to retrieve a value of type float32 from the samples
-func (samples *Samples) GetFloat32(index int, fieldName string) float32 {
-	fieldNameCStr := C.CString(fieldName)
-	defer C.free(unsafe.Pointer(fieldNameCStr))
-	return float32(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
+func (samples *Samples) GetFloat32(index int, fieldName string) (float32, error) {
+	var retVal C.double
+	err := samples.getNumber(index, fieldName, &retVal)
+	return float32(retVal), err
 }
 
 // GetFloat64 is a function to retrieve a value of type float64 from the samples
-func (samples *Samples) GetFloat64(index int, fieldName string) float64 {
-	fieldNameCStr := C.CString(fieldName)
-	defer C.free(unsafe.Pointer(fieldNameCStr))
-	return float64(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
+func (samples *Samples) GetFloat64(index int, fieldName string) (float64, error) {
+	var retVal C.double
+	err := samples.getNumber(index, fieldName, &retVal)
+	return float64(retVal), err
 }
 
 // GetInt is a function to retrieve a value of type int from the samples
-func (samples *Samples) GetInt(index int, fieldName string) int {
-	fieldNameCStr := C.CString(fieldName)
-	defer C.free(unsafe.Pointer(fieldNameCStr))
-	return int(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
+func (samples *Samples) GetInt(index int, fieldName string) (int, error) {
+	var retVal C.double
+	err := samples.getNumber(index, fieldName, &retVal)
+	return int(retVal), err
 }
 
 // GetUint is a function to retrieve a value of type uint from the samples
-func (samples *Samples) GetUint(index int, fieldName string) uint {
-	fieldNameCStr := C.CString(fieldName)
-	defer C.free(unsafe.Pointer(fieldNameCStr))
-	return uint(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
+func (samples *Samples) GetUint(index int, fieldName string) (uint, error) {
+	var retVal C.double
+	err := samples.getNumber(index, fieldName, &retVal)
+	return uint(retVal), err
 }
 
 // GetByte is a function to retrieve a value of type byte from the samples
-func (samples *Samples) GetByte(index int, fieldName string) byte {
-	fieldNameCStr := C.CString(fieldName)
-	defer C.free(unsafe.Pointer(fieldNameCStr))
-	return byte(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
+func (samples *Samples) GetByte(index int, fieldName string) (byte, error) {
+	var retVal C.double
+	err := samples.getNumber(index, fieldName, &retVal)
+	return byte(retVal), err
 }
 
 // GetRune is a function to retrieve a value of type rune from the samples
-func (samples *Samples) GetRune(index int, fieldName string) rune {
-	fieldNameCStr := C.CString(fieldName)
-	defer C.free(unsafe.Pointer(fieldNameCStr))
-	return rune(C.RTIDDSConnector_getNumberFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr))
+func (samples *Samples) GetRune(index int, fieldName string) (rune, error) {
+	var retVal C.double
+	err := samples.getNumber(index, fieldName, &retVal)
+	return rune(retVal), err
 }
 
 // GetBoolean is a function to retrieve a value of type boolean from the samples
-func (samples *Samples) GetBoolean(index int, fieldName string) bool {
+func (samples *Samples) GetBoolean(index int, fieldName string) (bool, error) {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
-	return int(C.RTIDDSConnector_getBooleanFromSamples(
-		unsafe.Pointer(samples.input.connector.native),
-		samples.input.nameCStr,
-		C.int(index+1),
-		fieldNameCStr),
-	) != 0
+
+	var retVal C.int
+
+	retcode := int(C.RTI_Connector_get_boolean_from_sample(unsafe.Pointer(samples.input.connector.native), &retVal, samples.input.nameCStr, C.int(index+1), fieldNameCStr))
+	err := checkRetcode(retcode)
+
+	return (retVal != 0), err
 }
 
 // GetString is a function to retrieve a value of type string from the samples
-func (samples *Samples) GetString(index int, fieldName string) string {
+func (samples *Samples) GetString(index int, fieldName string) (string, error) {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
-	return C.GoString((*C.char)(C.RTIDDSConnector_getStringFromSamples(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), fieldNameCStr)))
+
+	var retVal *C.char
+
+	retcode := int(C.RTI_Connector_get_string_from_sample(unsafe.Pointer(samples.input.connector.native), &retVal, samples.input.nameCStr, C.int(index+1), fieldNameCStr))
+	err := checkRetcode(retcode)
+
+	return C.GoString(retVal), err
 }
 
 // GetJSON is a function to retrieve a slice of bytes of a JSON string from the samples
 func (samples *Samples) GetJSON(index int) ([]byte, error) {
-	jsonCStr := C.RTIDDSConnector_getJSONSample(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1))
-	defer C.RTIDDSConnector_freeString((*C.char)(jsonCStr))
+	var retVal *C.char
 
-	return []byte(C.GoString((*C.char)(jsonCStr))), nil
+	retcode := int(C.RTI_Connector_get_json_sample(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), &retVal))
+	err := checkRetcode(retcode)
+
+	return []byte(C.GoString(retVal)), err
 }
 
 // Get is a function to retrieve all the information
@@ -586,22 +611,20 @@ func (samples *Samples) Get(index int, v interface{}) error {
 	if err != nil {
 		return err
 	}
+
 	return json.Unmarshal(jsonData, &v)
 }
 
 // IsValid is a function to check validity of the element and return a boolean
-func (infos *Infos) IsValid(index int) bool {
+func (infos *Infos) IsValid(index int) (bool, error) {
 	memberNameCStr := C.CString("valid_data")
 	defer C.free(unsafe.Pointer(memberNameCStr))
 	var retVal C.int
 
-	C.RTI_Connector_get_boolean_from_infos(
-		unsafe.Pointer(infos.input.connector.native),
-		&retVal,
-		infos.input.nameCStr,
-		C.int(index+1), memberNameCStr,
-	)
-	return (retVal != 0)
+	retcode := int(C.RTI_Connector_get_boolean_from_infos(unsafe.Pointer(infos.input.connector.native), &retVal, infos.input.nameCStr, C.int(index+1), memberNameCStr))
+	err := checkRetcode(retcode)
+
+	return (retVal != 0), err
 }
 
 // GetSourceTimestamp is a function to get the source timestamp of a sample
@@ -609,23 +632,17 @@ func (infos *Infos) GetSourceTimestamp(index int) (int64, error) {
 	memberNameCStr := C.CString("source_timestamp")
 	defer C.free(unsafe.Pointer(memberNameCStr))
 
-	var jsonStr string
-	jsonCStr := C.CString(jsonStr)
-	defer C.free(unsafe.Pointer(jsonCStr))
+	var retVal *C.char
 
-	retcode := C.RTI_Connector_get_json_from_infos(
-		unsafe.Pointer(infos.input.connector.native),
-		infos.input.nameCStr, C.int(index+1),
-		memberNameCStr,
-		&jsonCStr,
-	)
-	if retcode != DDSRetCodeOK {
-		return 0, errors.New("RTI_Connector_get_json_from_infos failed")
+	retcode := int(C.RTI_Connector_get_json_from_infos(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr, C.int(index+1), memberNameCStr, &retVal))
+	err := checkRetcode(retcode)
+	if err != nil {
+		return 0, err
 	}
 
-	ts, err := strconv.ParseInt(C.GoString(jsonCStr), 10, 64)
+	ts, err := strconv.ParseInt(C.GoString(retVal), 10, 64)
 	if err != nil {
-		return 0, errors.New("string conversion failed: " + err.Error())
+		return 0, err
 	}
 
 	return ts, nil
@@ -636,24 +653,17 @@ func (infos *Infos) GetReceptionTimestamp(index int) (int64, error) {
 	memberNameCStr := C.CString("reception_timestamp")
 	defer C.free(unsafe.Pointer(memberNameCStr))
 
-	var jsonStr string
-	jsonCStr := C.CString(jsonStr)
-	defer C.free(unsafe.Pointer(jsonCStr))
+	var retVal *C.char
 
-	retcode := C.RTI_Connector_get_json_from_infos(
-		unsafe.Pointer(infos.input.connector.native),
-		infos.input.nameCStr,
-		C.int(index+1),
-		memberNameCStr,
-		&jsonCStr,
-	)
-	if retcode != DDSRetCodeOK {
-		return 0, errors.New("RTI_Connector_get_json_from_infos failed")
+	retcode := int(C.RTI_Connector_get_json_from_infos(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr, C.int(index+1), memberNameCStr, &retVal))
+	err := checkRetcode(retcode)
+	if err != nil {
+		return 0, err
 	}
 
-	ts, err := strconv.ParseInt(C.GoString(jsonCStr), 10, 64)
+	ts, err := strconv.ParseInt(C.GoString(retVal), 10, 64)
 	if err != nil {
-		return 0, errors.New("string conversion failed: " + err.Error())
+		return 0, err
 	}
 
 	return ts, err
@@ -664,24 +674,18 @@ func (infos *Infos) GetIdentity(index int) (Identity, error) {
 	memberNameCStr := C.CString("identity")
 	defer C.free(unsafe.Pointer(memberNameCStr))
 
-	var jsonStr string
-	jsonCStr := C.CString(jsonStr)
-	defer C.free(unsafe.Pointer(jsonCStr))
-
+	var retVal *C.char
 	var writerID Identity
-	retcode := C.RTI_Connector_get_json_from_infos(
-		unsafe.Pointer(infos.input.connector.native),
-		infos.input.nameCStr,
-		C.int(index+1),
-		memberNameCStr,
-		&jsonCStr,
-	)
-	if retcode != DDSRetCodeOK {
-		return writerID, errors.New("RTI_Connector_get_json_from_infos failed")
+
+	retcode := int(C.RTI_Connector_get_json_from_infos(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr, C.int(index+1), memberNameCStr, &retVal))
+	err := checkRetcode(retcode)
+	if err != nil {
+		return writerID, err
 	}
 
-	jsonByte := []byte(C.GoString(jsonCStr))
-	if err := json.Unmarshal(jsonByte, &writerID); err != nil {
+	jsonByte := []byte(C.GoString(retVal))
+	err = json.Unmarshal(jsonByte, &writerID)
+	if err != nil {
 		return writerID, errors.New("JSON Unmarshal failed: " + err.Error())
 	}
 
@@ -689,10 +693,9 @@ func (infos *Infos) GetIdentity(index int) (Identity, error) {
 }
 
 // GetLength is a function to return the length of the
-func (infos *Infos) GetLength() (length int) {
-	length = int(C.RTIDDSConnector_getInfosLength(
-		unsafe.Pointer(infos.input.connector.native),
-		infos.input.nameCStr),
-	)
-	return length
+func (infos *Infos) GetLength() (int, error) {
+	var retVal C.double
+	retcode := int(C.RTI_Connector_get_sample_count(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr, &retVal))
+	err := checkRetcode(retcode)
+	return int(retVal), err
 }
