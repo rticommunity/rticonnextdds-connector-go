@@ -144,7 +144,7 @@ issues:
       text: "Error return value of `connector.Delete` is not checked"
 
     # Ignore complicated function that gocritic is suspecting
-    - path: rticonnextdds_connector.go
+    - path: .go
       linter:
         - gocritic
       text: "dupSubExpr: suspicious identical LHS and RHS for `==` operator"
