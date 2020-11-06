@@ -37,31 +37,6 @@ type Input struct {
 	Infos     *Infos
 }
 
-/********************
-* Private Functions *
-********************/
-
-func newInput(connector *Connector, inputName string) (*Input, error) {
-	// Error checking for the connector is skipped because it was already checked
-
-	input := new(Input)
-	input.connector = connector
-
-	input.nameCStr = C.CString(inputName)
-
-	input.native = C.RTI_Connector_get_datareader(unsafe.Pointer(connector.native), input.nameCStr)
-	if input.native == nil {
-		return nil, errors.New("invalid Subscription::DataReader name")
-	}
-	input.name = inputName
-	input.Samples = newSamples(input)
-	input.Infos = newInfos(input)
-
-	connector.Inputs = append(connector.Inputs, *input)
-
-	return input, nil
-}
-
 /*******************
 * Public Functions *
 *******************/

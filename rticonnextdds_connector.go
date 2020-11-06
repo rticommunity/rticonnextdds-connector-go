@@ -47,24 +47,6 @@ const (
 	DDSRetCodeOK = 0
 )
 
-/********************
-* Private Functions *
-********************/
-
-// checkRetcode is a function to check return code
-func checkRetcode(retcode int) error {
-	switch retcode {
-	case DDSRetCodeOK:
-	case DDSRetCodeNoData:
-		return errors.New("DDS Exceptrion: No Data")
-	case DDSRetCodeTimeout:
-		return errors.New("DDS Exception: Timeout")
-	default:
-		return errors.New("DDS Exception: " + C.GoString((*C.char)(C.RTI_Connector_get_last_error_message)))
-	}
-	return nil
-}
-
 /*******************
 * Public Functions *
 *******************/
@@ -138,4 +120,84 @@ func (connector *Connector) Wait(timeoutMs int) error {
 
 	retcode := int(C.RTI_Connector_wait_for_data(unsafe.Pointer(connector.native), C.int(timeoutMs)))
 	return checkRetcode(retcode)
+}
+
+/********************
+* Private Functions *
+********************/
+
+func newOutput(connector *Connector, outputName string) (*Output, error) {
+	// Error checking for the connector is skipped because it was already checked
+
+	output := new(Output)
+	output.connector = connector
+
+	output.nameCStr = C.CString(outputName)
+
+	output.native = C.RTI_Connector_get_datawriter(unsafe.Pointer(connector.native), output.nameCStr)
+	if output.native == nil {
+		return nil, errors.New("invalid Publication::DataWriter name")
+	}
+	output.name = outputName
+	output.Instance = newInstance(output)
+
+	connector.Outputs = append(connector.Outputs, *output)
+
+	return output, nil
+}
+
+func newInput(connector *Connector, inputName string) (*Input, error) {
+	// Error checking for the connector is skipped because it was already checked
+
+	input := new(Input)
+	input.connector = connector
+
+	input.nameCStr = C.CString(inputName)
+
+	input.native = C.RTI_Connector_get_datareader(unsafe.Pointer(connector.native), input.nameCStr)
+	if input.native == nil {
+		return nil, errors.New("invalid Subscription::DataReader name")
+	}
+	input.name = inputName
+	input.Samples = newSamples(input)
+	input.Infos = newInfos(input)
+
+	connector.Inputs = append(connector.Inputs, *input)
+
+	return input, nil
+}
+
+func newInstance(output *Output) *Instance {
+	// Error checking for the output is skipped because it was already checked
+	return &Instance{
+		output: output,
+	}
+}
+
+func newSamples(input *Input) *Samples {
+	// Error checking for the input is skipped because it was already checked
+	return &Samples{
+		input: input,
+	}
+}
+
+func newInfos(input *Input) *Infos {
+	// Error checking for the input is skipped because it was already checked
+	return &Infos{
+		input: input,
+	}
+}
+
+// checkRetcode is a function to check return code
+func checkRetcode(retcode int) error {
+	switch retcode {
+	case DDSRetCodeOK:
+	case DDSRetCodeNoData:
+		return errors.New("DDS Exceptrion: No Data")
+	case DDSRetCodeTimeout:
+		return errors.New("DDS Exception: Timeout")
+	default:
+		return errors.New("DDS Exception: " + C.GoString((*C.char)(C.RTI_Connector_get_last_error_message)))
+	}
+	return nil
 }

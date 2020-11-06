@@ -32,17 +32,6 @@ type Instance struct {
 	output *Output
 }
 
-/********************
-* Private Functions *
-********************/
-
-func newInstance(output *Output) *Instance {
-	// Error checking for the output is skipped because it was already checked
-	return &Instance{
-		output: output,
-	}
-}
-
 /*******************
 * Public Functions *
 *******************/

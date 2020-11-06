@@ -20,7 +20,6 @@ package rti
 import "C"
 
 import (
-	"errors"
 	"unsafe"
 )
 
@@ -35,30 +34,6 @@ type Output struct {
 	name      string // name of the native DataWriter
 	nameCStr  *C.char
 	Instance  *Instance
-}
-
-/********************
-* Private Functions *
-********************/
-
-func newOutput(connector *Connector, outputName string) (*Output, error) {
-	// Error checking for the connector is skipped because it was already checked
-
-	output := new(Output)
-	output.connector = connector
-
-	output.nameCStr = C.CString(outputName)
-
-	output.native = C.RTI_Connector_get_datawriter(unsafe.Pointer(connector.native), output.nameCStr)
-	if output.native == nil {
-		return nil, errors.New("invalid Publication::DataWriter name")
-	}
-	output.name = outputName
-	output.Instance = newInstance(output)
-
-	connector.Outputs = append(connector.Outputs, *output)
-
-	return output, nil
 }
 
 /*******************

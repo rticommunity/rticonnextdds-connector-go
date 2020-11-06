@@ -32,17 +32,6 @@ type Samples struct {
 	input *Input
 }
 
-/********************
-* Private Functions *
-********************/
-
-func newSamples(input *Input) *Samples {
-	// Error checking for the input is skipped because it was already checked
-	return &Samples{
-		input: input,
-	}
-}
-
 // getNumber is a function to return a number in double from a sample
 func (samples *Samples) getNumber(index int, fieldName string, retVal *C.double) error {
 	fieldNameCStr := C.CString(fieldName)

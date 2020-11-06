@@ -34,17 +34,6 @@ type Infos struct {
 	input *Input
 }
 
-/********************
-* Private Functions *
-********************/
-
-func newInfos(input *Input) *Infos {
-	// Error checking for the input is skipped because it was already checked
-	return &Infos{
-		input: input,
-	}
-}
-
 // Identity is the structure for identifying
 type Identity struct {
 	WriterGUID     [16]byte `json:"writer_guid"`
