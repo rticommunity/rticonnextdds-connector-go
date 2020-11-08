@@ -103,6 +103,40 @@ func TestCreateDR(t *testing.T) {
 	assert.NotNil(t, nullConnector.Wait(-1))
 }
 
+func TestInput(t *testing.T) {
+	connector, err := newTestConnector()
+	assert.Nil(t, err)
+	defer connector.Delete()
+	input, err := newTestInput(connector)
+	assert.Nil(t, err)
+	output, err := newTestOutput(connector)
+	assert.Nil(t, err)
+
+	// Testing Read
+	err = output.Write()
+	assert.Nil(t, err)
+	err = input.Wait(-1)
+	assert.Nil(t, err)
+	err = input.Read()
+	assert.Nil(t, err)
+	rst, err := input.Samples.GetString(0, "st")
+	assert.Nil(t, err)
+	assert.Equal(t, rst, "")
+
+	// Testing Take
+	err = input.Take()
+	assert.Nil(t, err)
+	rst, err = input.Samples.GetString(0, "st")
+	assert.Nil(t, err)
+	assert.Equal(t, rst, "")
+
+	// Testing Wait
+	assert.NotNil(t, input.Wait(5))
+
+	var nullInput *Input
+	assert.NotNil(t, nullInput.Wait(-1))
+}
+
 // Output tests
 func TestInvalidWriter(t *testing.T) {
 	invalidWriterName := "invalidWriter"
@@ -279,20 +313,9 @@ func TestDataFlow(t *testing.T) {
 	// Testing Wait TimeOut
 	assert.NotNil(t, connector.Wait(5))
 
-	// Testing Read
-	err = output.Write()
-	assert.Nil(t, err)
-	err = connector.Wait(-1)
-	assert.Nil(t, err)
-	err = input.Read()
-	assert.Nil(t, err)
-	rst, err = input.Samples.GetString(0, "st")
-	assert.Nil(t, err)
-	assert.Equal(t, rst, "")
-
 	id, err := input.Infos.GetIdentity(0)
 	assert.Nil(t, err)
-	assert.Equal(t, id.SequenceNumber, uint(2))
+	assert.Equal(t, id.SequenceNumber, uint(1))
 	// UUID can not be checked because it is unique to each run
 
 	ts, err := input.Infos.GetReceptionTimestamp(0)

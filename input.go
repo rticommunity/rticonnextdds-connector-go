@@ -64,3 +64,15 @@ func (input *Input) Take() error {
 	retcode := int(C.RTI_Connector_take(unsafe.Pointer(input.connector.native), input.nameCStr))
 	return checkRetcode(retcode)
 }
+
+// Wait is a function to wait for this input to receive data.
+// This function waits for the specified timeout in milliseconds
+// for data to be received by this input.
+func (input *Input) Wait(timeoutMs int) error {
+	if input == nil {
+		return errors.New("input is null")
+	}
+
+	retcode := int(C.RTI_Connector_wait_for_data_on_reader(input.native, C.int(timeoutMs)))
+	return checkRetcode(retcode)
+}
