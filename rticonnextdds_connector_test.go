@@ -111,29 +111,23 @@ func TestInput(t *testing.T) {
 	assert.Nil(t, err)
 	output, err := newTestOutput(connector)
 	assert.Nil(t, err)
+	var nullInput *Input
 
 	// Testing Read
-	err = output.Write()
-	assert.Nil(t, err)
-	err = input.Wait(-1)
-	assert.Nil(t, err)
-	err = input.Read()
-	assert.Nil(t, err)
-	rst, err := input.Samples.GetString(0, "st")
-	assert.Nil(t, err)
-	assert.Equal(t, rst, "")
+	assert.Nil(t, output.Write())
+	assert.Nil(t, input.Wait(-1))
+	assert.Nil(t, input.Read())
+
+	assert.NotNil(t, nullInput.Read())
 
 	// Testing Take
-	err = input.Take()
-	assert.Nil(t, err)
-	rst, err = input.Samples.GetString(0, "st")
-	assert.Nil(t, err)
-	assert.Equal(t, rst, "")
+	assert.Nil(t, input.Take())
+
+	assert.NotNil(t, nullInput.Take())
 
 	// Testing Wait
 	assert.NotNil(t, input.Wait(5))
 
-	var nullInput *Input
 	assert.NotNil(t, nullInput.Wait(-1))
 }
 
@@ -164,6 +158,31 @@ func TestCreateWriter(t *testing.T) {
 	output, err = nullConnector.GetOutput(writerName)
 	assert.Nil(t, output)
 	assert.NotNil(t, err)
+}
+
+func TestOutput(t *testing.T) {
+	connector, err := newTestConnector()
+	assert.Nil(t, err)
+	defer connector.Delete()
+	input, err := newTestInput(connector)
+	assert.Nil(t, err)
+	output, err := newTestOutput(connector)
+	assert.Nil(t, err)
+
+	var nullOutput *Output
+
+	// Testing Write
+	assert.Nil(t, output.Write())
+
+	assert.NotNil(t, nullOutput.Write())
+
+	// Testing Wait
+	assert.Nil(t, output.Wait(-1))
+
+	assert.NotNil(t, nullOutput.Wait(-1))
+
+	// Testing ClearMembers
+	assert.Nil(t, input.Wait(-1))
 }
 
 // Data flow tests

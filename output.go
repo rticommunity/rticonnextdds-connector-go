@@ -20,6 +20,7 @@ package rti
 import "C"
 
 import (
+	"errors"
 	"unsafe"
 )
 
@@ -42,12 +43,33 @@ type Output struct {
 
 // Write is a function to write a DDS data instance in an output
 func (output *Output) Write() error {
+	if output == nil {
+		return errors.New("output is null")
+	}
+
 	retcode := int(C.RTI_Connector_write(unsafe.Pointer(output.connector.native), output.nameCStr, nil))
 	return checkRetcode(retcode)
 }
 
 // ClearMembers is a function to initialize a DDS data instance in an output
 func (output *Output) ClearMembers() error {
+	if output == nil {
+		return errors.New("output is null")
+	}
+
 	retcode := int(C.RTI_Connector_clear(unsafe.Pointer(output.connector.native), output.nameCStr))
+	return checkRetcode(retcode)
+}
+
+// Wait is a function to wait until all matching reliable subscriptions
+// have acknowledged all the samples that have been currently written.
+// This method only waits if this output is configured with a reliable datawriter_qos.
+// If the operation times out, it raises a timeout error.
+func (output *Output) Wait(timeoutMs int) error {
+	if output == nil {
+		return errors.New("output is null")
+	}
+
+	retcode := int(C.RTI_Connector_wait_for_acknowledgments(output.native, C.int(timeoutMs)))
 	return checkRetcode(retcode)
 }
