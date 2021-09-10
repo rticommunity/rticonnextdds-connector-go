@@ -28,7 +28,7 @@ $ sudo apt-get install git-lfs
 $ git lfs install
 ```
 
-Be sure you have golang installed (we tested with golang v1.13 above). 
+Be sure you have golang installed (we tested with golang v1.17). 
 
 Install:
 ```bash
