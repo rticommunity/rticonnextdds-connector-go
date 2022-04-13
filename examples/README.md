@@ -1,17 +1,6 @@
 RTI Connext Go Connector Examples
 ========
 
-### Building and running examples
-``` bash
-$ go build $GOPATH/src/github.com/rticommunity/rticonnextdds-connector-go/examples/simple/reader/reader.go
-```
-After the go build command, you can find an executable for reader at your current path. 
-Currently, the Go Connector links to the Connector C library dynamically so the path to the dynamic library needs to be added to your library path. 
-``` bash
-$ export LD_LIBRARY_PATH=$GOPATH/src/github.com/rticommunity/rticonnextdds-connector-go/rticonnextdds-connector/lib/x64Linux2.6gcc4.4.5:$LD_LIBRARY_PATH
-$ ./reader
-```
-
 ### Example Overview
 #### Import the Connector library
 If you want to use the Go Connector, you have to import the package.
