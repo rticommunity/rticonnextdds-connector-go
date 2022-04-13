@@ -19,34 +19,193 @@ The *Connector* library is provided in binary form for [select architectures](ht
 Go *Connector* leverages [cgo](https://golang.org/cmd/cgo) to call its C library;
 this detail is hidden in a Go wrapper. 
 
-### Getting started
+### Examples
+#### Simple Reader
+```golang
+import (
+	"github.com/rticommunity/rticonnextdds-connector-go"
+	"log"
+	"os"
+	"os/signal"
+	"path"
+	"runtime"
+	"syscall"
+	"time"
+)
 
-Be sure you have golang installed (we tested with golang v1.17). 
+func main() {
+	// Find the file path to the XML configuration
+	_, filename, _, ok := runtime.Caller(0)
+	if !ok {
+		log.Panic("runtime.Caller error")
+	}
+	filepath := path.Join(path.Dir(filename), "./ShapeExample.xml")
 
-Install:
-```bash
-$ go get github.com/rticommunity/rticonnextdds-connector-go
+	// Create a channel to receive signals from OS
+	sigchan := make(chan os.Signal, 1)
+	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
+
+	// Create a connector defined in the XML configuration
+	connector, err := rti.NewConnector("MyParticipantLibrary::Zero", filepath)
+	if err != nil {
+		log.Panic(err)
+	}
+	// Delete the connector when this main function returns
+	defer connector.Delete()
+
+	// Get an input from the connector
+	input, err := connector.GetInput("MySubscriber::MySquareReader")
+	if err != nil {
+		log.Panic(err)
+	}
+
+	run := true
+
+	// Get values from a received sample and print them
+	for run == true {
+		select {
+		case sig := <-sigchan:
+			log.Printf("Received signal %v: terminating\n", sig)
+			run = false
+		default:
+			input.Take()
+			numOfSamples, _ := input.Samples.GetLength()
+			for i := 0; i < numOfSamples; i++ {
+				valid, _ := input.Infos.IsValid(i)
+				if valid {
+					color, _ := input.Samples.GetString(i, "color")
+					x, _ := input.Samples.GetInt(i, "x")
+					y, _ := input.Samples.GetInt(i, "y")
+					shapesize, _ := input.Samples.GetInt(i, "shapesize")
+
+					log.Println("---Received Sample---")
+					log.Printf("color: %s\n", color)
+					log.Printf("x: %d\n", x)
+					log.Printf("y: %d\n", y)
+					log.Printf("shapesize: %d\n", shapesize)
+				}
+			}
+			time.Sleep(time.Second * 1)
+		}
+	}
+}
 ```
 
+#### Simple Writer
+```golang
+import (
+	"github.com/rticommunity/rticonnextdds-connector-go"
+	"log"
+	"path"
+	"runtime"
+	"time"
+)
+
+func main() {
+	// Find the file path to the XML configuration
+	_, filename, _, ok := runtime.Caller(0)
+	if !ok {
+		log.Panic("runtime.Caller error")
+	}
+	filepath := path.Join(path.Dir(filename), "./ShapeExample.xml")
+
+	// Create a connector defined in the XML configuration
+	connector, err := rti.NewConnector("MyParticipantLibrary::Zero", filepath)
+	if err != nil {
+		log.Panic(err)
+	}
+	// Delete the connector when this main function returns
+	defer connector.Delete()
+
+	// Get an output from the connector
+	output, err := connector.GetOutput("MyPublisher::MySquareWriter")
+	if err != nil {
+		log.Panic(err)
+	}
+
+	// Set values to the instance and write the instance
+	for i := 0; i < 10; i++ {
+		output.Instance.SetInt("x", i)
+		output.Instance.SetInt("y", i*2)
+		output.Instance.SetInt("shapesize", 30)
+		output.Instance.SetString("color", "BLUE")
+		output.Write()
+		log.Println("Writing...")
+		time.Sleep(time.Second * 1)
+	}
+}
+```
+
+#### XML Configurations
+```xml
+<dds>
+  <!-- Qos Library -->
+  <qos_library name="QosLibrary">
+    <qos_profile name="DefaultProfile" base_name="BuiltinQosLibExp::Generic.StrictReliable" is_default_qos="true">
+      <participant_qos>
+        <transport_builtin>
+          <mask>UDPV4 | SHMEM</mask>
+        </transport_builtin>
+      </participant_qos>
+    </qos_profile>
+  </qos_library>
+  <!-- types -->
+  <types>
+    <struct name="ShapeType" extensibility="extensible">
+      <member name="color" stringMaxLength="128" id="0" type="string" key="true"/>
+      <member name="x" id="1" type="long"/>
+      <member name="y" id="2" type="long"/>
+      <member name="shapesize" id="3" type="long"/>
+    </struct>
+    <enum name="ShapeFillKind" extensibility="extensible">
+      <enumerator name="SOLID_FILL" value="0"/>
+      <enumerator name="TRANSPARENT_FILL" value="1"/>
+      <enumerator name="HORIZONTAL_HATCH_FILL" value="2"/>
+      <enumerator name="VERTICAL_HATCH_FILL" value="3"/>
+    </enum>
+    <struct name="ShapeTypeExtended" baseType="ShapeType" extensibility="extensible">
+      <member name="fillKind" id="4" type="nonBasic" nonBasicTypeName="ShapeFillKind"/>
+      <member name="angle" id="5" type="float"/>
+    </struct>
+  </types>
+  <!-- Domain Library -->
+  <domain_library name="MyDomainLibrary">
+    <domain name="MyDomain" domain_id="0">
+      <register_type name="ShapeType" type_ref="ShapeType"/>
+      <topic name="Square" register_type_ref="ShapeType"/>
+    </domain>
+  </domain_library>
+  <!-- Participant library -->
+  <domain_participant_library name="MyParticipantLibrary">
+    <domain_participant name="Zero" domain_ref="MyDomainLibrary::MyDomain">
+      <publisher name="MyPublisher">
+        <data_writer name="MySquareWriter" topic_ref="Square"/>
+      </publisher>
+      <subscriber name="MySubscriber">
+        <data_reader name="MySquareReader" topic_ref="Square"/>
+      </subscriber>
+    </domain_participant>
+  </domain_participant_library>
+</dds>
+```
+Please see [examples](examples/README.md) for usage details.
+
+### Getting started
+#### Using Go Modules
+Be sure you have golang installed (we tested with golang v1.17). 
+
 Import:
+
 ```golang
 import "github.com/rticommunity/rticonnextdds-connector-go"
 ```
 
-Please see [examples](examples/README.md) for usage details.
-
-### Static Build
-To build your application statically, it requires RTI Connext DDS static libs (```libnddscorez.a```, ```libnddscz.a```). They are located in ```$NDDSHOME/lib/YOUR_ARCHITECTURE```. 
-
+Build:
 ```bash
-$ cp $NDDSHOME/lib/YOUR_ARCHITECTURE/libnddscorez.a ./static_lib/YOUR_ARCHITECTURE/
-$ cp $NDDSHOME/lib/YOUR_ARCHITECTURE/libnddscz.a ./static_lib/YOUR_ARCHITECTURE/
+go build ./...
 ```
 
-Then, you can run ```go build``` with ```-tags static``` to build. 
-```bash
-$ go build -tags static ./examples/simple/writer/writer.go
-```
+A dependency to the latest stable version of rticonnextdds-connector-go should be automatically added to your `go.mod` file.
 
 ### Platform support
 Go *Connector* builds its library for few [select architectures](https://github.com/rticommunity/rticonnextdds-connector/tree/master/lib). If you need another architecture, please contact your RTI account manager or sales@rti.com.
