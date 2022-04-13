@@ -202,10 +202,18 @@ import "github.com/rticommunity/rticonnextdds-connector-go"
 
 Build:
 ```bash
-go build ./...
+$ go build simple_reader.go
 ```
 
 A dependency to the latest stable version of rticonnextdds-connector-go should be automatically added to your `go.mod` file.
+
+Run:
+
+To run your application, you need to add the Connector C library to your library path.
+```bash
+$ export LD_LIBRARY_PATH=$GOPATH//go/pkg/mod/github.com/rticommunity/rticonnextdds-connector-go\@{version}-{YYYYMMDDHHmm}-{commit_id}/rticonnextdds-connector/lib/linux-x64:$LD_LIBRARY_PATH
+$ ./simple_reader
+```
 
 ### Platform support
 Go *Connector* builds its library for few [select architectures](https://github.com/rticommunity/rticonnextdds-connector/tree/master/lib). If you need another architecture, please contact your RTI account manager or sales@rti.com.
