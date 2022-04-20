@@ -22,70 +22,37 @@ this detail is hidden in a Go wrapper.
 ### Examples
 #### Simple Reader
 ```golang
+package main
 import (
-	"github.com/rticommunity/rticonnextdds-connector-go"
+	rti "github.com/rticommunity/rticonnextdds-connector-go"
 	"log"
-	"os"
-	"os/signal"
-	"path"
-	"runtime"
-	"syscall"
-	"time"
 )
 
 func main() {
-	// Find the file path to the XML configuration
-	_, filename, _, ok := runtime.Caller(0)
-	if !ok {
-		log.Panic("runtime.Caller error")
-	}
-	filepath := path.Join(path.Dir(filename), "./ShapeExample.xml")
-
-	// Create a channel to receive signals from OS
-	sigchan := make(chan os.Signal, 1)
-	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
-
-	// Create a connector defined in the XML configuration
-	connector, err := rti.NewConnector("MyParticipantLibrary::Zero", filepath)
+	connector, err := rti.NewConnector("MyParticipantLibrary::Zero", "./ShapeExample.xml")
 	if err != nil {
 		log.Panic(err)
 	}
-	// Delete the connector when this main function returns
 	defer connector.Delete()
-
-	// Get an input from the connector
 	input, err := connector.GetInput("MySubscriber::MySquareReader")
 	if err != nil {
 		log.Panic(err)
 	}
 
-	run := true
-
-	// Get values from a received sample and print them
-	for run == true {
-		select {
-		case sig := <-sigchan:
-			log.Printf("Received signal %v: terminating\n", sig)
-			run = false
-		default:
-			input.Take()
-			numOfSamples, _ := input.Samples.GetLength()
-			for i := 0; i < numOfSamples; i++ {
-				valid, _ := input.Infos.IsValid(i)
-				if valid {
-					color, _ := input.Samples.GetString(i, "color")
-					x, _ := input.Samples.GetInt(i, "x")
-					y, _ := input.Samples.GetInt(i, "y")
-					shapesize, _ := input.Samples.GetInt(i, "shapesize")
-
-					log.Println("---Received Sample---")
-					log.Printf("color: %s\n", color)
-					log.Printf("x: %d\n", x)
-					log.Printf("y: %d\n", y)
-					log.Printf("shapesize: %d\n", shapesize)
+	for {
+		connector.Wait(-1)
+		input.Take()
+		numOfSamples, _ := input.Samples.GetLength()
+		for j := 0; j < numOfSamples; j++ {
+			valid, _ := input.Infos.IsValid(j)
+			if valid {
+				json, err := input.Samples.GetJSON(j)
+				if err != nil {
+					log.Println(err)
+				} else {
+					log.Println(string(json))
 				}
 			}
-			time.Sleep(time.Second * 1)
 		}
 	}
 }
@@ -93,24 +60,16 @@ func main() {
 
 #### Simple Writer
 ```golang
+package main
 import (
 	"github.com/rticommunity/rticonnextdds-connector-go"
 	"log"
-	"path"
-	"runtime"
 	"time"
 )
 
 func main() {
-	// Find the file path to the XML configuration
-	_, filename, _, ok := runtime.Caller(0)
-	if !ok {
-		log.Panic("runtime.Caller error")
-	}
-	filepath := path.Join(path.Dir(filename), "./ShapeExample.xml")
-
 	// Create a connector defined in the XML configuration
-	connector, err := rti.NewConnector("MyParticipantLibrary::Zero", filepath)
+	connector, err := rti.NewConnector("MyParticipantLibrary::Zero", "./ShapeExample.xml")
 	if err != nil {
 		log.Panic(err)
 	}
@@ -202,7 +161,7 @@ import "github.com/rticommunity/rticonnextdds-connector-go"
 
 Build:
 ```bash
-$ go build simple_reader.go
+$ go build reader.go
 ```
 
 A dependency to the latest stable version of rticonnextdds-connector-go should be automatically added to your `go.mod` file.
