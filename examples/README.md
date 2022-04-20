@@ -10,7 +10,7 @@ import "github.com/rticommunity/rticonnextdds-connector"
 ```
 
 #### Instantiate a new connector
-To create a new connector you have to pass a location of an XML configuration file and a configuration name in XML. For more information on the XML format check the [XML App Creation guide](https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/xml_application_creation/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted.pdf) or take a look at the [ShapeExample.xml](ShapeExample.xml).
+To create a new connector you have to pass a location of an XML configuration file and a configuration name in XML. For more information on the XML format check the [XML App Creation guide](https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/xml_application_creation/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted.pdf).
 
 ```go
 connector, err := rti.NewConnector("MyParticipantLibrary::Zero", filepath)
