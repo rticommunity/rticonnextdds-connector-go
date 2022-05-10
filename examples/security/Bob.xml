@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<!--
+(c) 2005-2015 Copyright, Real-Time Innovations.  All rights reserved.
+No duplications, whole or partial, manual or electronic, may be made
+without express written permission.  Any such copies, or revisions thereof,
+must display this notice unaltered.
+This code contains trade secrets of Real-Time Innovations, Inc.
+ -->
+<dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://community.rti.com/schema/5.1.0/rti_dds_profiles.xsd" version="5.1.0">
+  <!-- Qos Library -->
+  <qos_library name="QosLibrary">
+    <qos_profile name="DefaultProfile" base_name="BuiltinQosLib::Generic.Security" is_default_qos="true">
+      <participant_qos>
+        <transport_builtin>
+          <mask>UDPV4</mask>
+        </transport_builtin>
+        <property>
+          <value>
+            <element>
+              <name>dds.sec.auth.identity_ca</name>
+              <value>file:./cert/ecdsa01/ca/ecdsa01RootCaCert.pem</value>
+            </element>
+            <element>
+              <name>dds.sec.auth.identity_certificate</name>
+              <value>file:./cert/ecdsa01/identities/ecdsa01Peer02Cert.pem</value>
+            </element>
+            <element>
+              <name>dds.sec.auth.private_key</name>
+              <value>file:./cert/ecdsa01/identities/ecdsa01Peer02Key.pem</value>
+            </element>
+            <element>
+              <name>dds.sec.access.permissions_ca</name>
+              <value>file:./cert/ecdsa01/ca/ecdsa01RootCaCert.pem</value>
+            </element>
+            <element>
+              <name>dds.sec.access.governance</name>
+              <value>file:./xml/signed/signed_Governance.p7s</value>
+            </element>
+            <element>
+              <name>dds.sec.access.permissions</name>
+              <value>file:./xml/signed/signed_PermissionsB.p7s</value>
+            </element>
+            <element>
+              <name>dds.sec.auth.password</name>
+              <value>VG9tQjEy</value>
+            </element>
+          </value>
+        </property>
+      </participant_qos>
+    </qos_profile>
+  </qos_library>
+  <!-- types -->
+  <types>
+    <struct name="ShapeType" extensibility="extensible">
+      <member name="color" stringMaxLength="128" id="0" type="string" key="true"/>
+      <member name="x" id="1" type="long"/>
+      <member name="y" id="2" type="long"/>
+      <member name="shapesize" id="3" type="long"/>
+    </struct>
+    <enum name="ShapeFillKind" extensibility="extensible">
+      <enumerator name="SOLID_FILL" value="0"/>
+      <enumerator name="TRANSPARENT_FILL" value="1"/>
+      <enumerator name="HORIZONTAL_HATCH_FILL" value="2"/>
+      <enumerator name="VERTICAL_HATCH_FILL" value="3"/>
+    </enum>
+    <struct name="ShapeTypeExtended" baseType="ShapeType" extensibility="extensible">
+      <member name="fillKind" id="4" type="nonBasic" nonBasicTypeName="ShapeFillKind"/>
+      <member name="angle" id="5" type="float"/>
+    </struct>
+  </types>
+  <!-- Domain Library -->
+  <domain_library name="MyDomainLibrary">
+    <domain name="MyDomain" domain_id="0">
+      <register_type name="ShapeType" type_ref="ShapeType"/>
+      <topic name="Square" register_type_ref="ShapeType"/>
+    </domain>
+  </domain_library>
+  <!-- Participant library -->
+  <domain_participant_library name="MyParticipantLibrary">
+    <domain_participant name="Zero" domain_ref="MyDomainLibrary::MyDomain">
+      <publisher name="MyPublisher">
+        <data_writer name="MySquareWriter" topic_ref="Square"/>
+      </publisher>
+      <subscriber name="MySubscriber">
+        <data_reader name="MySquareReader" topic_ref="Square"/>
+      </subscriber>
+    </domain_participant>
+  </domain_participant_library>
+</dds>
