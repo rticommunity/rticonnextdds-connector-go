@@ -11,7 +11,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -51,10 +50,6 @@ func main() {
 
 	run := true
 
-	totalShapes := 0
-
-	log.Print("Starting to read...")
-
 	// Get values from a received sample and print them
 	for run == true {
 		select {
@@ -62,41 +57,24 @@ func main() {
 			log.Printf("Received signal %v: terminating\n", sig)
 			run = false
 		default:
-			err := connector.Wait(10000)
-			if err != nil {
-				fmt.Println("Error waiting on connector:", err)
-				break
-			}
 			input.Take()
-
 			numOfSamples, _ := input.Samples.GetLength()
 			for i := 0; i < numOfSamples; i++ {
-
-				valid, err := input.Infos.IsValid(i)
-				if err != nil {
-					fmt.Println("Error getting is valid:", err)
-					break
-				}
+				valid, _ := input.Infos.IsValid(i)
 				if valid {
-
-					sourceTs, _ := input.Infos.GetSourceTimestamp(i)
-
 					color, _ := input.Samples.GetString(i, "color")
 					x, _ := input.Samples.GetInt(i, "x")
 					y, _ := input.Samples.GetInt(i, "y")
 					shapesize, _ := input.Samples.GetInt(i, "shapesize")
 
-					if totalShapes%99 == 0 {
-						log.Printf("---Received %dth shapes---\n", totalShapes)
-						log.Printf("source timestamp: %s\n", time.Unix(0, sourceTs))
-						log.Printf("color: %s\n", color)
-						log.Printf("x: %d\n", x)
-						log.Printf("y: %d\n", y)
-						log.Printf("shapesize: %d\n", shapesize)
-					}
-					totalShapes++
+					log.Println("---Received Sample---")
+					log.Printf("color: %s\n", color)
+					log.Printf("x: %d\n", x)
+					log.Printf("y: %d\n", y)
+					log.Printf("shapesize: %d\n", shapesize)
 				}
 			}
+			time.Sleep(time.Second * 1)
 		}
 	}
 }
