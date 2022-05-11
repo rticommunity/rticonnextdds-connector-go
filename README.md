@@ -180,7 +180,7 @@ Go *Connector* builds its library for few [select architectures](https://github.
 If you want to check the version of the libraries you can run the following command:
 
 ``` bash
-strings librtiddsconnector.so | grep BUILD
+strings ./rticonnextdds-connector/lib/linux-x64/librtiddsconnector.so | grep BUILD
 ```
 
 ### Threading model
