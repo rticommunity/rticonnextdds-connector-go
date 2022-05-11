@@ -58,18 +58,12 @@ func (infos *Infos) IsValid(index int) (bool, error) {
 
 // GetSourceTimestamp is a function to get the source timestamp of a sample
 func (infos *Infos) GetSourceTimestamp(index int) (int64, error) {
-	memberNameCStr := C.CString("source_timestamp")
-	defer C.free(unsafe.Pointer(memberNameCStr))
-
-	var retVal *C.char
-
-	retcode := int(C.RTI_Connector_get_json_from_infos(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr, C.int(index+1), memberNameCStr, &retVal))
-	err := checkRetcode(retcode)
+	tsStr, err := infos.getJSONMember(index, "source_timestamp")
 	if err != nil {
 		return 0, err
 	}
 
-	ts, err := strconv.ParseInt(C.GoString(retVal), 10, 64)
+	ts, err := strconv.ParseInt(tsStr, 10, 64)
 	if err != nil {
 		return 0, err
 	}
@@ -79,40 +73,30 @@ func (infos *Infos) GetSourceTimestamp(index int) (int64, error) {
 
 // GetReceptionTimestamp is a function to get the reception timestamp of a sample
 func (infos *Infos) GetReceptionTimestamp(index int) (int64, error) {
-	memberNameCStr := C.CString("reception_timestamp")
-	defer C.free(unsafe.Pointer(memberNameCStr))
-
-	var retVal *C.char
-
-	retcode := int(C.RTI_Connector_get_json_from_infos(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr, C.int(index+1), memberNameCStr, &retVal))
-	err := checkRetcode(retcode)
+	tsStr, err := infos.getJSONMember(index, "reception_timestamp")
 	if err != nil {
 		return 0, err
 	}
 
-	ts, err := strconv.ParseInt(C.GoString(retVal), 10, 64)
+	ts, err := strconv.ParseInt(tsStr, 10, 64)
 	if err != nil {
 		return 0, err
 	}
 
-	return ts, err
+	return ts, nil
 }
 
 // GetIdentity is a function to get the identity of a writer that sent the sample
 func (infos *Infos) GetIdentity(index int) (Identity, error) {
-	memberNameCStr := C.CString("identity")
-	defer C.free(unsafe.Pointer(memberNameCStr))
 
-	var retVal *C.char
 	var writerID Identity
 
-	retcode := int(C.RTI_Connector_get_json_from_infos(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr, C.int(index+1), memberNameCStr, &retVal))
-	err := checkRetcode(retcode)
+	identityStr, err := infos.getJSONMember(index, "identity")
 	if err != nil {
 		return writerID, err
 	}
 
-	jsonByte := []byte(C.GoString(retVal))
+	jsonByte := []byte(identityStr)
 	err = json.Unmarshal(jsonByte, &writerID)
 	if err != nil {
 		return writerID, errors.New("JSON Unmarshal failed: " + err.Error())
@@ -127,4 +111,22 @@ func (infos *Infos) GetLength() (int, error) {
 	retcode := int(C.RTI_Connector_get_sample_count(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr, &retVal))
 	err := checkRetcode(retcode)
 	return int(retVal), err
+}
+
+func (infos *Infos) getJSONMember(index int, memberName string) (string, error) {
+	memberNameCStr := C.CString(memberName)
+	defer C.free(unsafe.Pointer(memberNameCStr))
+
+	var retValCStr *C.char
+
+	retcode := int(C.RTI_Connector_get_json_from_infos(unsafe.Pointer(infos.input.connector.native), infos.input.nameCStr, C.int(index+1), memberNameCStr, &retValCStr))
+	err := checkRetcode(retcode)
+	if err != nil {
+		return "", err
+	}
+
+	retValGoStr := C.GoString(retValCStr)
+	C.RTI_Connector_free_string(retValCStr)
+
+	return retValGoStr, nil
 }

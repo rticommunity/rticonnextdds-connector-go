@@ -11,11 +11,12 @@
 package main
 
 import (
-	"github.com/rticommunity/rticonnextdds-connector-go"
+	"fmt"
 	"log"
 	"path"
 	"runtime"
-	"time"
+
+	rti "github.com/rticommunity/rticonnextdds-connector-go"
 )
 
 func main() {
@@ -40,14 +41,27 @@ func main() {
 		log.Panic(err)
 	}
 
+	totalShapes := 0
+
+	log.Print("Starting to write...")
+
 	// Set values to the instance and write the instance
-	for i := 0; i < 10; i++ {
+	for i := 0; true; i++ {
+
+		if totalShapes%99 == 0 {
+			i = 0
+			log.Print(fmt.Sprintf("written %d shapes", totalShapes))
+		}
+		totalShapes++
+
 		output.Instance.SetInt("x", i)
 		output.Instance.SetInt("y", i*2)
 		output.Instance.SetInt("shapesize", 30)
 		output.Instance.SetString("color", "BLUE")
-		output.Write()
-		log.Println("Writing...")
-		time.Sleep(time.Second * 1)
+		err := output.Write()
+		if err != nil {
+			log.Print("error writing:", err)
+		}
+		// time.Sleep(time.Millisecond * 50)
 	}
 }

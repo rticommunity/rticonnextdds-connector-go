@@ -169,22 +169,34 @@ func (samples *Samples) GetString(index int, fieldName string) (string, error) {
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 
-	var retVal *C.char
+	var retValCStr *C.char
 
-	retcode := int(C.RTI_Connector_get_string_from_sample(unsafe.Pointer(samples.input.connector.native), &retVal, samples.input.nameCStr, C.int(index+1), fieldNameCStr))
+	retcode := int(C.RTI_Connector_get_string_from_sample(unsafe.Pointer(samples.input.connector.native), &retValCStr, samples.input.nameCStr, C.int(index+1), fieldNameCStr))
 	err := checkRetcode(retcode)
+	if err != nil {
+		return "", err
+	}
 
-	return C.GoString(retVal), err
+	retValGoStr := C.GoString(retValCStr)
+	C.RTI_Connector_free_string(retValCStr)
+
+	return retValGoStr, nil
 }
 
 // GetJSON is a function to retrieve a slice of bytes of a JSON string from the samples
 func (samples *Samples) GetJSON(index int) ([]byte, error) {
-	var retVal *C.char
+	var retValCStr *C.char
 
-	retcode := int(C.RTI_Connector_get_json_sample(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), &retVal))
+	retcode := int(C.RTI_Connector_get_json_sample(unsafe.Pointer(samples.input.connector.native), samples.input.nameCStr, C.int(index+1), &retValCStr))
 	err := checkRetcode(retcode)
+	if err != nil {
+		return nil, err
+	}
 
-	return []byte(C.GoString(retVal)), err
+	retValGoStr := C.GoString(retValCStr)
+	C.RTI_Connector_free_string(retValCStr)
+
+	return []byte(retValGoStr), err
 }
 
 // Get is a function to retrieve all the information
