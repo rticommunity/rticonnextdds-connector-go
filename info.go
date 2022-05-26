@@ -37,7 +37,7 @@ type Infos struct {
 // Identity is the structure for identifying
 type Identity struct {
 	WriterGUID     [16]byte `json:"writer_guid"`
-	SequenceNumber uint     `json:"sequence_number"`
+	SequenceNumber int     `json:"sequence_number"`
 }
 
 /*******************
@@ -91,7 +91,7 @@ func (infos *Infos) GetIdentity(index int) (Identity, error) {
 
 	var writerID Identity
 
-	identityStr, err := infos.getJSONMember(index, "identity")
+	identityStr, err := infos.getJSONMember(index, "sample_identity")
 	if err != nil {
 		return writerID, err
 	}
@@ -104,6 +104,45 @@ func (infos *Infos) GetIdentity(index int) (Identity, error) {
 
 	return writerID, nil
 }
+
+// GetIdentityJSON is a function to get the identity of a writer in JSON
+func (infos *Infos) GetIdentityJSON(index int) (string, error) {
+	identityStr, err := infos.getJSONMember(index, "sample_identity")
+	if err != nil {
+		return "", err
+	}
+
+	return identityStr, nil
+}
+
+// GetRelatedIdentity is a function used for request-reply communications. 
+func (infos *Infos) GetRelatedIdentity(index int) (Identity, error) {
+
+	var writerID Identity
+
+	identityStr, err := infos.getJSONMember(index, "related_sample_identity")
+	if err != nil {
+		return writerID, err
+	}
+
+	jsonByte := []byte(identityStr)
+	err = json.Unmarshal(jsonByte, &writerID)
+	if err != nil {
+		return writerID, errors.New("JSON Unmarshal failed: " + err.Error())
+	}
+
+	return writerID, nil
+}
+
+// GetRelatedIdentityJSON is a function used for get related identity in JSON.
+func (infos *Infos) GetRelatedIdentityJSON(index int) (string, error) {
+	identityStr, err := infos.getJSONMember(index, "related_sample_identity")
+	if err != nil {
+		return "", err
+	}
+
+	return identityStr, nil
+} 
 
 // GetLength is a function to return the length of the
 func (infos *Infos) GetLength() (int, error) {
