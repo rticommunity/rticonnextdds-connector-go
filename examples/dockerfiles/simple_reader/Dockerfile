@@ -11,4 +11,4 @@ RUN git clone https://github.com/rticommunity/rticonnextdds-connector-go.git && 
     cd /app/rticonnextdds-connector-go && \
     go build /app/rticonnextdds-connector-go/examples/simple/reader/reader.go
 
-CMD cd /app/rticonnextdds-connector-go && ./reader
+CMD /app/rticonnextdds-connector-go/reader
