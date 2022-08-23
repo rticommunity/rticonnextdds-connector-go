@@ -1,6 +1,6 @@
 rticonnextdds-connector-go
 =======
-[![GoDoc](https://godoc.org/github.com/rticommunity/rticonnextdds-connector-go?status.png)](https://godoc.org/github.com/rticommunity/rticonnextdds-connector-go) [![Build Status](https://travis-ci.org/rticommunity/rticonnextdds-connector-go.svg?branch=master)](https://travis-ci.org/rticommunity/rticonnextdds-connector-go) [![Coverage](https://codecov.io/gh/rticommunity/rticonnextdds-connector-go/branch/master/graph/badge.svg)](https://codecov.io/gh/rticommunity/rticonnextdds-connector-go)
+[![Coverage](https://codecov.io/gh/rticommunity/rticonnextdds-connector-go/branch/master/graph/badge.svg)](https://codecov.io/gh/rticommunity/rticonnextdds-connector-go)
 [![Go Report Card](https://goreportcard.com/badge/github.com/rticommunity/rticonnextdds-connector-go)](https://goreportcard.com/report/github.com/rticommunity/rticonnextdds-connector-go)
 
 ### RTI Connector for Connext DDS
@@ -193,8 +193,6 @@ may be implemented in the future.
 ### Documentation
 The best way to get started with *Connector* is to look at the
 examples; you will see that it is very easy to use.
-
-Please see the [API documentaiton](https://godoc.org/github.com/rticommunity/rticonnextdds-connector-go) for more information.
 
 ### Contributing
 Contributions to the code, examples, documentation are really appreciated. Please follow the steps below for contributions. 
