@@ -1,4 +1,4 @@
-FROM golang:1.14-buster
+FROM golang:1.17
 
 ARG working_dir
 
@@ -9,9 +9,7 @@ ENV GO111MODULE=on
 
 RUN apt-get update && apt-get install -y \
         curl \
-        git-lfs \
         git \
-    && git lfs install \
     && rm -rf /var/lib/apt/lists/*
 
 COPY scripts/install_golangci-lint.sh .
