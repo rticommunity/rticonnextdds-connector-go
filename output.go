@@ -48,6 +48,7 @@ func (output *Output) Write() error {
 
 // WriteWithParams is a function to write a DDS data instance with parameters
 // The supported parameters are:
+// action: One of write (default), dispose or unregister
 // source_timestamp: The source timestamp, an integer representing the total number of nanoseconds
 // identity: A dictionary containing the keys ``"writer_guid"`` (a list of 16 bytes) and ``"sequence_number"`` (an integer) that uniquely identifies this sample.
 // related_sample_identity: Used for request-reply communications. It has the same format as ``identity``
