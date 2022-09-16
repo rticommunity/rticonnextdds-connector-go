@@ -24,6 +24,16 @@ import (
 )
 
 /********
+* Errors *
+*********/
+
+// ErrNoData is returned when there is no data available in the DDS layer
+var ErrNoData = errors.New("DDS Exception: No Data")
+
+// ErrTimeout is returned when there is a timeout in the DDS layer
+var ErrTimeout = errors.New("DDS Exception: Timeout")
+
+/********
 * Types *
 *********/
 
@@ -193,9 +203,9 @@ func checkRetcode(retcode int) error {
 	switch retcode {
 	case DDSRetCodeOK:
 	case DDSRetCodeNoData:
-		return errors.New("DDS Exceptrion: No Data")
+		return ErrNoData
 	case DDSRetCodeTimeout:
-		return errors.New("DDS Exception: Timeout")
+		return ErrTimeout
 	default:
 		return errors.New("DDS Exception: " + C.GoString((*C.char)(C.RTI_Connector_get_last_error_message)))
 	}
