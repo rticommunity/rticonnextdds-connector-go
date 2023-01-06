@@ -207,7 +207,7 @@ func checkRetcode(retcode int) error {
 	case DDSRetCodeTimeout:
 		return ErrTimeout
 	default:
-		return errors.New("DDS Exception: " + C.GoString((*C.char)(C.RTI_Connector_get_last_error_message)))
+		return errors.New("DDS Exception: " + C.GoString((*C.char)(C.RTI_Connector_get_last_error_message())))
 	}
 	return nil
 }
