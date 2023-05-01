@@ -2,7 +2,7 @@ rticonnextdds-connector-go
 =======
 [![Coverage](https://codecov.io/gh/rticommunity/rticonnextdds-connector-go/branch/master/graph/badge.svg)](https://codecov.io/gh/rticommunity/rticonnextdds-connector-go)
 [![Go Report Card](https://goreportcard.com/badge/github.com/rticommunity/rticonnextdds-connector-go)](https://goreportcard.com/report/github.com/rticommunity/rticonnextdds-connector-go)
-[![Build and Test RTI Go Connector](https://github.com/rticommunity/rticonnextdds-connector-go/actions/workflows/build.yml/badge.svg)](https://github.com/rticommunity/rticonnextdds-connector-go/actions/workflows/build.yml)
+[![Build and Test](https://github.com/rticommunity/rticonnextdds-connector-go/actions/workflows/build.yml/badge.svg)](https://github.com/rticommunity/rticonnextdds-connector-go/actions/workflows/build.yml)
 
 ### RTI Connector for Connext DDS
 *RTI Connector* for Connext DDS is a quick and easy way to access the power and
