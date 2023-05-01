@@ -1,4 +1,4 @@
-name: Build and Test RTI Go Connector
+name: Build and Test
 
 on:
   push:
