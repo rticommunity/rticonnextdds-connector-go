@@ -49,6 +49,15 @@ func TestInvalidParticipantProfile(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
+func TestInvalidXMLProfile(t *testing.T) {
+	_, curPath, _, _ := runtime.Caller(0)
+	xmlPath := path.Join(path.Dir(curPath), "./test/xml/InvalidXml.xml")
+
+	connector, err := NewConnector(participantProfile, xmlPath)
+	assert.Nil(t, connector)
+	assert.NotNil(t, err)
+}
+
 func TestMultipleConnectorCreation(t *testing.T) {
 	_, curPath, _, _ := runtime.Caller(0)
 	xmlPath := path.Join(path.Dir(curPath), "./test/xml/Test.xml")
@@ -277,7 +286,9 @@ func TestDataFlow(t *testing.T) {
 	assert.Nil(t, output.ClearMembers())
 
 	// Testing Wait TimeOut
-	assert.NotNil(t, connector.Wait(5))
+	err = connector.Wait(5)
+	t.Log(err)
+	assert.NotNil(t, err)
 
 	// Testing Read
 	err = output.Write()
