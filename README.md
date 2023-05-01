@@ -31,29 +31,38 @@ import (
 )
 
 func main() {
+	// Create a connector defined in the XML configuration
 	connector, err := rti.NewConnector("MyParticipantLibrary::Zero", "./ShapeExample.xml")
 	if err != nil {
 		log.Panic(err)
 	}
+	// Delete the connector when this main function returns
 	defer connector.Delete()
+	
+	// Get an input from the connector
 	input, err := connector.GetInput("MySubscriber::MySquareReader")
 	if err != nil {
 		log.Panic(err)
 	}
 
+	// Get values from a received sample and print them
 	for {
 		connector.Wait(-1)
 		input.Take()
 		numOfSamples, _ := input.Samples.GetLength()
-		for j := 0; j < numOfSamples; j++ {
-			valid, _ := input.Infos.IsValid(j)
+		for i := 0; i < numOfSamples; i++ {
+			valid, _ := input.Infos.IsValid(i)
 			if valid {
-				json, err := input.Samples.GetJSON(j)
-				if err != nil {
-					log.Println(err)
-				} else {
-					log.Println(string(json))
-				}
+				color, _ := input.Samples.GetString(i, "color")
+				x, _ := input.Samples.GetInt(i, "x")
+				y, _ := input.Samples.GetInt(i, "y")
+				shapesize, _ := input.Samples.GetInt(i, "shapesize")
+
+				log.Println("---Received Sample---")
+				log.Printf("color: %s\n", color)
+				log.Printf("x: %d\n", x)
+				log.Printf("y: %d\n", y)
+				log.Printf("shapesize: %d\n", shapesize)
 			}
 		}
 	}
