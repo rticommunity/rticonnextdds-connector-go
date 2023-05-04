@@ -32,6 +32,8 @@ func newTestOutput(connector *Connector) (*Output, error) {
 }
 
 // Connector test
+
+// This test function ensures that an error is raised if an incorrect xml path is passed to the Connector constructor.
 func TestInvalidXMLPath(t *testing.T) {
 	invalidXMLPath := "invalid/path/to/xml"
 
@@ -40,6 +42,7 @@ func TestInvalidXMLPath(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
+// This test function ensures that an error is raised if an invalid participant profile name is passed to the Connector constructor.
 func TestInvalidParticipantProfile(t *testing.T) {
 	_, curPath, _, _ := runtime.Caller(0)
 	xmlPath := path.Join(path.Dir(curPath), "./test/xml/Test.xml")
@@ -49,6 +52,7 @@ func TestInvalidParticipantProfile(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
+// This test function ensures that an error is raised if an invalid xml file is passed to the Connector constructor.
 func TestInvalidXMLProfile(t *testing.T) {
 	_, curPath, _, _ := runtime.Caller(0)
 	xmlPath := path.Join(path.Dir(curPath), "./test/xml/InvalidXml.xml")
@@ -58,6 +62,14 @@ func TestInvalidXMLProfile(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
+// This function tests the correct instantiation of Connector object.
+func TestConnectorCreation(t *testing.T) {
+	connector, err := newTestConnector()
+	assert.Nil(t, err)
+	assert.NotNil(t, connector)
+}
+
+// This function tests the correct instantiation of multiple Connector objects in succession.
 func TestMultipleConnectorCreation(t *testing.T) {
 	_, curPath, _, _ := runtime.Caller(0)
 	xmlPath := path.Join(path.Dir(curPath), "./test/xml/Test.xml")
@@ -74,6 +86,31 @@ func TestMultipleConnectorCreation(t *testing.T) {
 	for i := 0; i < 5; i++ {
 		assert.Nil(t, connectors[i].Delete())
 	}
+}
+
+// Tests that it is possible to load two xml files using the url group syntax
+func TestLoadMultipleFiles(t *testing.T) {
+	_, curPath, _, _ := runtime.Caller(0)
+	xmlPath1 := path.Join(path.Dir(curPath), "./test/xml/TestConnector1.xml")
+	xmlPath2 := path.Join(path.Dir(curPath), "./test/xml/TestConnector2.xml")
+
+	connector, err := NewConnector("MyParticipantLibrary2::MyParticipant2", xmlPath1 + ";" + xmlPath2)
+	assert.Nil(t, err)
+	assert.NotNil(t, connector)	
+
+	output, err := connector.GetOutput("MyPublisher2::MySquareWriter2")
+	assert.Nil(t, err)
+	assert.NotNil(t, output)	
+}
+
+// Tests that a domain_participant defined in XML alonside participant_qos can be used to create a Connector object.
+func TestConnectorCreationWithParticipantQos(t *testing.T) {
+	_, curPath, _, _ := runtime.Caller(0)
+	xmlPath := path.Join(path.Dir(curPath), "./test/xml/TestConnector1.xml")
+
+	connector, err := NewConnector("MyParticipantLibrary::ConnectorWithParticipantQos", xmlPath)
+	assert.Nil(t, err)
+	assert.NotNil(t, connector)
 }
 
 func TestConnectorDeletion(t *testing.T) {
