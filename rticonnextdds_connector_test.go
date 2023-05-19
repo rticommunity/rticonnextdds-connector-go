@@ -376,3 +376,26 @@ func TestJSON(t *testing.T) {
 	assert.Nil(t, input.Samples.Get(0, &inputTestData))
 	assert.Equal(t, inputTestData.St, outputTestData.St)
 }
+
+func TestSimpleMatching(t *testing.T) {
+	connector, err := newTestConnector()
+	defer connector.Delete()
+	input, err := newTestInput(connector)
+	output, err := newTestOutput(connector)
+
+	change, err := input.WaitForPublications(2000)
+	assert.Nil(t, err)
+	assert.Equal(t, change, 1)
+
+	matches, err := input.GetMatchedPublications()
+	assert.Nil(t, err)
+	assert.Equal(t, matches, "[{\"name\":\"MyWriter\"}]")
+
+	change, err = output.WaitForSubscriptions(2000)
+	assert.Nil(t, err)
+	assert.Equal(t, change, 1)
+
+	matches, err = output.GetMatchedSubscriptions()
+	assert.Nil(t, err)
+	assert.Equal(t, matches, "[{\"name\":\"MyReader\"}]")
+}
