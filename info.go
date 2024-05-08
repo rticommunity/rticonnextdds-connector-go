@@ -142,7 +142,37 @@ func (infos *Infos) GetRelatedIdentityJSON(index int) (string, error) {
 	}
 
 	return identityStr, nil
-} 
+}
+
+// GetViewState is a function used to get a view state in string (either "NEW" or "NOT NEW").
+func (infos *Infos) GetViewState(index int) (string, error) {
+        viewStateStr, err := infos.getJSONMember(index, "view_state")
+        if err != nil {
+                return "", err
+        }
+
+        return viewStateStr, nil
+}
+
+// GetInstanceState is a function used to get a instance state in string (one of "ALIVE", "NOT_ALIVE_DISPOSED" or "NOT_ALIVE_NO_WRITERS").
+func (infos *Infos) GetInstanceState(index int) (string, error) {
+        instanceStateStr, err := infos.getJSONMember(index, "instance_state")
+        if err != nil {
+                return "", err
+        }
+
+        return instanceStateStr, nil
+}
+
+// GetSampleState is a function used to get a sample state in string (either "READ" or "NOT_READ").
+func (infos *Infos) GetSampleState(index int) (string, error) {
+        sampleStateStr, err := infos.getJSONMember(index, "sample_state")
+        if err != nil {
+                return "", err
+        }
+
+        return sampleStateStr, nil
+}
 
 // GetLength is a function to return the length of the
 func (infos *Infos) GetLength() (int, error) {

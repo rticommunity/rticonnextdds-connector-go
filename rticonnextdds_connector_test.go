@@ -256,6 +256,18 @@ func TestDataFlow(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, valid, true)
 
+	viewState, err := input.Infos.GetViewState(0)
+        assert.Nil(t, err)
+        assert.Equal(t, viewState, "NEW")
+
+	instanceState, err := input.Infos.GetInstanceState(0)
+        assert.Nil(t, err)
+        assert.Equal(t, instanceState, "ALIVE")
+
+	sampleState, err := input.Infos.GetSampleState(0)
+        assert.Nil(t, err)
+        assert.Equal(t, sampleState, "NOT_READ")
+
 	rst, err := input.Samples.GetString(0, "st")
 	assert.Nil(t, err)
 	assert.Equal(t, rst, st)
