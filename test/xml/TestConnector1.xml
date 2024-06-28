@@ -1,0 +1,403 @@
+<?xml version="1.0"?>
+<!--
+(c) 2005-2019 Copyright, Real-Time Innovations.  All rights reserved.
+No duplications, whole or partial, manual or electronic, may be made
+without express written permission.  Any such copies, or revisions thereof,
+must display this notice unaltered.
+This code contains trade secrets of Real-Time Innovations, Inc.
+ -->
+
+<dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:noNamespaceSchemaLocation="http://community.rti.com/schema/current/rti_dds_profiles.xsd">
+
+    <!-- Qos Library -->
+    <qos_library name="QosLibrary">
+        <qos_profile name="DefaultProfile" is_default_qos="true">
+        	<participant_qos>
+                <discovery>
+                    <initial_peers>
+                        <element>shmem://</element>
+                    </initial_peers>
+                    <multicast_receive_addresses/>
+                </discovery>
+                <database>
+                    <shutdown_cleanup_period>
+                        <sec>0</sec>
+                        <nanosec>100000000</nanosec>
+                    </shutdown_cleanup_period>
+                </database>
+            </participant_qos>
+            <datawriter_qos>
+                <reliability>
+                    <kind> RELIABLE_RELIABILITY_QOS </kind>
+                </reliability>
+                <history>
+                    <kind> KEEP_ALL_HISTORY_QOS </kind>
+                </history>
+                <durability>
+                    <kind> TRANSIENT_LOCAL_DURABILITY_QOS </kind>
+                </durability>
+                <resource_limits>
+                    <initial_instances>1</initial_instances>
+                    <max_instances>5</max_instances>
+                </resource_limits>
+                <writer_data_lifecycle>
+                    <autodispose_unregistered_instances>false</autodispose_unregistered_instances>
+                </writer_data_lifecycle>
+            </datawriter_qos>
+            <datareader_qos>
+                <reliability>
+                    <kind> RELIABLE_RELIABILITY_QOS </kind>
+                </reliability>
+                <history>
+                    <kind> KEEP_ALL_HISTORY_QOS </kind>
+                </history>
+                <durability>
+                    <kind> TRANSIENT_LOCAL_DURABILITY_QOS </kind>
+                </durability>
+            </datareader_qos>
+        </qos_profile>
+    </qos_library>
+
+    <!-- types -->
+    <types>
+        <struct name="ShapeType" extensibility="extensible">
+            <member name="color" stringMaxLength="128" type="string" key="true"/>
+            <member name="x" type="long"/>
+            <member name="y" type="long"/>
+            <member name="shapesize" type="long"/>
+            <member name="z" type="boolean"/>
+        </struct>
+        <enum name="ShapeFillKind" extensibility="extensible">
+            <enumerator name="SOLID_FILL" value="0"/>
+            <enumerator name="TRANSPARENT_FILL" value="1"/>
+            <enumerator name="HORIZONTAL_HATCH_FILL" value="2"/>
+            <enumerator name="VERTICAL_HATCH_FILL" value="3"/>
+        </enum>
+        <struct name="ShapeTypeExtended" baseType="ShapeType" extensibility="extensible">
+            <member name="fillKind" type="nonBasic" nonBasicTypeName="ShapeFillKind"/>
+            <member name="angle" type="float"/>
+        </struct>
+
+        <enum name="Color">
+            <enumerator name="RED"/>
+            <enumerator name="GREEN"/>
+            <enumerator name="BLUE"/>
+        </enum>
+        <struct name= "Point">
+            <member name="x" type="int32"/>
+            <member name="y" type="int32"/>
+        </struct>
+        <union name="MyUnion">
+            <discriminator type="nonBasic" nonBasicTypeName="Color"/>
+            <case>
+              <caseDiscriminator value="(RED)"/>
+              <member name="point" type="nonBasic"  nonBasicTypeName= "Point"/>
+            </case>
+            <case>
+              <caseDiscriminator value="(GREEN)"/>
+              <member name="my_long" type="int32"/>
+            </case>
+            <case>
+              <caseDiscriminator value="(BLUE)"/>
+              <member name="my_int_sequence" sequenceMaxLength="10" type="int32"/>
+            </case>
+        </union>
+        <union name="MyIntUnion">
+            <discriminator type="long"/>
+            <case>
+              <caseDiscriminator value="10"/>
+              <member name="point" type="nonBasic"  nonBasicTypeName= "Point"/>
+            </case>
+            <case>
+              <caseDiscriminator value="20"/>
+              <member name="my_long" type="int32"/>
+            </case>
+        </union>
+        <typedef name="PointAlias" type="nonBasic"  nonBasicTypeName= "Point"/>
+        <struct name= "MyType">
+            <member name="my_long" type="int32"/>
+            <member name="my_double" type="float64"/>
+            <member name="my_enum" type="nonBasic"  nonBasicTypeName= "Color" default="BLUE"/>
+            <member name="my_boolean" type="boolean"/>
+            <member name="my_string" stringMaxLength="512" type="string"/>
+            <member name="my_point" type="nonBasic"  nonBasicTypeName= "Point"/>
+            <member name="my_union" type="nonBasic"  nonBasicTypeName= "MyUnion"/>
+            <member name="my_int_union" type="nonBasic"  nonBasicTypeName= "MyIntUnion"/>
+            <member name="my_int_sequence" sequenceMaxLength="10" type="int32"/>
+            <member name="my_point_sequence" sequenceMaxLength="10" type="nonBasic"  nonBasicTypeName= "Point"/>
+            <member name="my_point_array" type="nonBasic"  nonBasicTypeName= "Point" arrayDimensions="5"/>
+            <member name="my_optional_point" type="nonBasic"  nonBasicTypeName= "Point" optional="true"/>
+            <member name="my_optional_long" type="int32" optional="true"/>
+            <member name="my_optional_bool" type="boolean" optional="true"/>
+            <member name="my_point_alias" type="nonBasic"  nonBasicTypeName= "PointAlias" optional="true"/>
+            <member name="my_int64" type="int64"/>
+            <member name="my_uint64" type="uint64"/>
+        </struct>
+        <struct name= "UnboundedType">
+            <member name="my_string" stringMaxLength="-1" type="string"/>
+            <member name="my_sequence" sequenceMaxLength="-1" type="int32"/>
+        </struct>
+        <struct name="UnkeyedShapeType">
+            <member name="color" stringMaxLength="128" type="string"/>
+            <member name="x" type="long"/>
+            <member name="y" type="long"/>
+            <member name="shapesize" type="long"/>
+            <member name="z" type="boolean"/>
+        </struct>
+        <struct name="MultipleKeyedShapeType">
+            <member name="color" stringMaxLength="128" type="string" key="true"/>
+            <member name="other_color" stringMaxLength="128" type="string" key="true"/>
+            <member name="x" type="long"/>
+            <member name="y" type="long" key="true"/>
+            <member name="shapesize" type="long"/>
+            <member name="z" type="boolean" key="true"/>
+        </struct>
+        <struct name="NestedKeyedShapeType">
+            <member name="keyed_shape" type="nonBasic" nonBasicTypeName="UnkeyedShapeType" key="true"/>
+            <member name="unkeyed_shape" type="nonBasic" nonBasicTypeName="UnkeyedShapeType"/>
+            <member name="keyed_nested_member" type="nonBasic" nonBasicTypeName="ShapeType" key="true"/>
+            <member name="unkeyed_toplevel_member" type="long" default="12"/>
+            <member name="keyed_toplevel_member" type="long" key="true" default="4"/>
+        </struct>
+        <struct name="ShapeTypeWithoutToplevelKeyType">
+            <member name="unkeyed_shape" type="nonBasic" nonBasicTypeName="ShapeType"/>
+            <member name="keyed_shape" type="nonBasic" nonBasicTypeName="ShapeType" key="true"/>
+        </struct>
+        <struct name="PerformanceTestType" extensibility="extensible">
+            <member name='myID' type="long"/>
+            <member name="myOctSeq" type="byte" sequenceMaxLength="600000"/>
+        </struct>
+    </types>
+
+    <!-- Domain Library -->
+    <domain_library name="MyDomainLibrary">
+        <domain name="MyDomain" domain_id="0">
+            <register_type name="ShapeType" type_ref="ShapeType" />
+            <register_type name="UnkeyedShapeType" type_ref="UnkeyedShapeType"/>
+            <register_type name="MultipleKeyedShapeType" type_ref="MultipleKeyedShapeType"/>
+            <register_type name="NestedKeyedShapeType" type_ref="NestedKeyedShapeType"/>
+            <register_type name="UnboundedType" type_ref="UnboundedType" />
+            <register_type name="ShapeTypeWithoutToplevelKeyType" type_ref="ShapeTypeWithoutToplevelKeyType" />
+            <register_type name="PerformanceTestType" type_ref="PerformanceTestType" />
+            <topic name="UnkeyedSquare" register_type_ref="UnkeyedShapeType"/>
+            <topic name="MultipleKeyedSquare" register_type_ref="MultipleKeyedShapeType"/>
+            <topic name="NestedKeyedSquare" register_type_ref="NestedKeyedShapeType"/>
+            <topic name="Square" register_type_ref="ShapeType"/>
+            <topic name="Circle" register_type_ref="ShapeType"/>
+            <topic name="SingleUseShape" register_type_ref="ShapeType"/>
+            <topic name="UnboundedTopic" register_type_ref="UnboundedType"/>
+            <topic name="ShapeTypeWithoutToplevelKey" register_type_ref="ShapeTypeWithoutToplevelKeyType"/>
+            <topic name="PerformanceTopic" register_type_ref="PerformanceTestType"/>
+        </domain>
+        <domain name="DataAccessDomain" domain_id="0">
+            <register_type name="MyType" type_ref="MyType" />
+            <topic name="TestTopic" register_type_ref="MyType"/>
+            <topic name="TestTopic2" register_type_ref="MyType"/>
+        </domain>
+        <!-- Since the Discovery Tests check how many matches etc. have occurred
+             we perform the tests in a separate domain, to avoid interference
+             from other tests -->
+        <domain name="DiscoveryDomain" domain_id="1">
+            <register_type name="ShapeType" type_ref="ShapeType" />
+            <topic name="Square" register_type_ref="ShapeType"/>
+        </domain>
+    </domain_library>
+
+    <!-- Participant library -->
+    <domain_participant_library name="MyParticipantLibrary">
+        <domain_participant name="Zero" domain_ref="MyDomainLibrary::MyDomain">
+            <publisher name="MyPublisher">
+                <data_writer name="MySquareWriter" topic_ref="Square" />
+            </publisher>
+
+            <subscriber name="MySubscriber">
+                <data_reader name="MySquareReader" topic_ref="Square" />
+            </subscriber>
+        </domain_participant>
+
+        <domain_participant name="SingleUseParticipant" domain_ref="MyDomainLibrary::MyDomain">
+            <publisher name="MyPublisher">
+                <data_writer name="MySquareWriter" topic_ref="SingleUseShape"/>
+                <data_writer name="MyUnkeyedSquareWriter" topic_ref="UnkeyedSquare"/>
+                <data_writer name="MyMultipleKeyedSquareWriter" topic_ref="MultipleKeyedSquare"/>
+                <data_writer name="MyNestedKeyedSquareWriter" topic_ref="NestedKeyedSquare"/>
+                <data_writer name="MySquareWithoutTopLevelKeyWriter" topic_ref="ShapeTypeWithoutToplevelKey"/>
+                <data_writer name="PerformanceTestWriter" topic_ref="PerformanceTopic">
+                    <datawriter_qos>
+                        <reliability>
+                            <kind> RELIABLE_RELIABILITY_QOS </kind>
+                        </reliability>
+                        <history>
+                            <kind> KEEP_ALL_HISTORY_QOS </kind>
+                        </history>
+                        <durability>
+                            <kind> TRANSIENT_LOCAL_DURABILITY_QOS </kind>
+                        </durability>
+                        <publish_mode>
+                            <kind>ASYNCHRONOUS_PUBLISH_MODE_QOS</kind>
+                        </publish_mode>
+                    </datawriter_qos>
+                </data_writer>
+            </publisher>
+
+            <subscriber name="MySubscriber">
+                <data_reader name="MySquareReader" topic_ref="SingleUseShape" />
+                <data_reader name="MyUnkeyedSquareReader" topic_ref="UnkeyedSquare" />
+                <data_reader name="MyMultipleKeyedSquareReader" topic_ref="MultipleKeyedSquare" />
+                <data_reader name="MyNestedKeyedSquareReader" topic_ref="NestedKeyedSquare" />
+                <data_reader name="MySquareWithoutTopLevelKeyReader" topic_ref="ShapeTypeWithoutToplevelKey" />
+                <data_reader name="PerformanceTestReader" topic_ref="PerformanceTopic" />
+            </subscriber>
+        </domain_participant>
+
+        <domain_participant name="DataAccessTest" domain_ref="MyDomainLibrary::DataAccessDomain">
+            <publisher name="TestPublisher">
+                <data_writer name="TestWriter" topic_ref="TestTopic" />
+                <data_writer name="TestWriter2" topic_ref="TestTopic2" />
+            </publisher>
+
+            <subscriber name="TestSubscriber">
+                <data_reader name="TestReader" topic_ref="TestTopic" />
+                <data_reader name="TestReader2" topic_ref="TestTopic2" />
+            </subscriber>
+        </domain_participant>
+
+        <domain_participant name="TestRequestReply" domain_ref="MyDomainLibrary::MyDomain">
+            <publisher name="TestPublisher">
+                <data_writer name="RequestWriter" topic_ref="Square" />
+                <data_writer name="ReplyWriter" topic_ref="Circle" />
+            </publisher>
+
+            <subscriber name="TestSubscriber">
+                <data_reader name="RequestReader" topic_ref="Square" />
+                <data_reader name="ReplyReader" topic_ref="Circle" />
+            </subscriber>
+        </domain_participant>
+
+        <domain_participant name="DiscoveryTest" domain_ref="MyDomainLibrary::DiscoveryDomain">
+            <subscriber name="MySubscriber">
+                <data_reader name="MyReader" topic_ref="Square"/>
+            </subscriber>
+            <publisher name="MyPublisher">
+                <data_writer name="MyWriter" topic_ref="Square"/>
+            </publisher>
+        </domain_participant>
+
+        <domain_participant name="DiscoveryTestNoEntityName" domain_ref="MyDomainLibrary::DiscoveryDomain">
+            <subscriber name="MySubscriber">
+                <data_reader name="" topic_ref="Square">
+                    <datareader_qos>
+                        <subscription_name>
+                            <name xsi:nil="true"/>
+                        </subscription_name>
+                    </datareader_qos>
+                </data_reader>
+            </subscriber>
+            <publisher name="MyPublisher">
+                <data_writer name="MyWriter" topic_ref="Square"/>
+            </publisher>
+        </domain_participant>
+
+        <domain_participant name="DiscoveryTestReaderOnly" domain_ref="MyDomainLibrary::DiscoveryDomain">
+            <subscriber name="TestSubscriber">
+                <data_reader name="TestReader" topic_ref="Square"/>
+            </subscriber>
+        </domain_participant>
+        <domain_participant name="DiscoveryTestWriterOnly" domain_ref="MyDomainLibrary::DiscoveryDomain">
+            <publisher name="TestPublisher">
+                <data_writer name="TestWriter" topic_ref="Square"/>
+            </publisher>
+        </domain_participant>
+
+        <domain_participant name="TestNoAutoenableSubscriber"
+                            domain_ref="MyDomainLibrary::MyDomain">
+            <subscriber name="TestSubscriber">
+                <subscriber_qos>
+                    <entity_factory>
+                        <autoenable_created_entities>false</autoenable_created_entities>
+                    </entity_factory>
+                </subscriber_qos>
+                <data_reader name="TestReader" topic_ref="SingleUseShape">
+                    <datareader_qos>
+                        <durability>
+                            <kind>VOLATILE_DURABILITY_QOS</kind>
+                        </durability>
+                    </datareader_qos>
+                </data_reader>
+            </subscriber>
+
+            <publisher name="TestPublisher">
+                <data_writer name="TestWriter" topic_ref="SingleUseShape" />
+            </publisher>
+        </domain_participant>
+
+        <domain_participant name="TestAppAckParticipant"
+                            domain_ref="MyDomainLibrary::MyDomain">
+            <subscriber name="TestSubscriber">
+                <data_reader name="TestReader" topic_ref="SingleUseShape">
+                    <datareader_qos>
+                        <reliability>
+                            <kind>RELIABLE_RELIABILITY_QOS</kind>
+                            <acknowledgment_kind>APPLICATION_AUTO_ACKNOWLEDGMENT_MODE</acknowledgment_kind>
+                        </reliability>
+                    </datareader_qos>
+                </data_reader>
+            </subscriber>
+
+            <publisher name="TestPublisher">
+                <data_writer name="TestWriter" topic_ref="SingleUseShape">
+                    <datawriter_qos>
+                        <reliability>
+                            <kind>RELIABLE_RELIABILITY_QOS</kind>
+                            <acknowledgment_kind>APPLICATION_AUTO_ACKNOWLEDGMENT_MODE</acknowledgment_kind>
+                        </reliability>
+                    </datawriter_qos>
+                </data_writer>
+            </publisher>
+        </domain_participant>
+
+        <domain_participant name="TestUnbounded"
+                            domain_ref="MyDomainLibrary::MyDomain">
+            <subscriber name="TestSubscriber">
+                <data_reader name="TestReader" topic_ref="UnboundedTopic">
+                    <datareader_qos base_name="QosLibrary::DefaultProfile">
+                        <property>
+                            <value>
+                                <element>
+                                    <name>
+                                        dds.data_reader.history.memory_manager.fast_pool.pool_buffer_max_size
+                                    </name>
+                                    <value>4096</value>
+                                </element>
+                            </value>
+                        </property>
+                    </datareader_qos>
+                </data_reader>
+            </subscriber>
+
+            <publisher name="TestPublisher">
+                <data_writer name="TestWriter" topic_ref="UnboundedTopic">
+                    <datawriter_qos base_name="QosLibrary::DefaultProfile">
+                        <property>
+                            <value>
+                                <element>
+                                    <name>
+                                        dds.data_writer.history.memory_manager.fast_pool.pool_buffer_max_size
+                                    </name>
+                                    <value>4096</value>
+                                </element>
+                            </value>
+                        </property>
+                    </datawriter_qos>
+                </data_writer>
+            </publisher>
+        </domain_participant>
+
+        <!-- Test for CON-214 -->
+        <domain_participant name="ConnectorWithParticipantQos"
+                            domain_ref="MyDomainLibrary::MyDomain">
+            <domain_participant_qos/>
+        </domain_participant>
+    </domain_participant_library>
+</dds>

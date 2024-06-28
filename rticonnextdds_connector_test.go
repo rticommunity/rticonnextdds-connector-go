@@ -32,6 +32,8 @@ func newTestOutput(connector *Connector) (*Output, error) {
 }
 
 // Connector test
+
+// This test function ensures that an error is raised if an incorrect xml path is passed to the Connector constructor.
 func TestInvalidXMLPath(t *testing.T) {
 	invalidXMLPath := "invalid/path/to/xml"
 
@@ -40,6 +42,7 @@ func TestInvalidXMLPath(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
+// This test function ensures that an error is raised if an invalid participant profile name is passed to the Connector constructor.
 func TestInvalidParticipantProfile(t *testing.T) {
 	_, curPath, _, _ := runtime.Caller(0)
 	xmlPath := path.Join(path.Dir(curPath), "./test/xml/Test.xml")
@@ -49,6 +52,24 @@ func TestInvalidParticipantProfile(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
+// This test function ensures that an error is raised if an invalid xml file is passed to the Connector constructor.
+func TestInvalidXMLProfile(t *testing.T) {
+	_, curPath, _, _ := runtime.Caller(0)
+	xmlPath := path.Join(path.Dir(curPath), "./test/xml/InvalidXml.xml")
+
+	connector, err := NewConnector(participantProfile, xmlPath)
+	assert.Nil(t, connector)
+	assert.NotNil(t, err)
+}
+
+// This function tests the correct instantiation of Connector object.
+func TestConnectorCreation(t *testing.T) {
+	connector, err := newTestConnector()
+	assert.Nil(t, err)
+	assert.NotNil(t, connector)
+}
+
+// This function tests the correct instantiation of multiple Connector objects in succession.
 func TestMultipleConnectorCreation(t *testing.T) {
 	_, curPath, _, _ := runtime.Caller(0)
 	xmlPath := path.Join(path.Dir(curPath), "./test/xml/Test.xml")
@@ -65,6 +86,31 @@ func TestMultipleConnectorCreation(t *testing.T) {
 	for i := 0; i < 5; i++ {
 		assert.Nil(t, connectors[i].Delete())
 	}
+}
+
+// Tests that it is possible to load two xml files using the url group syntax
+func TestLoadMultipleFiles(t *testing.T) {
+	_, curPath, _, _ := runtime.Caller(0)
+	xmlPath1 := path.Join(path.Dir(curPath), "./test/xml/TestConnector1.xml")
+	xmlPath2 := path.Join(path.Dir(curPath), "./test/xml/TestConnector2.xml")
+
+	connector, err := NewConnector("MyParticipantLibrary2::MyParticipant2", xmlPath1 + ";" + xmlPath2)
+	assert.Nil(t, err)
+	assert.NotNil(t, connector)	
+
+	output, err := connector.GetOutput("MyPublisher2::MySquareWriter2")
+	assert.Nil(t, err)
+	assert.NotNil(t, output)	
+}
+
+// Tests that a domain_participant defined in XML alonside participant_qos can be used to create a Connector object.
+func TestConnectorCreationWithParticipantQos(t *testing.T) {
+	_, curPath, _, _ := runtime.Caller(0)
+	xmlPath := path.Join(path.Dir(curPath), "./test/xml/TestConnector1.xml")
+
+	connector, err := NewConnector("MyParticipantLibrary::ConnectorWithParticipantQos", xmlPath)
+	assert.Nil(t, err)
+	assert.NotNil(t, connector)
 }
 
 func TestConnectorDeletion(t *testing.T) {
@@ -210,6 +256,18 @@ func TestDataFlow(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, valid, true)
 
+	viewState, err := input.Infos.GetViewState(0)
+        assert.Nil(t, err)
+        assert.Equal(t, viewState, "NEW")
+
+	instanceState, err := input.Infos.GetInstanceState(0)
+        assert.Nil(t, err)
+        assert.Equal(t, instanceState, "ALIVE")
+
+	sampleState, err := input.Infos.GetSampleState(0)
+        assert.Nil(t, err)
+        assert.Equal(t, sampleState, "NOT_READ")
+
 	rst, err := input.Samples.GetString(0, "st")
 	assert.Nil(t, err)
 	assert.Equal(t, rst, st)
@@ -277,7 +335,9 @@ func TestDataFlow(t *testing.T) {
 	assert.Nil(t, output.ClearMembers())
 
 	// Testing Wait TimeOut
-	assert.NotNil(t, connector.Wait(5))
+	err = connector.Wait(5)
+	t.Log(err)
+	assert.NotNil(t, err)
 
 	// Testing Read
 	err = output.Write()
@@ -292,7 +352,7 @@ func TestDataFlow(t *testing.T) {
 
 	id, err := input.Infos.GetIdentity(0)
 	assert.Nil(t, err)
-	assert.Equal(t, id.SequenceNumber, uint(2))
+	assert.Equal(t, id.SequenceNumber, int(2))
 	// UUID can not be checked because it is unique to each run
 
 	ts, err := input.Infos.GetReceptionTimestamp(0)
@@ -327,4 +387,27 @@ func TestJSON(t *testing.T) {
 	var inputTestData types.Test
 	assert.Nil(t, input.Samples.Get(0, &inputTestData))
 	assert.Equal(t, inputTestData.St, outputTestData.St)
+}
+
+func TestSimpleMatching(t *testing.T) {
+	connector, err := newTestConnector()
+	defer connector.Delete()
+	input, err := newTestInput(connector)
+	output, err := newTestOutput(connector)
+
+	change, err := input.WaitForPublications(2000)
+	assert.Nil(t, err)
+	assert.Equal(t, change, 1)
+
+	matches, err := input.GetMatchedPublications()
+	assert.Nil(t, err)
+	assert.Equal(t, matches, "[{\"name\":\"MyWriter\"}]")
+
+	change, err = output.WaitForSubscriptions(2000)
+	assert.Nil(t, err)
+	assert.Equal(t, change, 1)
+
+	matches, err = output.GetMatchedSubscriptions()
+	assert.Nil(t, err)
+	assert.Equal(t, matches, "[{\"name\":\"MyReader\"}]")
 }

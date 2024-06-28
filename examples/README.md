@@ -1,17 +1,6 @@
 RTI Connext Go Connector Examples
 ========
 
-### Building and running examples
-``` bash
-$ go build $GOPATH/src/github.com/rticommunity/rticonnextdds-connector-go/examples/simple/reader/reader.go
-```
-After the go build command, you can find an executable for reader at your current path. 
-Currently, the Go Connector links to the Connector C library dynamically so the path to the dynamic library needs to be added to your library path. 
-``` bash
-$ export LD_LIBRARY_PATH=$GOPATH/src/github.com/rticommunity/rticonnextdds-connector-go/rticonnextdds-connector/lib/x64Linux2.6gcc4.4.5:$LD_LIBRARY_PATH
-$ ./reader
-```
-
 ### Example Overview
 #### Import the Connector library
 If you want to use the Go Connector, you have to import the package.
@@ -21,7 +10,7 @@ import "github.com/rticommunity/rticonnextdds-connector"
 ```
 
 #### Instantiate a new connector
-To create a new connector you have to pass a location of an XML configuration file and a configuration name in XML. For more information on the XML format check the [XML App Creation guide](https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/xml_application_creation/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted.pdf) or take a look at the [ShapeExample.xml](ShapeExample.xml).
+To create a new connector you have to pass a location of an XML configuration file and a configuration name in XML. For more information on the XML format check the [XML App Creation guide](https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/xml_application_creation/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted.pdf).
 
 ```go
 connector, err := rti.NewConnector("MyParticipantLibrary::Zero", filepath)
