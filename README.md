@@ -186,7 +186,7 @@ $ ./simple_reader
 ```
 
 ### Platform support
-Go *Connector* builds its library for few [select architectures](https://github.com/rticommunity/rticonnextdds-connector/tree/master/lib). If you need another architecture, please contact your RTI account manager or sales@rti.com.
+Go *Connector* builds its library for few [select architectures](https://github.com/rticommunity/rticonnextdds-connector/blob/master/config.yaml). If you need another architecture, please contact your RTI account manager or sales@rti.com.
 
 If you want to check the version of the libraries you can run the following command:
 
