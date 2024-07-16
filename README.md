@@ -170,6 +170,9 @@ Import:
 import "github.com/rticommunity/rticonnextdds-connector-go"
 ```
 
+
+Please see [examples](examples/README.md) for usage details.
+
 Build:
 ```bash
 $ go build reader.go
