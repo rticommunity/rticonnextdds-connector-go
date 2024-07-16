@@ -162,7 +162,7 @@ Please see [examples](examples/README.md) for usage details.
 
 ### Getting started
 #### Using Go Modules
-Be sure you have golang installed (we tested with golang v1.19). 
+Be sure you have golang installed. 
 
 Import:
 
