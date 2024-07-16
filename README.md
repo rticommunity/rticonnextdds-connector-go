@@ -42,19 +42,6 @@ import "github.com/rticommunity/rticonnextdds-connector-go"
 
 Please see [examples](examples/README.md) for usage details.
 
-### Static Build
-To build your application statically, it requires RTI Connext DDS static libs (```libnddscorez.a```, ```libnddscz.a```). They are located in ```$NDDSHOME/lib/YOUR_ARCHITECTURE```. 
-
-```bash
-$ cp $NDDSHOME/lib/YOUR_ARCHITECTURE/libnddscorez.a ./static_lib/YOUR_ARCHITECTURE/
-$ cp $NDDSHOME/lib/YOUR_ARCHITECTURE/libnddscz.a ./static_lib/YOUR_ARCHITECTURE/
-```
-
-Then, you can run ```go build``` with ```-tags static``` to build. 
-```bash
-$ go build -tags static ./examples/simple/writer/writer.go
-```
-
 ### Platform support
 Go *Connector* builds its library for few [select architectures](https://github.com/rticommunity/rticonnextdds-connector/tree/master/lib). If you need another architecture, please contact your RTI account manager or sales@rti.com.
 
