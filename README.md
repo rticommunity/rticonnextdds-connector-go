@@ -1,151 +1,78 @@
-rticonnextdds-connector-go
-=======
+# RTI Connector for Connext DDS - Go
+
 [![Coverage](https://img.shields.io/badge/coverage-90.4%25-brightgreen)](https://github.com/rticommunity/rticonnextdds-connector-go/actions/workflows/build.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/rticommunity/rticonnextdds-connector-go)](https://goreportcard.com/report/github.com/rticommunity/rticonnextdds-connector-go)
 [![Build and Test](https://github.com/rticommunity/rticonnextdds-connector-go/actions/workflows/build.yml/badge.svg)](https://github.com/rticommunity/rticonnextdds-connector-go/actions/workflows/build.yml)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/rticommunity/rticonnextdds-connector-go)](https://github.com/rticommunity/rticonnextdds-connector-go/blob/master/go.mod)
 
+> A lightweight, easy-to-use Go binding for RTI Connext DDS that enables rapid development of distributed applications.
 
-### RTI Connector for Connext DDS
-*RTI Connector* for Connext DDS is a quick and easy way to access the power and
-functionality of [RTI Connext DDS](http://www.rti.com/products/index.html).
-It is based on [XML-Based Application Creation](https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/xml_application_creation/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted.pdf) and Dynamic Data.
+## Table of Contents
 
-*Connector* was created by the RTI Research Group to quickly and easily develop demos
-and proofs of concept. It can be useful for anybody that needs
-a quick way to develop an application communicating over the Connext DDS Databus.
-Thanks to the binding with multiple programming languages, you can integrate
-with many other available technologies.
+- [Overview](#overview)
+- [Key Features](#key-features)
+- [Quick Start](#quick-start)
+- [Installation](#installation)
+- [Usage Examples](#usage-examples)
+- [Platform Support](#platform-support)
+- [Development](#development)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [Support](#support)
 
-The *Connector* library is provided in binary form for [select architectures](https://github.com/rticommunity/rticonnextdds-connector/blob/master/config.yaml). Language bindings and examples are provided in source format.
+## Overview
 
-Go *Connector* leverages [cgo](https://golang.org/cmd/cgo) to call its C library;
-this detail is hidden in a Go wrapper. 
+**RTI Connector** for Connext DDS is a lightweight, easy-to-use API that provides access to the power and functionality of [RTI Connext DDS](http://www.rti.com/products/index.html). Built on [XML-Based Application Creation](https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/xml_application_creation/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted.pdf) and Dynamic Data, it enables rapid prototyping and development of distributed applications.
 
-### Examples
-#### Simple Reader
-```golang
-package main
-import (
-	rti "github.com/rticommunity/rticonnextdds-connector-go"
-	"log"
-)
+Originally created by the RTI Research Group for demos and proof-of-concepts, RTI Connector is perfect for developers who need to quickly integrate DDS communication into their Go applications without the complexity of the full RTI Connext DDS Professional SDK.
 
-func main() {
-	// Create a connector defined in the XML configuration
-	connector, err := rti.NewConnector("MyParticipantLibrary::Zero", "./ShapeExample.xml")
-	if err != nil {
-		log.Panic(err)
-	}
-	// Delete the connector when this main function returns
-	defer connector.Delete()
-	
-	// Get an input from the connector
-	input, err := connector.GetInput("MySubscriber::MySquareReader")
-	if err != nil {
-		log.Panic(err)
-	}
+## Key Features
 
-	// Get values from a received sample and print them
-	for {
-		connector.Wait(-1)
-		input.Take()
-		numOfSamples, _ := input.Samples.GetLength()
-		for i := 0; i < numOfSamples; i++ {
-			valid, _ := input.Infos.IsValid(i)
-			if valid {
-				color, _ := input.Samples.GetString(i, "color")
-				x, _ := input.Samples.GetInt(i, "x")
-				y, _ := input.Samples.GetInt(i, "y")
-				shapesize, _ := input.Samples.GetInt(i, "shapesize")
+✨ **Simple API** - Easy-to-use Go interface that hides DDS complexity  
+🚀 **Rapid Development** - Get up and running with DDS in minutes  
+🔄 **Dynamic Data** - No need to generate code from IDL files  
+📄 **XML Configuration** - Define data types and QoS policies in XML  
+🌐 **Cross-Platform** - Supports Linux x64, macOS, and Windows x64  
 
-				log.Println("---Received Sample---")
-				log.Printf("color: %s\n", color)
-				log.Printf("x: %d\n", x)
-				log.Printf("y: %d\n", y)
-				log.Printf("shapesize: %d\n", shapesize)
-			}
-		}
-	}
-}
+## Quick Start
+
+### Prerequisites
+
+- Go 1.19 or later
+- Supported platform (Linux x64, macOS, Windows x64)
+
+### Installation
+
+```bash
+go get github.com/rticommunity/rticonnextdds-connector-go
 ```
 
-#### Simple Writer
-```golang
-package main
-import (
-	"github.com/rticommunity/rticonnextdds-connector-go"
-	"log"
-	"time"
-)
+### Your First DDS Application
 
-func main() {
-	// Create a connector defined in the XML configuration
-	connector, err := rti.NewConnector("MyParticipantLibrary::Zero", "./ShapeExample.xml")
-	if err != nil {
-		log.Panic(err)
-	}
-	// Delete the connector when this main function returns
-	defer connector.Delete()
+1. **Create an XML configuration file** (`ShapeExample.xml`):
 
-	// Get an output from the connector
-	output, err := connector.GetOutput("MyPublisher::MySquareWriter")
-	if err != nil {
-		log.Panic(err)
-	}
-
-	// Set values to the instance and write the instance
-	for i := 0; i < 10; i++ {
-		output.Instance.SetInt("x", i)
-		output.Instance.SetInt("y", i*2)
-		output.Instance.SetInt("shapesize", 30)
-		output.Instance.SetString("color", "BLUE")
-		output.Write()
-		log.Println("Writing...")
-		time.Sleep(time.Second * 1)
-	}
-}
-```
-
-#### XML Configurations
 ```xml
 <dds>
-  <!-- Qos Library -->
   <qos_library name="QosLibrary">
-    <qos_profile name="DefaultProfile" base_name="BuiltinQosLibExp::Generic.StrictReliable" is_default_qos="true">
-      <participant_qos>
-        <transport_builtin>
-          <mask>UDPV4 | SHMEM</mask>
-        </transport_builtin>
-      </participant_qos>
-    </qos_profile>
+    <qos_profile name="DefaultProfile" base_name="BuiltinQosLibExp::Generic.StrictReliable" is_default_qos="true"/>
   </qos_library>
-  <!-- types -->
+  
   <types>
-    <struct name="ShapeType" extensibility="extensible">
-      <member name="color" stringMaxLength="128" id="0" type="string" key="true"/>
-      <member name="x" id="1" type="long"/>
-      <member name="y" id="2" type="long"/>
-      <member name="shapesize" id="3" type="long"/>
-    </struct>
-    <enum name="ShapeFillKind" extensibility="extensible">
-      <enumerator name="SOLID_FILL" value="0"/>
-      <enumerator name="TRANSPARENT_FILL" value="1"/>
-      <enumerator name="HORIZONTAL_HATCH_FILL" value="2"/>
-      <enumerator name="VERTICAL_HATCH_FILL" value="3"/>
-    </enum>
-    <struct name="ShapeTypeExtended" baseType="ShapeType" extensibility="extensible">
-      <member name="fillKind" id="4" type="nonBasic" nonBasicTypeName="ShapeFillKind"/>
-      <member name="angle" id="5" type="float"/>
+    <struct name="ShapeType">
+      <member name="color" type="string" key="true"/>
+      <member name="x" type="long"/>
+      <member name="y" type="long"/>
+      <member name="shapesize" type="long"/>
     </struct>
   </types>
-  <!-- Domain Library -->
+  
   <domain_library name="MyDomainLibrary">
     <domain name="MyDomain" domain_id="0">
       <register_type name="ShapeType" type_ref="ShapeType"/>
       <topic name="Square" register_type_ref="ShapeType"/>
     </domain>
   </domain_library>
-  <!-- Participant library -->
+  
   <domain_participant_library name="MyParticipantLibrary">
     <domain_participant name="Zero" domain_ref="MyDomainLibrary::MyDomain">
       <publisher name="MyPublisher">
@@ -158,84 +85,273 @@ func main() {
   </domain_participant_library>
 </dds>
 ```
-Please see [examples](examples/README.md) for usage details.
 
-### Getting started
-#### Using Go Modules
-Be sure you have golang installed. 
+2. **Create a publisher** (`publisher.go`):
 
-Import:
+```go
+package main
 
-```golang
-import "github.com/rticommunity/rticonnextdds-connector-go"
+import (
+    "log"
+    "time"
+    
+    rti "github.com/rticommunity/rticonnextdds-connector-go"
+)
+
+func main() {
+    // Create connector
+    connector, err := rti.NewConnector("MyParticipantLibrary::Zero", "./ShapeExample.xml")
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer connector.Delete()
+
+    // Get output (writer)
+    output, err := connector.GetOutput("MyPublisher::MySquareWriter")
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    // Publish data
+    for i := 0; i < 10; i++ {
+        output.Instance.SetString("color", "BLUE")
+        output.Instance.SetInt("x", i*10)
+        output.Instance.SetInt("y", i*20)
+        output.Instance.SetInt("shapesize", 30)
+        
+        output.Write()
+        log.Printf("Published sample %d", i)
+        time.Sleep(time.Second)
+    }
+}
 ```
 
+3. **Create a subscriber** (`subscriber.go`):
 
-Please see [examples](examples/README.md) for usage details.
+```go
+package main
 
-Build:
+import (
+    "log"
+    
+    rti "github.com/rticommunity/rticonnextdds-connector-go"
+)
+
+func main() {
+    // Create connector
+    connector, err := rti.NewConnector("MyParticipantLibrary::Zero", "./ShapeExample.xml")
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer connector.Delete()
+
+    // Get input (reader)
+    input, err := connector.GetInput("MySubscriber::MySquareReader")
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    // Read data
+    log.Println("Waiting for data...")
+    for {
+        connector.Wait(-1) // Wait indefinitely for data
+        input.Take()
+        
+        numSamples, _ := input.Samples.GetLength()
+        for i := 0; i < numSamples; i++ {
+            if valid, _ := input.Infos.IsValid(i); valid {
+                color, _ := input.Samples.GetString(i, "color")
+                x, _ := input.Samples.GetInt(i, "x")
+                y, _ := input.Samples.GetInt(i, "y")
+                shapesize, _ := input.Samples.GetInt(i, "shapesize")
+                
+                log.Printf("Received: color=%s, x=%d, y=%d, size=%d", color, x, y, shapesize)
+            }
+        }
+    }
+}
+```
+
+4. **Run your application**:
+
 ```bash
-$ go build reader.go
+# Terminal 1 - Start subscriber
+export DYLD_LIBRARY_PATH=$GOPATH/pkg/mod/github.com/rticommunity/rticonnextdds-connector-go@*/rticonnextdds-connector/lib/osx-arm64:$DYLD_LIBRARY_PATH  # macOS
+# export LD_LIBRARY_PATH=$GOPATH/pkg/mod/github.com/rticommunity/rticonnextdds-connector-go@*/rticonnextdds-connector/lib/linux-x64:$LD_LIBRARY_PATH  # Linux
+go run subscriber.go
+
+# Terminal 2 - Start publisher  
+go run publisher.go
 ```
 
-A dependency to the latest stable version of rticonnextdds-connector-go should be automatically added to your `go.mod` file.
+## Installation
 
-Run:
+### Using Go Modules (Recommended)
 
-To run your application, you need to add the Connector C library to your library path:
+```bash
+go get github.com/rticommunity/rticonnextdds-connector-go
+```
+
+### Manual Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/rticommunity/rticonnextdds-connector-go.git
+cd rticonnextdds-connector-go
+```
+
+2. Build and test:
+```bash
+make test-local
+```
+
+## Usage Examples
+## Usage Examples
+
+Explore our comprehensive examples to learn different patterns and use cases:
+
+| Example | Description | Key Features |
+|---------|-------------|--------------|
+| [Simple](examples/simple/) | Basic publisher/subscriber | Getting started, basic data flow |
+| [Shapes Demo](examples/array/) | Array data handling | Complex data types, arrays |
+| [JSON Integration](examples/go_struct/) | Go struct mapping | JSON serialization, struct binding |
+| [Request-Reply](examples/request_reply/) | RPC pattern | Synchronous communication |
+| [Security](examples/security/) | Secure communication | Authentication, encryption |
+| [Multiple Files](examples/module/) | Modular configuration | XML organization, reusability |
+
+**📁 [Browse all examples →](examples/README.md)**
+
+## Platform Support
+
+RTI Connector supports the following platforms:
+
+| Platform | Architecture | Status |
+|----------|-------------|---------|
+| **Linux** | x86_64 | ✅ Supported |
+| **macOS** | x86_64 (Intel) | ✅ Supported |
+| **macOS** | arm64 (Apple Silicon) | ✅ Supported |
+| **Windows** | x86_64 | ✅ Supported |
+
+> 📝 **Note**: If you need support for additional architectures, please contact your RTI account manager or [sales@rti.com](mailto:sales@rti.com).
+
+### Library Path Configuration
+
+To run applications, you need to configure the library path:
 
 **Linux:**
 ```bash
-$ export LD_LIBRARY_PATH=$GOPATH//go/pkg/mod/github.com/rticommunity/rticonnextdds-connector-go\@{version}-{YYYYMMDDHHmm}-{commit_id}/rticonnextdds-connector/lib/linux-x64:$LD_LIBRARY_PATH
-$ ./simple_reader
+export LD_LIBRARY_PATH=$GOPATH/pkg/mod/github.com/rticommunity/rticonnextdds-connector-go@*/rticonnextdds-connector/lib/linux-x64:$LD_LIBRARY_PATH
 ```
 
-**macOS:**
+**macOS (Intel):**
 ```bash
-$ export DYLD_LIBRARY_PATH=$GOPATH//go/pkg/mod/github.com/rticommunity/rticonnextdds-connector-go\@{version}-{YYYYMMDDHHmm}-{commit_id}/rticonnextdds-connector/lib/osx-arm64:$DYLD_LIBRARY_PATH
-$ ./simple_reader
+export DYLD_LIBRARY_PATH=$GOPATH/pkg/mod/github.com/rticommunity/rticonnextdds-connector-go@*/rticonnextdds-connector/lib/osx-x64:$DYLD_LIBRARY_PATH
 ```
 
-### Platform support
-Go *Connector* builds its library for few [select architectures](https://github.com/rticommunity/rticonnextdds-connector/blob/master/config.yaml). If you need another architecture, please contact your RTI account manager or sales@rti.com.
+**macOS (Apple Silicon):**
+```bash
+export DYLD_LIBRARY_PATH=$GOPATH/pkg/mod/github.com/rticommunity/rticonnextdds-connector-go@*/rticonnextdds-connector/lib/osx-arm64:$DYLD_LIBRARY_PATH
+```
 
-If you want to check the version of the libraries you can run the following command:
+**Windows:**
+```cmd
+set PATH=%GOPATH%\pkg\mod\github.com\rticommunity\rticonnextdds-connector-go@*\rticonnextdds-connector\lib\win-x64;%PATH%
+```
 
-``` bash
+### Version Information
+
+To check the version of the RTI libraries:
+
+```bash
+# Linux
 strings ./rticonnextdds-connector/lib/linux-x64/librtiddsconnector.so | grep BUILD
+
+# macOS  
+strings ./rticonnextdds-connector/lib/osx-arm64/librtiddsconnector.dylib | grep BUILD
+
+# Windows
+findstr BUILD .\rticonnextdds-connector\lib\win-x64\rtiddsconnector.dll
 ```
 
-### Threading model
-The *Connector* Native API does not yet implement any mechanism for thread safety. Originally, the *Connector* native code was built to work with *RTI Prototyper* and Lua. That was a single-threaded loop. RTI then introduced support for JavaScript, Python, and Go. For now, you are responsible for protecting calls to *Connector*. Thread safety
-may be implemented in the future.
+## Development
 
-### Support
-*Go Connector* is an experimental RTI product for rapid prototyping and development. If you have questions, please use the [RTI Community Forum](https://community.rti.com/forums/technical-questions). If you would like to report a bug or have a feature request, please create an [issue](https://github.com/rticommunity/rticonnextdds-connector-go/issues).
+### Building and Testing
 
-### Documentation
-The best way to get started with *Connector* is to look at the
-examples; you will see that it is very easy to use.
-
-### Contributing
-Contributions to the code, examples, documentation are really appreciated. Please follow the steps below for contributions. 
-
-1. [Sign the CLA](CONTRIBUTING.md).
-1. Create a fork and make your changes.
-1. Run tests and linters (`make test-local` or `./test_improvements.sh`).
-1. Push your branch.
-1. Open a new [pull request](https://github.com/rticommunity/rticonnextdds-connector-go/compare).
-
-All contributions are automatically tested for quality, including build verification, code linting, and comprehensive test suite validation.
-
-### Testing and Development
-For development and testing, use the provided Makefile which properly configures library paths:
+Use the provided Makefile for development tasks:
 
 ```bash
-# Run tests with coverage
-$ make test-local
+# Run all tests with coverage
+make test-local
 
-# Run comprehensive test suite
-$ ./test_improvements.sh
+# Run comprehensive test suite with quality checks
+./test_improvements.sh
+
+# Build all packages
+go build ./...
+
+# Run static analysis
+go vet ./...
+
+# Format code
+go fmt ./...
 ```
 
-For more testing options, see [TESTING.md](TESTING.md).
+### Threading Model
+
+> ⚠️ **Important**: The Connector Native API does not implement thread safety. You are responsible for protecting calls to Connector in multi-threaded applications.
+
+The native code was originally designed for single-threaded environments (RTI Prototyper and Lua). While we've added support for Go, Python, and JavaScript, thread safety remains the developer's responsibility.
+
+## Documentation
+
+- 📚 **[API Reference](https://pkg.go.dev/github.com/rticommunity/rticonnextdds-connector-go)** - Complete Go API documentation
+- 📖 **[Examples](examples/README.md)** - Comprehensive examples and tutorials  
+- 🧪 **[Testing Guide](TESTING.md)** - Development and testing guidelines
+- 🤝 **[Contributing](CONTRIBUTING.md)** - How to contribute to the project
+
+### Additional Resources
+
+- [RTI Connext DDS Documentation](https://community.rti.com/documentation)
+- [XML-Based Application Creation Guide](https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/xml_application_creation/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted.pdf)
+- [RTI Community Forum](https://community.rti.com/forums/technical-questions)
+
+## Contributing
+
+We welcome contributions! Here's how to get started:
+
+1. **📝 [Sign the CLA](CONTRIBUTING.md)** - Required for all contributions
+2. **🍴 Fork and clone** the repository
+3. **🔧 Make your changes** with tests
+4. **✅ Run quality checks**: `make test-local` or `./test_improvements.sh`
+5. **📤 Submit a pull request**
+
+All contributions are automatically tested for quality, including:
+- Build verification across platforms
+- Code linting and formatting  
+- Comprehensive test suite validation
+- Coverage analysis
+
+### Development Environment
+
+```bash
+# Clone the repository
+git clone https://github.com/rticommunity/rticonnextdds-connector-go.git
+cd rticonnextdds-connector-go
+
+# Run tests to verify setup
+./test_improvements.sh
+
+# Start developing!
+```
+
+## Support
+
+### Getting Help
+
+- 💬 **[RTI Community Forum](https://community.rti.com/forums/technical-questions)** - Technical questions and discussions
+- 🐛 **[GitHub Issues](https://github.com/rticommunity/rticonnextdds-connector-go/issues)** - Bug reports and feature requests
+- 📧 **[Contact RTI](mailto:sales@rti.com)** - Commercial support and licensing
+
+---
+
+**Ready to get started?** Check out our [Quick Start](#quick-start) guide or explore the [examples](examples/README.md)!
