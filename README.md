@@ -38,7 +38,7 @@ Originally created by the RTI Research Group for demos and proof-of-concepts, RT
 
 ### Prerequisites
 
-- Go 1.19 or later
+- Go 1.21 or later
 - Supported platform (Linux x64, macOS, Windows x64)
 
 ### Installation
