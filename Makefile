@@ -25,7 +25,7 @@ DOCKER_RUNTIME_CMD=\
 
 .PHONY: test-local
 test-local:
-	DYLD_LIBRARY_PATH=rticonnextdds-connector/lib/osx-x64 \
+	DYLD_LIBRARY_PATH=rticonnextdds-connector/lib/osx-$(shell uname -m | sed 's/x86_64/x64/') \
 	LD_LIBRARY_PATH=rticonnextdds-connector/lib/linux-x64 \
 	${GO} test -v -race -coverprofile=coverage.txt -covermode=atomic
 
