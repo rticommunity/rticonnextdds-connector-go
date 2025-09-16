@@ -206,7 +206,6 @@ make test-local
 ```
 
 ## Usage Examples
-## Usage Examples
 
 Explore our comprehensive examples to learn different patterns and use cases:
 
@@ -303,7 +302,6 @@ The native code was originally designed for single-threaded environments (RTI Pr
 
 ## Documentation
 
-- 📚 **[API Reference](https://pkg.go.dev/github.com/rticommunity/rticonnextdds-connector-go)** - Complete Go API documentation
 - 📖 **[Examples](examples/README.md)** - Comprehensive examples and tutorials  
 - 🧪 **[Testing Guide](TESTING.md)** - Development and testing guidelines
 - 🤝 **[Contributing](CONTRIBUTING.md)** - How to contribute to the project
