@@ -228,8 +228,7 @@ RTI Connector supports the following platforms:
 | Platform | Architecture | Status |
 |----------|-------------|---------|
 | **Linux** | x86_64 | ✅ Supported |
-| **macOS** | x86_64 (Intel) | ✅ Supported |
-| **macOS** | arm64 (Apple Silicon) | ✅ Supported |
+| **macOS** | x86_64 (Intel/Apple Silicon) | ✅ Supported |
 | **Windows** | x86_64 | ✅ Supported |
 
 > 📝 **Note**: If you need support for additional architectures, please contact your RTI account manager or [sales@rti.com](mailto:sales@rti.com).
