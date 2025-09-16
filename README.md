@@ -182,9 +182,17 @@ A dependency to the latest stable version of rticonnextdds-connector-go should b
 
 Run:
 
-To run your application, you need to add the Connector C library to your library path.
+To run your application, you need to add the Connector C library to your library path:
+
+**Linux:**
 ```bash
 $ export LD_LIBRARY_PATH=$GOPATH//go/pkg/mod/github.com/rticommunity/rticonnextdds-connector-go\@{version}-{YYYYMMDDHHmm}-{commit_id}/rticonnextdds-connector/lib/linux-x64:$LD_LIBRARY_PATH
+$ ./simple_reader
+```
+
+**macOS:**
+```bash
+$ export DYLD_LIBRARY_PATH=$GOPATH//go/pkg/mod/github.com/rticommunity/rticonnextdds-connector-go\@{version}-{YYYYMMDDHHmm}-{commit_id}/rticonnextdds-connector/lib/osx-arm64:$DYLD_LIBRARY_PATH
 $ ./simple_reader
 ```
 
@@ -202,7 +210,7 @@ The *Connector* Native API does not yet implement any mechanism for thread safet
 may be implemented in the future.
 
 ### Support
-*Connector* is an experimental RTI product. If you have questions, please use the [RTI Community Forum](https://community.rti.com/forums/technical-questions). If you would like to report a bug or have a feature request, please create an [issue](https://github.com/rticommunity/rticonnextdds-connector-go/issues).
+*Go Connector* is an experimental RTI product for rapid prototyping and development. If you have questions, please use the [RTI Community Forum](https://community.rti.com/forums/technical-questions). If you would like to report a bug or have a feature request, please create an [issue](https://github.com/rticommunity/rticonnextdds-connector-go/issues).
 
 ### Documentation
 The best way to get started with *Connector* is to look at the
@@ -213,6 +221,21 @@ Contributions to the code, examples, documentation are really appreciated. Pleas
 
 1. [Sign the CLA](CONTRIBUTING.md).
 1. Create a fork and make your changes.
-1. Run tests and linters (make test lint).
+1. Run tests and linters (`make test-local` or `./test_improvements.sh`).
 1. Push your branch.
 1. Open a new [pull request](https://github.com/rticommunity/rticonnextdds-connector-go/compare).
+
+All contributions are automatically tested for quality, including build verification, code linting, and comprehensive test suite validation.
+
+### Testing and Development
+For development and testing, use the provided Makefile which properly configures library paths:
+
+```bash
+# Run tests with coverage
+$ make test-local
+
+# Run comprehensive test suite
+$ ./test_improvements.sh
+```
+
+For more testing options, see [TESTING.md](TESTING.md).
