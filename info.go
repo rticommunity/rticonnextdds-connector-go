@@ -11,10 +11,6 @@
 // Package rti implements functions of RTI Connector for Connext DDS in Go
 package rti
 
-// #cgo windows CFLAGS: -I${SRCDIR}/include -I${SRCDIR}/rticonnextdds-connector/include -DRTI_WIN32 -DNDDS_DLL_VARIABLE
-// #cgo linux,arm CFLAGS: -I${SRCDIR}/include -I${SRCDIR}/rticonnextdds-connector/include -DRTI_UNIX -DRTI_LINUX
-// #cgo windows LDFLAGS: -L${SRCDIR}/rticonnextdds-connector/lib/x64Win64VS2013 -lrtiddsconnector
-// #cgo linux,arm LDFLAGS: -L${SRCDIR}/rticonnextdds-connector/lib/armv6vfphLinux3.xgcc4.7.2 -lrtiddsconnector -ldl -lnsl -lm -lpthread -lrt
 // #include "rticonnextdds-connector.h"
 // #include <stdlib.h>
 import "C"
@@ -37,7 +33,7 @@ type Infos struct {
 // Identity is the structure for identifying
 type Identity struct {
 	WriterGUID     [16]byte `json:"writer_guid"`
-	SequenceNumber int     `json:"sequence_number"`
+	SequenceNumber int      `json:"sequence_number"`
 }
 
 /*******************
@@ -115,7 +111,7 @@ func (infos *Infos) GetIdentityJSON(index int) (string, error) {
 	return identityStr, nil
 }
 
-// GetRelatedIdentity is a function used for request-reply communications. 
+// GetRelatedIdentity is a function used for request-reply communications.
 func (infos *Infos) GetRelatedIdentity(index int) (Identity, error) {
 
 	var writerID Identity
@@ -146,32 +142,32 @@ func (infos *Infos) GetRelatedIdentityJSON(index int) (string, error) {
 
 // GetViewState is a function used to get a view state in string (either "NEW" or "NOT NEW").
 func (infos *Infos) GetViewState(index int) (string, error) {
-        viewStateStr, err := infos.getJSONMember(index, "view_state")
-        if err != nil {
-                return "", err
-        }
+	viewStateStr, err := infos.getJSONMember(index, "view_state")
+	if err != nil {
+		return "", err
+	}
 
-        return viewStateStr, nil
+	return viewStateStr, nil
 }
 
 // GetInstanceState is a function used to get a instance state in string (one of "ALIVE", "NOT_ALIVE_DISPOSED" or "NOT_ALIVE_NO_WRITERS").
 func (infos *Infos) GetInstanceState(index int) (string, error) {
-        instanceStateStr, err := infos.getJSONMember(index, "instance_state")
-        if err != nil {
-                return "", err
-        }
+	instanceStateStr, err := infos.getJSONMember(index, "instance_state")
+	if err != nil {
+		return "", err
+	}
 
-        return instanceStateStr, nil
+	return instanceStateStr, nil
 }
 
 // GetSampleState is a function used to get a sample state in string (either "READ" or "NOT_READ").
 func (infos *Infos) GetSampleState(index int) (string, error) {
-        sampleStateStr, err := infos.getJSONMember(index, "sample_state")
-        if err != nil {
-                return "", err
-        }
+	sampleStateStr, err := infos.getJSONMember(index, "sample_state")
+	if err != nil {
+		return "", err
+	}
 
-        return sampleStateStr, nil
+	return sampleStateStr, nil
 }
 
 // GetLength is a function to return the length of the

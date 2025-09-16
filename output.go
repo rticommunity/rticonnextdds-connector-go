@@ -11,10 +11,6 @@
 // Package rti implements functions of RTI Connector for Connext DDS in Go
 package rti
 
-// #cgo windows CFLAGS: -I${SRCDIR}/include -I${SRCDIR}/rticonnextdds-connector/include -DRTI_WIN32 -DNDDS_DLL_VARIABLE
-// #cgo linux,arm CFLAGS: -I${SRCDIR}/include -I${SRCDIR}/rticonnextdds-connector/include -DRTI_UNIX -DRTI_LINUX
-// #cgo windows LDFLAGS: -L${SRCDIR}/rticonnextdds-connector/lib/x64Win64VS2013 -lrtiddsconnector
-// #cgo linux,arm LDFLAGS: -L${SRCDIR}/rticonnextdds-connector/lib/armv6vfphLinux3.xgcc4.7.2 -lrtiddsconnector -ldl -lnsl -lm -lpthread -lrt
 // #include "rticonnextdds-connector.h"
 // #include <stdlib.h>
 import "C"
@@ -44,8 +40,8 @@ type Output struct {
 // Write is a function to write a DDS data instance in an output
 func (output *Output) Write() error {
 	if output == nil {
-                return errors.New("output is null")
-        }
+		return errors.New("output is null")
+	}
 
 	retcode := int(C.RTI_Connector_write(unsafe.Pointer(output.connector.native), output.nameCStr, nil))
 	return checkRetcode(retcode)
@@ -59,12 +55,13 @@ func (output *Output) Write() error {
 // related_sample_identity: Used for request-reply communications. It has the same format as "identity"
 // For example::
 // output.Write(
-//   identity={"writer_guid":[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], "sequence_number":1},
-//	 timestamp=1000000000)
+//
+//	  identity={"writer_guid":[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], "sequence_number":1},
+//		 timestamp=1000000000)
 func (output *Output) WriteWithParams(jsonStr string) error {
 	if output == nil {
-                return errors.New("output is null")
-        }
+		return errors.New("output is null")
+	}
 
 	jsonCStr := C.CString(jsonStr)
 	defer C.free(unsafe.Pointer(jsonCStr))
@@ -76,8 +73,8 @@ func (output *Output) WriteWithParams(jsonStr string) error {
 // ClearMembers is a function to initialize a DDS data instance in an output
 func (output *Output) ClearMembers() error {
 	if output == nil {
-                return errors.New("output is null")
-        }
+		return errors.New("output is null")
+	}
 
 	retcode := int(C.RTI_Connector_clear(unsafe.Pointer(output.connector.native), output.nameCStr))
 	return checkRetcode(retcode)
@@ -92,14 +89,14 @@ func (output *Output) ClearMembers() error {
 
 // Return: The change in the current number of matched outputs. If a positive number is returned, the input has matched with new publishers. If a negative number is returned the input has unmatched from an output. It is possible for multiple matches and/or unmatches to be returned (e.g., 0 could be returned, indicating that the input matched the same number of writers as it unmatched).
 func (output *Output) WaitForSubscriptions(timeoutMs int) (int, error) {
-        if output == nil {
-                return -1, errors.New("output is null")
-        }
+	if output == nil {
+		return -1, errors.New("output is null")
+	}
 
-        var currentCountChange C.int
+	var currentCountChange C.int
 
-        retcode := int(C.RTI_Connector_wait_for_matched_subscription(unsafe.Pointer(output.native), C.int(timeoutMs), &currentCountChange))
-        return int(currentCountChange), checkRetcode(retcode)
+	retcode := int(C.RTI_Connector_wait_for_matched_subscription(unsafe.Pointer(output.native), C.int(timeoutMs), &currentCountChange))
+	return int(currentCountChange), checkRetcode(retcode)
 }
 
 // Returns information about the matched subscriptions
@@ -114,20 +111,20 @@ func (output *Output) WaitForSubscriptions(timeoutMs int) (int, error) {
 // Note that Connector Inputs are automatically assigned a name from the
 // *data_reader name* in the XML configuration.
 func (output *Output) GetMatchedSubscriptions() (string, error) {
-        if output == nil {
-                return "", errors.New("output is null")
-        }
+	if output == nil {
+		return "", errors.New("output is null")
+	}
 
-        var jsonCStr *C.char
+	var jsonCStr *C.char
 
-        retcode := int(C.RTI_Connector_get_matched_subscriptions(unsafe.Pointer(output.native), &jsonCStr))
-        err := checkRetcode(retcode)
-        if err != nil {
-                return "", err
-        }
+	retcode := int(C.RTI_Connector_get_matched_subscriptions(unsafe.Pointer(output.native), &jsonCStr))
+	err := checkRetcode(retcode)
+	if err != nil {
+		return "", err
+	}
 
-        jsonGoStr := C.GoString(jsonCStr)
-        C.RTI_Connector_free_string(jsonCStr)
+	jsonGoStr := C.GoString(jsonCStr)
+	C.RTI_Connector_free_string(jsonCStr)
 
-        return jsonGoStr, nil
+	return jsonGoStr, nil
 }
