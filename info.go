@@ -146,12 +146,22 @@ func (infos *Infos) GetRelatedIdentityJSON(index int) (string, error) {
 
 // GetViewState is a function used to get a view state in string (either "NEW" or "NOT NEW").
 func (infos *Infos) GetViewState(index int) (string, error) {
-        viewStateStr, err := infos.getJSONMember(index, "view_state")
-        if err != nil {
-                return "", err
-        }
+	viewStateStr, err := infos.getJSONMember(index, "view_state")
+	if err != nil {
+		return "", err
+	}
 
-        return viewStateStr, nil
+	return viewStateStr, nil
+}
+
+// GetInstanceHandle is a function to get the identity of a writer in JSON
+func (infos *Infos) GetInstanceHandle(index int) (string, error) {
+	instanceHandleStr, err := infos.getJSONMember(index, "instance_handle")
+	if err != nil {
+		return "", err
+	}
+
+	return instanceHandleStr, nil
 }
 
 // GetInstanceState is a function used to get a instance state in string (one of "ALIVE", "NOT_ALIVE_DISPOSED" or "NOT_ALIVE_NO_WRITERS").
