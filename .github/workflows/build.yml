@@ -36,3 +36,52 @@ jobs:
 
     - name: Run comprehensive test suite
       run: ./test_improvements.sh
+
+    - name: Generate coverage report
+      run: |
+        go tool cover -func=coverage.txt > coverage_report.txt
+        echo "## Coverage Report" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        cat coverage_report.txt >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        
+        # Extract coverage percentage
+        COVERAGE=$(go tool cover -func=coverage.txt | grep total | awk '{print substr($3, 1, length($3)-1)}')
+        echo "COVERAGE=$COVERAGE" >> $GITHUB_ENV
+        echo "Coverage: $COVERAGE%" >> $GITHUB_STEP_SUMMARY
+
+    - name: Update coverage badge
+      if: github.ref == 'refs/heads/master'
+      run: |
+        # Determine badge color based on coverage percentage
+        if (( $(echo "$COVERAGE >= 90" | bc -l) )); then
+          COLOR="brightgreen"
+        elif (( $(echo "$COVERAGE >= 80" | bc -l) )); then
+          COLOR="green"
+        elif (( $(echo "$COVERAGE >= 70" | bc -l) )); then
+          COLOR="yellow"
+        elif (( $(echo "$COVERAGE >= 60" | bc -l) )); then
+          COLOR="orange"
+        else
+          COLOR="red"
+        fi
+        
+        # Update README.md with new coverage badge
+        sed -i "s/coverage-[0-9.]*%25-[a-z]*/coverage-${COVERAGE}%25-${COLOR}/g" README.md
+        
+        # Check if there are changes to commit
+        if ! git diff --quiet README.md; then
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add README.md
+          git commit -m "Update coverage badge to ${COVERAGE}%" || exit 0
+          git push
+        fi
+
+    - name: Upload coverage artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report
+        path: |
+          coverage.txt
+          coverage_report.txt

@@ -1,6 +1,6 @@
 rticonnextdds-connector-go
 =======
-[![Coverage](https://codecov.io/gh/rticommunity/rticonnextdds-connector-go/branch/master/graph/badge.svg)](https://codecov.io/gh/rticommunity/rticonnextdds-connector-go)
+[![Coverage](https://img.shields.io/badge/coverage-90.4%25-brightgreen)](https://github.com/rticommunity/rticonnextdds-connector-go/actions/workflows/build.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/rticommunity/rticonnextdds-connector-go)](https://goreportcard.com/report/github.com/rticommunity/rticonnextdds-connector-go)
 [![Build and Test](https://github.com/rticommunity/rticonnextdds-connector-go/actions/workflows/build.yml/badge.svg)](https://github.com/rticommunity/rticonnextdds-connector-go/actions/workflows/build.yml)
 

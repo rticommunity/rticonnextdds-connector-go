@@ -49,7 +49,7 @@ else
     ((test_passed++))
 fi
 
-# Test 4: Unit tests with Makefile
+# Test 4: Unit tests with coverage (generates coverage.txt for CI)
 echo -e "\n${YELLOW}Testing: Unit tests with Makefile${NC}"
 if make test-local; then
     echo -e "${GREEN}✅ PASS: Unit tests with Makefile${NC}"
