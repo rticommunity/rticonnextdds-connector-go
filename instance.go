@@ -16,6 +16,7 @@ package rti
 import "C"
 import (
 	"encoding/json"
+	"errors"
 	"unsafe"
 )
 
@@ -142,6 +143,13 @@ func (instance *Instance) SetFloat64(fieldName string, value float64) error {
 
 // SetString is a function that set a string to a fieldname of the samples
 func (instance *Instance) SetString(fieldName, value string) error {
+	if instance == nil || instance.output == nil || instance.output.connector == nil {
+		return errors.New("instance, output, or connector is null")
+	}
+	if fieldName == "" {
+		return errors.New("fieldName cannot be empty")
+	}
+
 	fieldNameCStr := C.CString(fieldName)
 	defer C.free(unsafe.Pointer(fieldNameCStr))
 

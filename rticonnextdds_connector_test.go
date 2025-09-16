@@ -94,13 +94,13 @@ func TestLoadMultipleFiles(t *testing.T) {
 	xmlPath1 := path.Join(path.Dir(curPath), "./test/xml/TestConnector1.xml")
 	xmlPath2 := path.Join(path.Dir(curPath), "./test/xml/TestConnector2.xml")
 
-	connector, err := NewConnector("MyParticipantLibrary2::MyParticipant2", xmlPath1 + ";" + xmlPath2)
+	connector, err := NewConnector("MyParticipantLibrary2::MyParticipant2", xmlPath1+";"+xmlPath2)
 	assert.Nil(t, err)
-	assert.NotNil(t, connector)	
+	assert.NotNil(t, connector)
 
 	output, err := connector.GetOutput("MyPublisher2::MySquareWriter2")
 	assert.Nil(t, err)
-	assert.NotNil(t, output)	
+	assert.NotNil(t, output)
 }
 
 // Tests that a domain_participant defined in XML alonside participant_qos can be used to create a Connector object.
@@ -257,16 +257,16 @@ func TestDataFlow(t *testing.T) {
 	assert.Equal(t, valid, true)
 
 	viewState, err := input.Infos.GetViewState(0)
-        assert.Nil(t, err)
-        assert.Equal(t, viewState, "NEW")
+	assert.Nil(t, err)
+	assert.Equal(t, viewState, "NEW")
 
 	instanceState, err := input.Infos.GetInstanceState(0)
-        assert.Nil(t, err)
-        assert.Equal(t, instanceState, "ALIVE")
+	assert.Nil(t, err)
+	assert.Equal(t, instanceState, "ALIVE")
 
 	sampleState, err := input.Infos.GetSampleState(0)
-        assert.Nil(t, err)
-        assert.Equal(t, sampleState, "NOT_READ")
+	assert.Nil(t, err)
+	assert.Equal(t, sampleState, "NOT_READ")
 
 	rst, err := input.Samples.GetString(0, "st")
 	assert.Nil(t, err)

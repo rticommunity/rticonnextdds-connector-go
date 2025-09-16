@@ -20,9 +20,9 @@ import (
 )
 
 type Replier struct {
-	connector *rti.Connector
-	output *rti.Output
-	input *rti.Input
+	connector       *rti.Connector
+	output          *rti.Output
+	input           *rti.Input
 	relatedIdentity string
 }
 
@@ -73,7 +73,7 @@ func main() {
 
 		var replyData types.Shape
 		replyData.X = requestData.Y
-		replyData.Y = requestData.X 
+		replyData.Y = requestData.X
 		replyData.Shapesize = requestData.Shapesize
 		replyData.Color = requestData.Color
 
@@ -84,7 +84,6 @@ func main() {
 		log.Printf("x: %d\n", requestData.X)
 		log.Printf("y: %d\n", requestData.Y)
 		log.Printf("shapesize: %d\n", requestData.Shapesize)
-
 
 		time.Sleep(time.Second * 1)
 	}
@@ -110,7 +109,7 @@ func (replier *Replier) receiveRequest(data *types.Shape) error {
 			}
 			log.Println(replier.input.Infos.GetIdentityJSON(0))
 			identity, _ := replier.input.Infos.GetIdentityJSON(0)
-			replier.relatedIdentity	= identity
+			replier.relatedIdentity = identity
 		}
 	}
 	return err

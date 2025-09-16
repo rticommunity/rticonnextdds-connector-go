@@ -23,9 +23,9 @@ import (
 
 type Requester struct {
 	connector *rti.Connector
-	output *rti.Output
-	input *rti.Input
-	identity string
+	output    *rti.Output
+	input     *rti.Input
+	identity  string
 }
 
 func main() {

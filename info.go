@@ -42,6 +42,13 @@ type Identity struct {
 
 // IsValid is a function to check validity of the element and return a boolean
 func (infos *Infos) IsValid(index int) (bool, error) {
+	if infos == nil || infos.input == nil || infos.input.connector == nil {
+		return false, errors.New("infos, input, or connector is null")
+	}
+	if index < 0 {
+		return false, errors.New("index cannot be negative")
+	}
+
 	memberNameCStr := C.CString("valid_data")
 	defer C.free(unsafe.Pointer(memberNameCStr))
 	var retVal C.int

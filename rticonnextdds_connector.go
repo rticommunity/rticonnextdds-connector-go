@@ -11,10 +11,6 @@
 // Package rti implements functions of RTI Connector for Connext DDS in Go
 package rti
 
-// #cgo windows CFLAGS: -I${SRCDIR}/include -I${SRCDIR}/rticonnextdds-connector/include -DRTI_WIN32 -DNDDS_DLL_VARIABLE
-// #cgo linux,arm CFLAGS: -I${SRCDIR}/include -I${SRCDIR}/rticonnextdds-connector/include -DRTI_UNIX -DRTI_LINUX
-// #cgo windows LDFLAGS: -L${SRCDIR}/rticonnextdds-connector/lib/win-x64 -lrtiddsconnector
-// #cgo linux,arm LDFLAGS: -L${SRCDIR}/rticonnextdds-connector/lib/linux-arm -lrtiddsconnector -ldl -lnsl -lm -lpthread -lrt
 // #include "rticonnextdds-connector.h"
 // #include <stdlib.h>
 import "C"
@@ -64,10 +60,13 @@ const (
 // NewConnector is a constructor of Connector.
 //
 // url is the location of XML documents in URL format. For example:
-//  File specification: file:///usr/local/default_dds.xml
-//  String specification: str://"<dds><qos_library>…</qos_library></dds>"
+//
+//	File specification: file:///usr/local/default_dds.xml
+//	String specification: str://"<dds><qos_library>…</qos_library></dds>"
+//
 // If you omit the URL schema name, Connector will assume a file name. For example:
-//  File Specification: /usr/local/default_dds.xml
+//
+//	File Specification: /usr/local/default_dds.xml
 func NewConnector(configName, url string) (*Connector, error) {
 	connector := new(Connector)
 
