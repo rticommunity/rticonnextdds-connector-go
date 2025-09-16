@@ -18,12 +18,14 @@ run_test() {
     local command="$2"
     
     echo -e "\n${YELLOW}Testing: $test_name${NC}"
-    if eval "$command" > /dev/null 2>&1; then
+    if eval "$command" > /tmp/test_output.log 2>&1; then
         echo -e "${GREEN}✅ PASS: $test_name${NC}"
         ((test_passed++))
         return 0
     else
         echo -e "${RED}❌ FAIL: $test_name${NC}"
+        echo -e "${RED}Error output:${NC}"
+        cat /tmp/test_output.log
         ((test_failed++))
         return 1
     fi
@@ -49,7 +51,7 @@ fi
 
 # Test 4: Unit tests with Makefile
 echo -e "\n${YELLOW}Testing: Unit tests with Makefile${NC}"
-if make test-local > /dev/null 2>&1; then
+if make test-local; then
     echo -e "${GREEN}✅ PASS: Unit tests with Makefile${NC}"
     ((test_passed++))
     
@@ -64,6 +66,7 @@ if make test-local > /dev/null 2>&1; then
     fi
 else
     echo -e "${RED}❌ FAIL: Unit tests with Makefile${NC}"
+    echo -e "${RED}Run 'make test-local' for detailed error output${NC}"
     ((test_failed++))
 fi
 

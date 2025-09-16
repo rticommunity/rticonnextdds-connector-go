@@ -237,17 +237,15 @@ func TestInputOutputMethods(t *testing.T) {
 	count, err := input.GetMatchedPublications()
 	// This might return 0 or an error depending on timing
 	if err == nil {
-		assert.GreaterOrEqual(t, count, uint32(0))
+		assert.NotEmpty(t, count)
 	}
 
 	// Test GetMatchedSubscriptions (80.0% coverage)
 	count, err = output.GetMatchedSubscriptions()
 	// This might return 0 or an error depending on timing
 	if err == nil {
-		assert.GreaterOrEqual(t, count, uint32(0))
-	}
-
-	// Test Read method (75.0% coverage)
+		assert.NotEmpty(t, count)
+	} // Test Read method (75.0% coverage)
 	_ = input.Read() // May return error if no data
 
 	// Test ClearMembers method (75.0% coverage)
