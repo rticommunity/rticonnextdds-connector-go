@@ -12,3 +12,6 @@
 .vscode
 
 coverage.txt
+
+# Downloaded RTI Connector libraries
+rticonnextdds-connector/
