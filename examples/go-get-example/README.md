@@ -21,11 +21,13 @@ go get github.com/rticommunity/rticonnextdds-connector-go
 go run github.com/rticommunity/rticonnextdds-connector-go/cmd/download-libs@latest
 ```
 
-4. **Set library path:**
-The download tool will show you the exact command for your platform. For example:
+4. **Set library path (for runtime):**
 ```bash
-# macOS
+# macOS (Apple Silicon/ARM64)
 export DYLD_LIBRARY_PATH=$(pwd)/rticonnextdds-connector/lib/osx-arm64:$DYLD_LIBRARY_PATH
+
+# macOS (Intel/x86_64)
+export DYLD_LIBRARY_PATH=$(pwd)/rticonnextdds-connector/lib/osx-x64:$DYLD_LIBRARY_PATH
 
 # Linux  
 export LD_LIBRARY_PATH=$(pwd)/rticonnextdds-connector/lib/linux-x64:$LD_LIBRARY_PATH
@@ -33,6 +35,10 @@ export LD_LIBRARY_PATH=$(pwd)/rticonnextdds-connector/lib/linux-x64:$LD_LIBRARY_
 # Windows (PowerShell)
 $env:PATH = "$(pwd)\rticonnextdds-connector\lib\win-x64;$env:PATH"
 ```
+
+> **💡 macOS Users**: Use `osx-arm64` for Apple Silicon Macs (M1/M2/M3) and `osx-x64` for Intel Macs. You can check your architecture with `uname -m` (arm64 = Apple Silicon, x86_64 = Intel).
+
+> **✨ New**: CGO compilation is now automatic! No manual CGO flags needed.
 
 5. **Run the example:**
 ```bash
