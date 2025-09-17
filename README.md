@@ -43,17 +43,24 @@ Originally created by the RTI Research Group for demos and proof-of-concepts, RT
 
 ### Installation
 
-1. **Get the Go package:**
+1. **Create a new project directory and initialize a Go module:**
+```bash
+mkdir my-rti-project
+cd my-rti-project
+go mod init my-rti-project
+```
+
+2. **Get the Go package:**
 ```bash
 go get github.com/rticommunity/rticonnextdds-connector-go
 ```
 
-2. **Download RTI Connector libraries:**
+3. **Download RTI Connector libraries:**
 ```bash
 go run github.com/rticommunity/rticonnextdds-connector-go/cmd/download-libs@latest
 ```
 
-3. **Set library path:**
+4. **Set library path:**
 The download tool will show you the exact command for your platform. For example:
 ```bash
 # macOS

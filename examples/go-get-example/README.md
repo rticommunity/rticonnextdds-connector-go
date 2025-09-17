@@ -4,17 +4,24 @@ This example shows the easiest way to get started with RTI Connector Go using `g
 
 ## Quick Start
 
-1. **Get the package:**
+1. **Create a new project and initialize Go module:**
+```bash
+mkdir my-rti-demo
+cd my-rti-demo
+go mod init my-rti-demo
+```
+
+2. **Get the package:**
 ```bash
 go get github.com/rticommunity/rticonnextdds-connector-go
 ```
 
-2. **Download RTI libraries:**
+3. **Download RTI libraries:**
 ```bash
 go run github.com/rticommunity/rticonnextdds-connector-go/cmd/download-libs@latest
 ```
 
-3. **Set library path:**
+4. **Set library path:**
 The download tool will show you the exact command for your platform. For example:
 ```bash
 # macOS
@@ -27,7 +34,7 @@ export LD_LIBRARY_PATH=$(pwd)/rticonnextdds-connector/lib/linux-x64:$LD_LIBRARY_
 $env:PATH = "$(pwd)\rticonnextdds-connector\lib\win-x64;$env:PATH"
 ```
 
-4. **Run the example:**
+5. **Run the example:**
 ```bash
 go run publisher.go
 ```
