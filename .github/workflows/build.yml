@@ -25,8 +25,7 @@ jobs:
 
     - name: Download RTI Connector libraries
       run: |
-        chmod +x scripts/download_libs.sh
-        ./scripts/download_libs.sh
+        go run ./cmd/download-libs
 
     - name: Install dependencies
       run: |

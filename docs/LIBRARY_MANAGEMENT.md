@@ -14,8 +14,8 @@ The RTI Connector Go binding requires native C libraries from RTI Connext DDS. T
 # Using Make (recommended)
 make download-libs
 
-# Or directly
-./download_libs.sh
+# Or directly using Go command
+go run ./cmd/download-libs
 ```
 
 ### Check Current Installation
@@ -30,35 +30,38 @@ make check-libs
 make list-lib-versions
 ```
 
-## Library Download Script
+## Library Download Tool
 
-The `scripts/download_libs.sh` script provides comprehensive library management:
+The Go-based download tool (`cmd/download-libs`) provides comprehensive library management:
 
 ### Basic Usage
 
 ```bash
 # Download latest version
-./download_libs.sh
+go run ./cmd/download-libs
 
 # Download specific version  
-./download_libs.sh -v v1.3.1
+go run ./cmd/download-libs -version v1.3.1
 
 # Force download (overwrite existing)
-./download_libs.sh -f
+go run ./cmd/download-libs -force
 
 # Show current installation
-./download_libs.sh -c
+go run ./cmd/download-libs -current
 
 # List available versions
-./download_libs.sh -l
+go run ./cmd/download-libs -list
 
-# Show help
-./download_libs.sh -h
+# Use make commands (recommended)
+make download-libs          # Download latest
+make download-libs-latest   # Force download latest
+make check-libs            # Show current installation
+make list-lib-versions     # List available versions
 ```
 
 ### Platform Support
 
-The script automatically detects your platform and downloads the appropriate libraries:
+The tool automatically detects your platform and downloads the appropriate libraries:
 
 - **Linux x64**: `linux-x64` libraries
 - **Linux ARM64**: `linux-arm64` libraries  
@@ -68,7 +71,7 @@ The script automatically detects your platform and downloads the appropriate lib
 
 ### Library Path Setup
 
-After downloading, the script shows the appropriate environment setup:
+After downloading, the tool shows the appropriate environment setup:
 
 **Linux:**
 ```bash
@@ -106,10 +109,12 @@ Libraries are downloaded from the official RTI repository:
 
 ### Current Version Detection
 
-The script can detect the currently installed version by examining the library files:
+The tool can detect the currently installed version by examining the library files:
 
 ```bash
-./download_libs.sh --current
+go run ./cmd/download-libs -current
+# or
+make check-libs
 ```
 
 This shows:
@@ -123,7 +128,9 @@ This shows:
 Check what versions are available for download:
 
 ```bash
-./download_libs.sh --list
+go run ./cmd/download-libs -list
+# or
+make list-lib-versions
 ```
 
 Recent versions include:
@@ -160,7 +167,7 @@ rticonnextdds-connector/
 ### Common Issues
 
 1. **Libraries not found**: Ensure library path is set correctly
-2. **Permission denied**: Make sure download script is executable (`chmod +x`)
+2. **Go tool issues**: Ensure Go is properly installed and accessible
 3. **Network issues**: Check internet connection and GitHub access
 4. **Version not found**: Verify version exists in releases
 
@@ -184,17 +191,17 @@ For automated builds, you can use:
 
 ```bash
 # In CI scripts
-./download_libs.sh --force  # Force download latest
-make test-local             # Run tests
+go run ./cmd/download-libs -force  # Force download latest
+make test-local                   # Run tests
 ```
 
-The script is designed to work in both interactive and automated environments.
+The tool is designed to work in both interactive and automated environments.
 
 ## Contributing
 
 When contributing to the project:
 
 1. Always test with multiple library versions
-2. Ensure the download script works on all supported platforms
+2. Ensure the download tool works on all supported platforms
 3. Update documentation if adding new library management features
 4. Test both Go module and manual installation paths

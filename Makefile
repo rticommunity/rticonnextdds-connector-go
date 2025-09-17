@@ -43,16 +43,16 @@ lint:
 
 .PHONY: download-libs
 download-libs:
-	./scripts/download_libs.sh
+	go run ./cmd/download-libs
 
 .PHONY: download-libs-latest
 download-libs-latest:
-	./scripts/download_libs.sh --force
+	go run ./cmd/download-libs -force
 
 .PHONY: check-libs
 check-libs:
-	./scripts/download_libs.sh --current
+	go run ./cmd/download-libs -current
 
 .PHONY: list-lib-versions
 list-lib-versions:
-	./scripts/download_libs.sh --list
+	go run ./cmd/download-libs -list
