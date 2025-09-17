@@ -43,9 +43,30 @@ Originally created by the RTI Research Group for demos and proof-of-concepts, RT
 
 ### Installation
 
+1. **Get the Go package:**
 ```bash
 go get github.com/rticommunity/rticonnextdds-connector-go
 ```
+
+2. **Download RTI Connector libraries:**
+```bash
+go run github.com/rticommunity/rticonnextdds-connector-go/cmd/download-libs@latest
+```
+
+3. **Set library path:**
+The download tool will show you the exact command for your platform. For example:
+```bash
+# macOS
+export DYLD_LIBRARY_PATH=$(pwd)/rticonnextdds-connector/lib/osx-arm64:$DYLD_LIBRARY_PATH
+
+# Linux  
+export LD_LIBRARY_PATH=$(pwd)/rticonnextdds-connector/lib/linux-x64:$LD_LIBRARY_PATH
+
+# Windows (PowerShell)
+$env:PATH = "$(pwd)\rticonnextdds-connector\lib\win-x64;$env:PATH"
+```
+
+> **💡 New to RTI Connector Go?** Try the [go-get-example](examples/go-get-example/) first - it provides a complete walkthrough of this installation process with a simple working example.
 
 ### Your First DDS Application
 
@@ -172,38 +193,55 @@ func main() {
 }
 ```
 
-4. **Run your application**:
+4. **Run your application:**
+
+Make sure you've completed the installation steps above (including library download and path setup), then:
 
 ```bash
 # Terminal 1 - Start subscriber
-export DYLD_LIBRARY_PATH=$GOPATH/pkg/mod/github.com/rticommunity/rticonnextdds-connector-go@*/rticonnextdds-connector/lib/osx-arm64:$DYLD_LIBRARY_PATH  # macOS
-# export LD_LIBRARY_PATH=$GOPATH/pkg/mod/github.com/rticommunity/rticonnextdds-connector-go@*/rticonnextdds-connector/lib/linux-x64:$LD_LIBRARY_PATH  # Linux
 go run subscriber.go
 
 # Terminal 2 - Start publisher  
 go run publisher.go
 ```
 
-## Installation
+You should see the subscriber receiving data published by the publisher!
 
-### Using Go Modules (Recommended)
+## Library Management
+
+The installation above uses our automated library download tool. For advanced scenarios, see our comprehensive guides:
+
+- **[Library Management Documentation](docs/LIBRARY_MANAGEMENT.md)** - Complete guide to library installation options
+- **[Go Get Users Guide](docs/GO_GET_USERS.md)** - Specific help for `go get` workflow
+- **[Examples](examples/)** - Ready-to-run code samples
+
+### Library Download Tool Options
 
 ```bash
-go get github.com/rticommunity/rticonnextdds-connector-go
+# Download specific version
+go run github.com/rticommunity/rticonnextdds-connector-go/cmd/download-libs@latest -version v1.3.1
+
+# Check what's currently installed
+go run github.com/rticommunity/rticonnextdds-connector-go/cmd/download-libs@latest -current
+
+# List available versions
+go run github.com/rticommunity/rticonnextdds-connector-go/cmd/download-libs@latest -list
 ```
 
-### Manual Installation
+### Development Setup
 
-1. Clone the repository:
+For contributors or users who want to build from source:
+
 ```bash
 git clone https://github.com/rticommunity/rticonnextdds-connector-go.git
 cd rticonnextdds-connector-go
-```
-
-2. Build and test:
-```bash
+make download-libs
 make test-local
 ```
+
+See our [contribution guide](CONTRIBUTING.md) for more details.
+- ✅ Shows version information and setup instructions
+- ✅ Validates downloads and provides helpful error messages
 
 ## Usage Examples
 
@@ -212,6 +250,7 @@ Explore our comprehensive examples to learn different patterns and use cases:
 | Example | Description | Key Features |
 |---------|-------------|--------------|
 | [Simple](examples/simple/) | Basic publisher/subscriber | Getting started, basic data flow |
+| [Go Get Example](examples/go-get-example/) | For `go get` users | Inline XML, library download workflow |
 | [Shapes Demo](examples/array/) | Array data handling | Complex data types, arrays |
 | [JSON Integration](examples/go_struct/) | Go struct mapping | JSON serialization, struct binding |
 | [Request-Reply](examples/request_reply/) | RPC pattern | Synchronous communication |
@@ -232,52 +271,26 @@ RTI Connector supports the following platforms:
 
 > 📝 **Note**: If you need support for additional architectures, please contact your RTI account manager or [sales@rti.com](mailto:sales@rti.com).
 
-### Library Path Configuration
-
-To run applications, you need to configure the library path:
-
-**Linux:**
-```bash
-export LD_LIBRARY_PATH=$GOPATH/pkg/mod/github.com/rticommunity/rticonnextdds-connector-go@*/rticonnextdds-connector/lib/linux-x64:$LD_LIBRARY_PATH
-```
-
-**macOS (Intel):**
-```bash
-export DYLD_LIBRARY_PATH=$GOPATH/pkg/mod/github.com/rticommunity/rticonnextdds-connector-go@*/rticonnextdds-connector/lib/osx-x64:$DYLD_LIBRARY_PATH
-```
-
-**macOS (Apple Silicon):**
-```bash
-export DYLD_LIBRARY_PATH=$GOPATH/pkg/mod/github.com/rticommunity/rticonnextdds-connector-go@*/rticonnextdds-connector/lib/osx-arm64:$DYLD_LIBRARY_PATH
-```
-
-**Windows:**
-```cmd
-set PATH=%GOPATH%\pkg\mod\github.com\rticommunity\rticonnextdds-connector-go@*\rticonnextdds-connector\lib\win-x64;%PATH%
-```
-
 ### Version Information
 
-To check the version of the RTI libraries:
+To check the version of your installed RTI libraries:
 
 ```bash
-# Linux
-strings ./rticonnextdds-connector/lib/linux-x64/librtiddsconnector.so | grep BUILD
-
-# macOS  
-strings ./rticonnextdds-connector/lib/osx-arm64/librtiddsconnector.dylib | grep BUILD
-
-# Windows
-findstr BUILD .\rticonnextdds-connector\lib\win-x64\rtiddsconnector.dll
+go run github.com/rticommunity/rticonnextdds-connector-go/cmd/download-libs@latest -current
 ```
 
 ## Development
 
 ### Building and Testing
 
-Use the provided Makefile for development tasks:
+For contributors and developers working with the source code:
 
 ```bash
+# Clone and setup
+git clone https://github.com/rticommunity/rticonnextdds-connector-go.git
+cd rticonnextdds-connector-go
+make download-libs
+
 # Run all tests with coverage
 make test-local
 
@@ -304,6 +317,8 @@ The native code was originally designed for single-threaded environments (RTI Pr
 
 - 📖 **[Examples](examples/README.md)** - Comprehensive examples and tutorials  
 - 🧪 **[Testing Guide](TESTING.md)** - Development and testing guidelines
+- 📚 **[Library Management](docs/LIBRARY_MANAGEMENT.md)** - Managing RTI Connector libraries
+- 🚀 **[Go Get Users Guide](docs/GO_GET_USERS.md)** - Complete guide for `go get` users
 - 🤝 **[Contributing](CONTRIBUTING.md)** - How to contribute to the project
 
 ### Additional Resources

@@ -1,12 +1,19 @@
 RTI Connext Go Connector Examples
 ========
 
-### Example Overview
-#### Import the Connector library
+## Getting Started
+
+**New to RTI Connector Go?** Start with the **[go-get-example/](go-get-example/)** - it shows the complete workflow from installation to running your first program using `go get`.
+
+For users who prefer manual setup, see the main project README for library installation instructions.
+
+## Example Overview
+
+### Import the Connector library
 If you want to use the Go Connector, you have to import the package.
 
 ```go
-import "github.com/rticommunity/rticonnextdds-connector"
+import "github.com/rticommunity/rticonnextdds-connector-go"
 ```
 
 #### Instantiate a new connector
@@ -150,3 +157,19 @@ for j := 0; j < numOfSamples; j++ {
 }
 
 ```
+
+## Available Examples
+
+| Example | Description | Key Features |
+|---------|-------------|--------------|
+| [simple](simple/) | Basic publisher/subscriber | Getting started, file-based XML configuration |
+| [go-get-example](go-get-example/) | Example for `go get` users | Inline XML, library download workflow |
+| [array](array/) | Array data handling | Complex data types, arrays |
+| [go_struct](go_struct/) | Go struct mapping | JSON serialization, struct binding |
+| [request_reply](request_reply/) | RPC pattern | Synchronous communication |
+| [security](security/) | Secure communication | Authentication, encryption |
+| [module](module/) | Modular configuration | XML organization, reusability |
+| [xml_string](xml_string/) | Inline XML configuration | XML strings, no external files |
+| [sequence](sequence/) | Sequence data types | Dynamic arrays, sequences |
+| [read_and_write](read_and_write/) | Combined reader/writer | Single application pattern |
+| [reader_wait](reader_wait/) | Blocking read pattern | Waiting for data, timeouts |

@@ -3,6 +3,10 @@
 
 package rti
 
+// CGO configuration for dynamic linking with RTI Connector libraries
+// These paths assume libraries are downloaded to ./rticonnextdds-connector/lib/
+// via the download scripts (scripts/download_libs.sh or cmd/download-libs)
+
 // #cgo linux,amd64 CFLAGS: -I${SRCDIR}/include -I${SRCDIR}/rticonnextdds-connector/include -DRTI_UNIX -DRTI_LINUX -DRTI_64BIT
 // #cgo linux,amd64 LDFLAGS: -L${SRCDIR}/rticonnextdds-connector/lib/linux-x64 -lrtiddsconnector -ldl -lm -lpthread -lrt -Wl,-rpath,${SRCDIR}/rticonnextdds-connector/lib/linux-x64
 // #cgo linux,arm64 CFLAGS: -I${SRCDIR}/include -I${SRCDIR}/rticonnextdds-connector/include -DRTI_UNIX -DRTI_LINUX -DRTI_64BIT
