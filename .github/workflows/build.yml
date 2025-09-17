@@ -21,11 +21,17 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential curl unzip
+        sudo apt-get install -y build-essential curl unzip bc
 
     - name: Download RTI Connector libraries
       run: |
-        go run ./cmd/download-libs
+        go run ./cmd/download-libs -force
+
+    - name: Verify library installation
+      run: |
+        ls -la rticonnextdds-connector/lib/
+        echo "Library files in linux-x64:"
+        ls -la rticonnextdds-connector/lib/linux-x64/ || echo "linux-x64 directory not found"
 
     - name: Install dependencies
       run: |
@@ -33,7 +39,17 @@ jobs:
         go mod tidy
 
     - name: Build
-      run: go build -v ./...
+      run: |
+        echo "🔨 Building Go packages..."
+        if ! go build -v ./...; then
+          echo "❌ Build failed. Checking library installation..."
+          echo "RTI Connector directory contents:"
+          find rticonnextdds-connector -type f -name "*.so" 2>/dev/null || echo "No .so files found"
+          echo "CGO environment:"
+          go env CGO_ENABLED
+          exit 1
+        fi
+        echo "✅ Build successful"
 
     - name: Make test script executable
       run: chmod +x test_improvements.sh
@@ -57,14 +73,18 @@ jobs:
     - name: Update coverage badge
       if: github.ref == 'refs/heads/master'
       run: |
+        # Extract coverage percentage and convert to integer (remove decimal)
+        COVERAGE=$(go tool cover -func=coverage.txt | grep total | awk '{print substr($3, 1, length($3)-1)}')
+        COVERAGE_INT=$(echo "$COVERAGE" | cut -d'.' -f1)
+        
         # Determine badge color based on coverage percentage
-        if (( $(echo "$COVERAGE >= 90" | bc -l) )); then
+        if [ "$COVERAGE_INT" -ge 90 ]; then
           COLOR="brightgreen"
-        elif (( $(echo "$COVERAGE >= 80" | bc -l) )); then
+        elif [ "$COVERAGE_INT" -ge 80 ]; then
           COLOR="green"
-        elif (( $(echo "$COVERAGE >= 70" | bc -l) )); then
+        elif [ "$COVERAGE_INT" -ge 70 ]; then
           COLOR="yellow"
-        elif (( $(echo "$COVERAGE >= 60" | bc -l) )); then
+        elif [ "$COVERAGE_INT" -ge 60 ]; then
           COLOR="orange"
         else
           COLOR="red"
