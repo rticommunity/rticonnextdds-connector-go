@@ -18,6 +18,3 @@ examples/*/requester/requester
 .vscode
 
 coverage.txt
-
-# Downloaded RTI Connector libraries
-rticonnextdds-connector/
