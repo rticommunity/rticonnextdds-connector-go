@@ -13,37 +13,20 @@ This code contains trade secrets of Real-Time Innovations, Inc.
     <!-- Qos Library -->
 	<qos_library name="QosLibrary">
 		<qos_profile name="DefaultProfile" is_default_qos="true">
-			<participant_qos>
-				<transport_builtin>
-				    <mask>UDPV4</mask>
-				</transport_builtin>
-				
-				<!-- Restrict traffic to local interface only -->
-				<property>
-					<value>
-						<element>
-							<name>dds.transport.UDPv4.builtin.parent.allow_interfaces_list</name>
-							<value>127.0.0.1</value>
-						</element>
-					</value>
-				</property>
-
-				<!-- Turn on monitoring -->
-				<!-- Begin Monitoring
-				<property>
-					<value>
-						<element>
-							<name>rti.monitor.library</name>
-							<value>rtimonitoring</value>
-						</element>
-						<element>
-							<name>rti.monitor.create_function_ptr</name>
-							<value>$(NDDS_MONITOR)</value>
-						</element>
-					</value>
-				</property>
-				 End Monitoring -->
-			</participant_qos>
+        	<participant_qos>
+                <discovery>
+                    <initial_peers>
+                        <element>shmem://</element>
+                    </initial_peers>
+                    <multicast_receive_addresses/>
+                </discovery>
+                <database>
+                    <shutdown_cleanup_period>
+                        <sec>0</sec>
+                        <nanosec>100000000</nanosec>
+                    </shutdown_cleanup_period>
+                </database>
+            </participant_qos>
 			<datawriter_qos>
 				<reliability>
 					<kind> RELIABLE_RELIABILITY_QOS </kind>
