@@ -115,8 +115,16 @@ jobs:
     - name: Run comprehensive test suite (Windows)
       if: runner.os == 'Windows'
       run: |
+        Write-Host "Running tests on Windows..."
         go test -race -coverprofile=coverage.out -covermode=atomic ./...
-        go tool cover -func=coverage.out > coverage.txt
+        if ($LASTEXITCODE -eq 0) {
+          go tool cover -func=coverage.out | Out-File -FilePath coverage.txt -Encoding utf8
+          Write-Host "Tests completed successfully"
+        } else {
+          Write-Host "Tests failed"
+          exit 1
+        }
+      shell: powershell
 
     - name: Generate coverage report (Linux only)
       if: runner.os == 'Linux'
