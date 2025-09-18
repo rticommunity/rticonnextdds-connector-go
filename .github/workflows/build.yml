@@ -87,10 +87,10 @@ jobs:
     - name: Build (Windows)
       if: runner.os == 'Windows'
       run: |
-        Write-Host "🔨 Building Go packages on Windows..."
-        $buildResult = go build -v ./...
+        Write-Host "Building Go packages on Windows..."
+        go build -v ./...
         if ($LASTEXITCODE -ne 0) {
-          Write-Host "❌ Build failed. Checking library installation..."
+          Write-Host "Build failed. Checking library installation..."
           Write-Host "RTI Connector directory contents:"
           if (Test-Path "rticonnextdds-connector") {
             Get-ChildItem -Recurse rticonnextdds-connector -Include "*.dll", "*.lib" | Select-Object FullName
@@ -101,7 +101,7 @@ jobs:
           go env CGO_ENABLED
           exit 1
         }
-        Write-Host "✅ Build successful on Windows"
+        Write-Host "Build successful on Windows"
       shell: powershell
 
     - name: Make test script executable (Unix)
