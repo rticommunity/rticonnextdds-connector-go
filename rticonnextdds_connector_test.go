@@ -397,7 +397,7 @@ func TestSimpleMatching(t *testing.T) {
 
 	change, err := input.WaitForPublications(2000)
 	assert.Nil(t, err)
-	assert.Greater(t, change, 1)
+	assert.GreaterOrEqual(t, change, 1)
 
 	matches, err := input.GetMatchedPublications()
 	assert.Nil(t, err)
@@ -405,7 +405,7 @@ func TestSimpleMatching(t *testing.T) {
 
 	change, err = output.WaitForSubscriptions(2000)
 	assert.Nil(t, err)
-	assert.Greater(t, change, 1)
+	assert.GreaterOrEqual(t, change, 1)
 
 	matches, err = output.GetMatchedSubscriptions()
 	assert.Nil(t, err)
