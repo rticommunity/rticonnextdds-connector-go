@@ -364,7 +364,7 @@ git clone https://github.com/rticommunity/rticonnextdds-connector-go.git
 cd rticonnextdds-connector-go
 
 # Run tests to verify setup
-./test_improvements.sh
+make test-local
 
 # Start developing!
 ```
