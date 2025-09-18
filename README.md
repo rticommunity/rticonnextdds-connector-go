@@ -224,7 +224,6 @@ The installation above uses our automated library download tool. For advanced sc
 
 - **[Library Management Documentation](docs/LIBRARY_MANAGEMENT.md)** - Complete guide to library installation options
 - **[Go Get Users Guide](docs/GO_GET_USERS.md)** - Specific help for `go get` workflow
-- **[Examples](examples/)** - Ready-to-run code samples
 
 ### Library Download Tool Options
 
@@ -238,21 +237,6 @@ go run github.com/rticommunity/rticonnextdds-connector-go/cmd/download-libs@late
 # List available versions
 go run github.com/rticommunity/rticonnextdds-connector-go/cmd/download-libs@latest -list
 ```
-
-### Development Setup
-
-For contributors or users who want to build from source:
-
-```bash
-git clone https://github.com/rticommunity/rticonnextdds-connector-go.git
-cd rticonnextdds-connector-go
-make download-libs
-make test-local
-```
-
-See our [contribution guide](CONTRIBUTING.md) for more details.
-- ✅ Shows version information and setup instructions
-- ✅ Validates downloads and provides helpful error messages
 
 ## Usage Examples
 
@@ -355,19 +339,6 @@ All contributions are automatically tested for quality, including:
 - Code linting and formatting  
 - Comprehensive test suite validation
 - Coverage analysis
-
-### Development Environment
-
-```bash
-# Clone the repository
-git clone https://github.com/rticommunity/rticonnextdds-connector-go.git
-cd rticonnextdds-connector-go
-
-# Run tests to verify setup
-make test-local
-
-# Start developing!
-```
 
 ## Support
 
