@@ -77,8 +77,6 @@ $env:PATH = "$(pwd)\rticonnextdds-connector\lib\win-x64;$env:PATH"
 
 > **💡 macOS Users**: Use `osx-arm64` for Apple Silicon Macs (M1/M2/M3) and `osx-x64` for Intel Macs. You can check your architecture with `uname -m` (arm64 = Apple Silicon, x86_64 = Intel).
 
-> **✨ New**: CGO compilation is now automatic! No manual CGO flags needed - just set the runtime library path above.
-
 > **💡 New to RTI Connector Go?** Try the [go-get-example](examples/go-get-example/) first - it provides a complete walkthrough of this installation process with a simple working example.
 
 ### Your First DDS Application
