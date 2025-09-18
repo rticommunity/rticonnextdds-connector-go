@@ -116,9 +116,9 @@ jobs:
       if: runner.os == 'Windows'
       run: |
         Write-Host "Running tests on Windows..."
-        go test -race -coverprofile=coverage.out -covermode=atomic ./...
+        go test -race -coverprofile="coverage.out" -covermode=atomic ./...
         if ($LASTEXITCODE -eq 0) {
-          go tool cover -func=coverage.out | Out-File -FilePath coverage.txt -Encoding utf8
+          go tool cover -func="coverage.out" | Out-File -FilePath "coverage.txt" -Encoding utf8
           Write-Host "Tests completed successfully"
         } else {
           Write-Host "Tests failed"
