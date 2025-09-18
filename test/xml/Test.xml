@@ -17,6 +17,16 @@ This code contains trade secrets of Real-Time Innovations, Inc.
 				<transport_builtin>
 				    <mask>UDPV4</mask>
 				</transport_builtin>
+				
+				<!-- Restrict traffic to local interface only -->
+				<property>
+					<value>
+						<element>
+							<name>dds.transport.UDPv4.builtin.parent.allow_interfaces_list</name>
+							<value>127.0.0.1</value>
+						</element>
+					</value>
+				</property>
 
 				<!-- Turn on monitoring -->
 				<!-- Begin Monitoring
