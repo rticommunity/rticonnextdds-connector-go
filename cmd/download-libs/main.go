@@ -59,6 +59,10 @@ func main() {
 			os.Exit(1)
 		}
 		fmt.Printf("Latest version: %s\n", targetVersion)
+		if targetVersion == "" {
+			fmt.Printf("Error: Latest version is empty\n")
+			os.Exit(1)
+		}
 	}
 
 	err := downloadLibraries(targetVersion, *destination, *force)
@@ -146,9 +150,17 @@ func getLatestVersion() (string, error) {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("API request failed: %s", resp.Status)
+	}
+
 	var release Release
 	if err := json.NewDecoder(resp.Body).Decode(&release); err != nil {
 		return "", err
+	}
+
+	if release.TagName == "" {
+		return "", fmt.Errorf("tag_name is empty in API response")
 	}
 
 	return release.TagName, nil
