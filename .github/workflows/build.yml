@@ -14,9 +14,6 @@ jobs:
           - os: ubuntu-latest
             go-version: '1.21'
             arch: x64
-          - os: ubuntu-24.04-arm64
-            go-version: '1.21'
-            arch: arm64
           - os: windows-latest
             go-version: '1.21'
             arch: x64
@@ -53,13 +50,8 @@ jobs:
       if: runner.os == 'Linux'
       run: |
         ls -la rticonnextdds-connector/lib/
-        if [ "${{ matrix.arch }}" == "arm64" ]; then
-          echo "Library files in linux-arm64:"
-          ls -la rticonnextdds-connector/lib/linux-arm64/ || echo "linux-arm64 directory not found"
-        else
-          echo "Library files in linux-x64:"
-          ls -la rticonnextdds-connector/lib/linux-x64/ || echo "linux-x64 directory not found"
-        fi
+        echo "Library files in linux-x64:"
+        ls -la rticonnextdds-connector/lib/linux-x64/ || echo "linux-x64 directory not found"
 
     - name: Verify library installation (Windows)
       if: runner.os == 'Windows'
@@ -83,7 +75,7 @@ jobs:
     - name: Build (Unix)
       if: runner.os != 'Windows'
       run: |
-        echo "🔨 Building Go packages on ${{ runner.os }} ${{ matrix.arch }}..."
+        echo "🔨 Building Go packages on ${{ runner.os }}..."
         if ! go build -v ./...; then
           echo "❌ Build failed. Checking library installation..."
           echo "RTI Connector directory contents:"
@@ -92,7 +84,7 @@ jobs:
           go env CGO_ENABLED
           exit 1
         fi
-        echo "✅ Build successful on ${{ runner.os }} ${{ matrix.arch }}"
+        echo "✅ Build successful on ${{ runner.os }}"
       shell: bash
 
     - name: Build (Windows)
