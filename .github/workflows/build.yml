@@ -13,10 +13,16 @@ jobs:
         include:
           - os: ubuntu-latest
             go-version: '1.21'
+            arch: x64
+          - os: ubuntu-24.04-arm64
+            go-version: '1.21'
+            arch: arm64
           - os: windows-latest
             go-version: '1.21'
+            arch: x64
           - os: macos-13  # Intel-based macOS runner
             go-version: '1.21'
+            arch: x64
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -47,8 +53,13 @@ jobs:
       if: runner.os == 'Linux'
       run: |
         ls -la rticonnextdds-connector/lib/
-        echo "Library files in linux-x64:"
-        ls -la rticonnextdds-connector/lib/linux-x64/ || echo "linux-x64 directory not found"
+        if [ "${{ matrix.arch }}" == "arm64" ]; then
+          echo "Library files in linux-arm64:"
+          ls -la rticonnextdds-connector/lib/linux-arm64/ || echo "linux-arm64 directory not found"
+        else
+          echo "Library files in linux-x64:"
+          ls -la rticonnextdds-connector/lib/linux-x64/ || echo "linux-x64 directory not found"
+        fi
 
     - name: Verify library installation (Windows)
       if: runner.os == 'Windows'
@@ -72,7 +83,7 @@ jobs:
     - name: Build (Unix)
       if: runner.os != 'Windows'
       run: |
-        echo "🔨 Building Go packages on ${{ runner.os }}..."
+        echo "🔨 Building Go packages on ${{ runner.os }} ${{ matrix.arch }}..."
         if ! go build -v ./...; then
           echo "❌ Build failed. Checking library installation..."
           echo "RTI Connector directory contents:"
@@ -81,7 +92,7 @@ jobs:
           go env CGO_ENABLED
           exit 1
         fi
-        echo "✅ Build successful on ${{ runner.os }}"
+        echo "✅ Build successful on ${{ runner.os }} ${{ matrix.arch }}"
       shell: bash
 
     - name: Build (Windows)
@@ -116,6 +127,10 @@ jobs:
       if: runner.os == 'Windows'
       run: |
         Write-Host "Running tests on Windows..."
+        $libPath = Join-Path $PWD "rticonnextdds-connector\lib\win-x64"
+        $env:PATH = "$libPath;$env:PATH"
+        Write-Host "Added to PATH: $libPath"
+        Write-Host "Current PATH: $env:PATH"
         go test -race -coverprofile="coverage.out" -covermode=atomic ./...
         if ($LASTEXITCODE -eq 0) {
           go tool cover -func="coverage.out" | Out-File -FilePath "coverage.txt" -Encoding utf8
