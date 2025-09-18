@@ -69,22 +69,40 @@ jobs:
         go get -v -t -d ./...
         go mod tidy
 
-    - name: Build
+    - name: Build (Unix)
+      if: runner.os != 'Windows'
       run: |
         echo "🔨 Building Go packages on ${{ runner.os }}..."
         if ! go build -v ./...; then
           echo "❌ Build failed. Checking library installation..."
           echo "RTI Connector directory contents:"
-          if [ "${{ runner.os }}" == "Windows" ]; then
-            dir rticonnextdds-connector || echo "Directory not found"
-          else
-            find rticonnextdds-connector -type f -name "*.so" -o -name "*.dylib" -o -name "*.dll" 2>/dev/null || echo "No library files found"
-          fi
+          find rticonnextdds-connector -type f -name "*.so" -o -name "*.dylib" -o -name "*.dll" 2>/dev/null || echo "No library files found"
           echo "CGO environment:"
           go env CGO_ENABLED
           exit 1
         fi
         echo "✅ Build successful on ${{ runner.os }}"
+      shell: bash
+
+    - name: Build (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        Write-Host "🔨 Building Go packages on Windows..."
+        $buildResult = go build -v ./...
+        if ($LASTEXITCODE -ne 0) {
+          Write-Host "❌ Build failed. Checking library installation..."
+          Write-Host "RTI Connector directory contents:"
+          if (Test-Path "rticonnextdds-connector") {
+            Get-ChildItem -Recurse rticonnextdds-connector -Include "*.dll", "*.lib" | Select-Object FullName
+          } else {
+            Write-Host "Directory not found"
+          }
+          Write-Host "CGO environment:"
+          go env CGO_ENABLED
+          exit 1
+        }
+        Write-Host "✅ Build successful on Windows"
+      shell: powershell
 
     - name: Make test script executable (Unix)
       if: runner.os != 'Windows'
