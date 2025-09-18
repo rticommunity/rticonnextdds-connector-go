@@ -7,8 +7,12 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        go-version: ['1.21']
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v4
@@ -16,22 +20,46 @@ jobs:
     - name: Setup Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.21'
+        go-version: ${{ matrix.go-version }}
 
-    - name: Install system dependencies
+    - name: Install system dependencies (Linux)
+      if: runner.os == 'Linux'
       run: |
         sudo apt-get update
         sudo apt-get install -y build-essential curl unzip bc
+
+    - name: Install system dependencies (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        choco install make
+        choco install mingw
 
     - name: Download RTI Connector libraries
       run: |
         go run ./cmd/download-libs -force
 
-    - name: Verify library installation
+    - name: Verify library installation (Linux)
+      if: runner.os == 'Linux'
       run: |
         ls -la rticonnextdds-connector/lib/
         echo "Library files in linux-x64:"
         ls -la rticonnextdds-connector/lib/linux-x64/ || echo "linux-x64 directory not found"
+
+    - name: Verify library installation (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        dir rticonnextdds-connector\lib\
+        echo "Library files in win-x64:"
+        dir rticonnextdds-connector\lib\win-x64\ || echo "win-x64 directory not found"
+
+    - name: Verify library installation (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        ls -la rticonnextdds-connector/lib/
+        echo "Library files in osx-arm64:"
+        ls -la rticonnextdds-connector/lib/osx-arm64/ || echo "osx-arm64 directory not found"
+        echo "Library files in osx-x64:"
+        ls -la rticonnextdds-connector/lib/osx-x64/ || echo "osx-x64 directory not found"
 
     - name: Install dependencies
       run: |
@@ -40,24 +68,37 @@ jobs:
 
     - name: Build
       run: |
-        echo "🔨 Building Go packages..."
+        echo "🔨 Building Go packages on ${{ runner.os }}..."
         if ! go build -v ./...; then
           echo "❌ Build failed. Checking library installation..."
           echo "RTI Connector directory contents:"
-          find rticonnextdds-connector -type f -name "*.so" 2>/dev/null || echo "No .so files found"
+          if [ "${{ runner.os }}" == "Windows" ]; then
+            dir rticonnextdds-connector || echo "Directory not found"
+          else
+            find rticonnextdds-connector -type f -name "*.so" -o -name "*.dylib" -o -name "*.dll" 2>/dev/null || echo "No library files found"
+          fi
           echo "CGO environment:"
           go env CGO_ENABLED
           exit 1
         fi
-        echo "✅ Build successful"
+        echo "✅ Build successful on ${{ runner.os }}"
 
-    - name: Make test script executable
+    - name: Make test script executable (Unix)
+      if: runner.os != 'Windows'
       run: chmod +x test_improvements.sh
 
-    - name: Run comprehensive test suite
+    - name: Run comprehensive test suite (Unix)
+      if: runner.os != 'Windows'
       run: ./test_improvements.sh
 
-    - name: Generate coverage report
+    - name: Run comprehensive test suite (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        go test -race -coverprofile=coverage.out -covermode=atomic ./...
+        go tool cover -func=coverage.out > coverage.txt
+
+    - name: Generate coverage report (Linux only)
+      if: runner.os == 'Linux'
       run: |
         go tool cover -func=coverage.txt > coverage_report.txt
         echo "## Coverage Report" >> $GITHUB_STEP_SUMMARY
@@ -70,8 +111,8 @@ jobs:
         echo "COVERAGE=$COVERAGE" >> $GITHUB_ENV
         echo "Coverage: $COVERAGE%" >> $GITHUB_STEP_SUMMARY
 
-    - name: Update coverage badge
-      if: github.ref == 'refs/heads/master'
+    - name: Update coverage badge (Linux only)
+      if: runner.os == 'Linux' && github.ref == 'refs/heads/master'
       run: |
         # Extract coverage percentage and convert to integer (remove decimal)
         COVERAGE=$(go tool cover -func=coverage.txt | grep total | awk '{print substr($3, 1, length($3)-1)}')
@@ -102,7 +143,8 @@ jobs:
           git push
         fi
 
-    - name: Upload coverage artifact
+    - name: Upload coverage artifact (Linux only)
+      if: runner.os == 'Linux'
       uses: actions/upload-artifact@v4
       with:
         name: coverage-report
