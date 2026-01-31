@@ -45,6 +45,7 @@ package rti
 import "C"
 import (
 	"errors"
+	"fmt"
 	"unsafe"
 )
 
@@ -292,7 +293,13 @@ func checkRetcode(retcode int) error {
 	case DDSRetCodeTimeout:
 		return ErrTimeout
 	default:
-		return errors.New("DDS Exception: " + C.GoString((*C.char)(C.RTI_Connector_get_last_error_message())))
+		// Try to get detailed error message from C library
+		errMsg := C.GoString((*C.char)(C.RTI_Connector_get_last_error_message()))
+		if errMsg == "" {
+			// If no detailed message available, provide context based on return code
+			return fmt.Errorf("DDS Exception: error code %d (no detailed message available from RTI Connector)", retcode)
+		}
+		return fmt.Errorf("DDS Exception: %s (error code %d)", errMsg, retcode)
 	}
 	return nil
 }

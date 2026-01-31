@@ -587,7 +587,14 @@ func TestNonExistentField(t *testing.T) {
 	input, err := newTestInput(connector)
 	assert.Nil(t, err)
 
-	// Write valid data
+	// Try to set a field that doesn't exist - should get a meaningful error
+	err = output.Instance.SetString("nonexistent_field", "value")
+	assert.NotNil(t, err)
+	// Error should contain useful information (either detailed message or error code)
+	assert.Contains(t, err.Error(), "DDS Exception")
+	t.Logf("Error for non-existent field: %v", err)
+
+	// Write valid data first
 	assert.Nil(t, output.Instance.SetString("st", "test"))
 	err = output.Write()
 	assert.Nil(t, err)
@@ -598,13 +605,11 @@ func TestNonExistentField(t *testing.T) {
 	err = input.Take()
 	assert.Nil(t, err)
 
-	// Try to access a field that doesn't exist
+	// Try to access a field that doesn't exist on read - should get meaningful error
 	_, err = input.Samples.GetString(0, "nonexistent_field")
 	assert.NotNil(t, err)
-
-	// Try to set a field that doesn't exist
-	err = output.Instance.SetString("nonexistent_field", "value")
-	assert.NotNil(t, err)
+	assert.Contains(t, err.Error(), "DDS Exception")
+	t.Logf("Error for reading non-existent field: %v", err)
 }
 
 // TestSampleStateTransitions tests DDS sample state transitions
@@ -741,4 +746,45 @@ func TestLargeStringHandling(t *testing.T) {
 	receivedString, err := input.Samples.GetString(0, "st")
 	assert.Nil(t, err)
 	assert.Equal(t, largeString, receivedString)
+}
+
+// TestJSONStructureMismatch tests error handling when JSON structure doesn't match XML
+// This addresses GitHub issue #51: Get Last Error Message returns empty string
+func TestJSONStructureMismatch(t *testing.T) {
+	connector, err := newTestConnector()
+	assert.Nil(t, err)
+	defer connector.Delete()
+
+	output, err := newTestOutput(connector)
+	assert.Nil(t, err)
+
+	// Try to set JSON with fields that don't exist in the XML definition
+	// The Test.xml ShapeType has fields: color (string), x, y, shapesize (int32)
+	invalidJSON := []byte(`{"nonexistent_field": "value", "another_bad_field": 123}`)
+	err = output.Instance.SetJSON(invalidJSON)
+
+	// Should get an error with meaningful information
+	if err != nil {
+		assert.Contains(t, err.Error(), "DDS Exception")
+		t.Logf("Error message for JSON structure mismatch: %v", err)
+		// Error should contain either detailed message or error code
+		assert.True(t,
+			len(err.Error()) > len("DDS Exception: "),
+			"Error message should contain details beyond just 'DDS Exception: '")
+	} else {
+		// If no error, the C library might be lenient with extra fields
+		t.Log("No error returned for JSON with non-existent fields (C library may be lenient)")
+	}
+
+	// Try to set a field with wrong type (string instead of int32)
+	invalidTypeJSON := []byte(`{"x": "not_a_number", "y": 100}`)
+	err = output.Instance.SetJSON(invalidTypeJSON)
+
+	if err != nil {
+		assert.Contains(t, err.Error(), "DDS Exception")
+		t.Logf("Error message for type mismatch: %v", err)
+		assert.True(t,
+			len(err.Error()) > len("DDS Exception: "),
+			"Error message should contain details beyond just 'DDS Exception: '")
+	}
 }

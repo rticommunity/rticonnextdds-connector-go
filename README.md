@@ -1,6 +1,6 @@
 # RTI Connector for Connext DDS - Go
 
-[![Coverage](https://img.shields.io/badge/coverage-90.4%25-brightgreen)](https://github.com/rticommunity/rticonnextdds-connector-go/actions/workflows/build.yml)
+[![Coverage](https://img.shields.io/badge/coverage-90.2%25-brightgreen)](https://github.com/rticommunity/rticonnextdds-connector-go/actions/workflows/build.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/rticommunity/rticonnextdds-connector-go)](https://goreportcard.com/report/github.com/rticommunity/rticonnextdds-connector-go)
 [![Build and Test](https://github.com/rticommunity/rticonnextdds-connector-go/actions/workflows/build.yml/badge.svg)](https://github.com/rticommunity/rticonnextdds-connector-go/actions/workflows/build.yml)
 [![Go Version](https://img.shields.io/github/go-mod/go-version/rticommunity/rticonnextdds-connector-go)](https://github.com/rticommunity/rticonnextdds-connector-go/blob/master/go.mod)
