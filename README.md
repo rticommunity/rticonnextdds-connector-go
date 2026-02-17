@@ -1,4 +1,4 @@
-# RTI Connector for Connext DDS - Go
+# RTI Connector for Connext DDS - Go (Experimental)
 
 [![Coverage](https://img.shields.io/badge/coverage-90.2%25-brightgreen)](https://github.com/rticommunity/rticonnextdds-connector-go/actions/workflows/build.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/rticommunity/rticonnextdds-connector-go)](https://goreportcard.com/report/github.com/rticommunity/rticonnextdds-connector-go)
@@ -7,6 +7,12 @@
 [![Go Documentation](https://godocs.io/github.com/rticommunity/rticonnextdds-connector-go?status.svg)](https://godocs.io/github.com/rticommunity/rticonnextdds-connector-go)
 
 > A lightweight, easy-to-use Go binding for RTI Connext DDS that enables rapid development of distributed applications.
+
+## Experimental Status
+
+*RTI Connector for Go* is **currently experimental** and intended for evaluation, prototyping, feedback and *Not recommended* for production use. Use this package to explore Go + DDS integration and help shape the future of Go support in RTI products.
+
+**Do not use Connector for Go in production**.
 
 ## Table of Contents
 
