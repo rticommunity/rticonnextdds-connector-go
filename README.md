@@ -45,8 +45,22 @@ Originally created by the RTI Research Group for demos and proof-of-concepts, RT
 
 ### Prerequisites
 
-- Go 1.21 or later
+- Go 1.26.10 or later. Go 1.27 users must use 1.27.3 or later.
 - Supported platform (Linux x64, macOS, Windows x64)
+
+The library downloader and CI use Connector v1.4.0 by default. Use `-version` to select another release.
+Intel macOS and 32-bit ARM Linux require `-version v1.3.1`.
+
+### eMudhra certificate compromise
+
+Use a patched Go toolchain to mitigate [CVE-2026-111943](https://vuln.go.dev/ID/GO-2026-6809.json).
+Go 1.26.10 and 1.27.3 add a denylist for the compromised intermediate certificates.
+The library downloader uses HTTPS, so rebuild it and any applications built with affected Go versions.
+
+Update the CA trust stores on build hosts, deployment hosts, and container base images to distrust the
+compromised eMudhra certificates, then rebuild container images. The Go update does not update system
+trust stores used by `curl` or native libraries. Check native RTI libraries and deployed DDS security
+configurations separately; the Go version requirement does not establish their protection.
 
 ### Installation
 

@@ -8,7 +8,7 @@ The RTI Connector Go binding requires native C libraries from RTI Connext DDS. T
 
 ## Quick Start
 
-### Download Latest Libraries
+### Download Pinned Libraries
 
 ```bash
 # Using Make (recommended)
@@ -37,7 +37,7 @@ The Go-based download tool (`cmd/download-libs`) provides comprehensive library 
 ### Basic Usage
 
 ```bash
-# Download latest version
+# Download the pinned Connector v1.4.0 version
 go run ./cmd/download-libs
 
 # Download specific version  
@@ -53,8 +53,8 @@ go run ./cmd/download-libs -current
 go run ./cmd/download-libs -list
 
 # Use make commands (recommended)
-make download-libs          # Download latest
-make download-libs-latest   # Force download latest
+make download-libs          # Download pinned v1.4.0
+make download-libs-latest   # Force re-download pinned v1.4.0
 make check-libs            # Show current installation
 make list-lib-versions     # List available versions
 ```
@@ -100,8 +100,8 @@ The following Make targets are available:
 
 | Target | Description |
 |--------|-------------|
-| `make download-libs` | Download latest libraries (interactive) |
-| `make download-libs-latest` | Force download latest libraries |
+| `make download-libs` | Download pinned Connector v1.4.0 libraries |
+| `make download-libs-latest` | Force re-download pinned Connector v1.4.0 libraries |
 | `make check-libs` | Show current installation info |
 | `make list-lib-versions` | List available versions |
 
@@ -140,7 +140,7 @@ make list-lib-versions
 ```
 
 Recent versions include:
-- v1.4.0 (latest) - Apple Silicon support, removed Intel Mac and 32-bit ARM
+- v1.4.0 (pinned default) - Apple Silicon support, removed Intel Mac and 32-bit ARM
 - v1.3.1 - Last version with Intel Mac (osx-x64) and 32-bit ARM (linux-arm) support
 - v1.3.0
 - v1.2.3
@@ -205,7 +205,7 @@ For automated builds, you can use:
 
 ```bash
 # In CI scripts
-go run ./cmd/download-libs -force  # Force download latest
+go run ./cmd/download-libs -force  # Force re-download pinned v1.4.0
 make test-local                   # Run tests
 ```
 

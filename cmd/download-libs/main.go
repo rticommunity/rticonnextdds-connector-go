@@ -5,6 +5,7 @@ package main
 import (
 	"archive/zip"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -33,7 +34,7 @@ type Release struct {
 
 func main() {
 	var (
-		version     = flag.String("version", "", "Specific version to download (e.g., v1.3.1)")
+		version     = flag.String("version", "v1.4.0", "Specific version to download (e.g., v1.3.1)")
 		list        = flag.Bool("list", false, "List available versions")
 		current     = flag.Bool("current", false, "Show current installation info")
 		force       = flag.Bool("force", false, "Force download even if libraries exist")
@@ -207,7 +208,7 @@ func getLatestVersion() (string, error) {
 		if resp.StatusCode == http.StatusForbidden {
 			errMsg += "\nHint: You may have hit GitHub API rate limits. Set GITHUB_TOKEN environment variable."
 		}
-		return "", fmt.Errorf(errMsg)
+		return "", errors.New(errMsg)
 	}
 
 	var release Release
@@ -242,7 +243,7 @@ func getDownloadURL(version string) (string, string, error) {
 		if resp.StatusCode == http.StatusForbidden {
 			errMsg += "\nHint: You may have hit GitHub API rate limits. Set GITHUB_TOKEN environment variable."
 		}
-		return "", "", fmt.Errorf(errMsg)
+		return "", "", errors.New(errMsg)
 	}
 
 	var release Release
