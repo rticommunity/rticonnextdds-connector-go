@@ -1,4 +1,4 @@
-FROM golang:1.17
+FROM golang:1.26.10
 
 ARG working_dir
 

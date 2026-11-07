@@ -5,6 +5,7 @@ package main
 import (
 	"archive/zip"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -207,7 +208,7 @@ func getLatestVersion() (string, error) {
 		if resp.StatusCode == http.StatusForbidden {
 			errMsg += "\nHint: You may have hit GitHub API rate limits. Set GITHUB_TOKEN environment variable."
 		}
-		return "", fmt.Errorf(errMsg)
+		return "", errors.New(errMsg)
 	}
 
 	var release Release
@@ -242,7 +243,7 @@ func getDownloadURL(version string) (string, string, error) {
 		if resp.StatusCode == http.StatusForbidden {
 			errMsg += "\nHint: You may have hit GitHub API rate limits. Set GITHUB_TOKEN environment variable."
 		}
-		return "", "", fmt.Errorf(errMsg)
+		return "", "", errors.New(errMsg)
 	}
 
 	var release Release

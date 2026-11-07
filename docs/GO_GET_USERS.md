@@ -163,7 +163,7 @@ go test ./...
 For Docker builds:
 
 ```dockerfile
-FROM golang:1.21
+FROM golang:1.26.10
 
 WORKDIR /app
 COPY go.mod go.sum ./

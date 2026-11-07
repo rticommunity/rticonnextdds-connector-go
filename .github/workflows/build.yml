@@ -13,15 +13,15 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            go-version: '1.21'
+            go-version: '1.26.10'
             arch: x64
             connector-version: ''  # Use latest
           - os: windows-latest
-            go-version: '1.21'
+            go-version: '1.26.10'
             arch: x64
             connector-version: ''  # Use latest
           - os: macos-latest  # Apple Silicon macOS runner (v1.4.0+)
-            go-version: '1.21'
+            go-version: '1.26.10'
             arch: arm64
             connector-version: ''  # Use latest (v1.4.0+)
     runs-on: ${{ matrix.os }}
@@ -207,7 +207,7 @@ jobs:
     - name: Setup Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.21'
+        go-version: '1.26.10'
 
     - name: Install system dependencies
       run: |
