@@ -18,43 +18,52 @@ func (f roundTripperFunc) RoundTrip(req *http.Request) (*http.Response, error) {
 	return f(req)
 }
 
+func libraryArchive(t *testing.T, platform string) string {
+	t.Helper()
+	var archive bytes.Buffer
+	writer := zip.NewWriter(&archive)
+	entry, err := writer.Create("lib/" + platform + "/fixture.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := io.WriteString(entry, "test library"); err != nil {
+		t.Fatal(err)
+	}
+	if err := writer.Close(); err != nil {
+		t.Fatal(err)
+	}
+	return archive.String()
+}
+
 func TestDownloadVersionSelection(t *testing.T) {
 	for _, tc := range []struct {
-		name    string
-		args    []string
-		version string
+		name     string
+		version  string
+		override bool
 	}{
 		{name: "pinned default", version: "v1.4.0"},
-		{name: "explicit legacy version", args: []string{"-version", "v1.3.1"}, version: "v1.3.1"},
+		{name: "explicit legacy version", version: "v1.3.1", override: true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			dest := t.TempDir()
 			platform := getPlatform()
-			var archive bytes.Buffer
-			writer := zip.NewWriter(&archive)
-			entry, err := writer.Create("lib/" + platform + "/fixture.txt")
-			if err != nil {
-				t.Fatal(err)
-			}
-			if _, err := io.WriteString(entry, "test library"); err != nil {
-				t.Fatal(err)
-			}
-			if err := writer.Close(); err != nil {
-				t.Fatal(err)
-			}
+			archive := libraryArchive(t, platform)
 
 			oldArgs, oldFlags, oldTransport := os.Args, flag.CommandLine, http.DefaultTransport
 			t.Cleanup(func() {
 				os.Args, flag.CommandLine, http.DefaultTransport = oldArgs, oldFlags, oldTransport
 			})
-			os.Args = append([]string{"download-libs", "-dest", dest}, tc.args...)
+			os.Args = []string{"download-libs", "-dest", dest}
+			if tc.override {
+				os.Args = append(os.Args, "-version", tc.version)
+			}
 			flag.CommandLine = flag.NewFlagSet("download-libs", flag.ContinueOnError)
 			var releasePath string
 			latestRequested := false
 			http.DefaultTransport = roundTripperFunc(func(req *http.Request) (*http.Response, error) {
 				body := `{"tag_name":"v1.5.0","assets":[{"name":"connector.zip","browser_download_url":"https://downloads.example/connector.zip"}]}`
 				if req.URL.Path == "/connector.zip" {
-					body = archive.String()
+					body = archive
 				} else if req.URL.Path == "/repos/"+repoOwner+"/"+repoName+"/releases/latest" {
 					latestRequested = true
 				} else if strings.HasPrefix(req.URL.Path, "/repos/"+repoOwner+"/"+repoName+"/releases/tags/") {

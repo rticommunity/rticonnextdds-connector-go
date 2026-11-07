@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-declare LINTER_VER=${LINTER_VER:-'v1.31.0'}
-declare GO_ENV_PATH=$(go env GOPATH)
+LINTER_VER=${LINTER_VER:-v2.15.0}
 
-declare -r INSTALL_SCRIPT="https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh"
-
-curl -sfL ${INSTALL_SCRIPT} | sh -s -- -b "${GO_ENV_PATH}/bin" "${LINT_VER}"
+GOTOOLCHAIN=go1.26.10 go install "github.com/golangci/golangci-lint/v2/cmd/golangci-lint@${LINTER_VER}"

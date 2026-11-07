@@ -53,6 +53,10 @@ jobs:
         go run ./cmd/download-libs -force -version ${{ matrix.connector-version }}
       shell: bash
 
+    - name: Verify linter installer
+      run: bash scripts/test_install_golangci-lint.sh
+      shell: bash
+
     - name: Verify library installation (Linux)
       if: runner.os == 'Linux'
       run: |
