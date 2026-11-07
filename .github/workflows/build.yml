@@ -15,15 +15,15 @@ jobs:
           - os: ubuntu-latest
             go-version: '1.26.10'
             arch: x64
-            connector-version: ''  # Use latest
+            connector-version: 'v1.4.0'
           - os: windows-latest
             go-version: '1.26.10'
             arch: x64
-            connector-version: ''  # Use latest
+            connector-version: 'v1.4.0'
           - os: macos-latest  # Apple Silicon macOS runner (v1.4.0+)
             go-version: '1.26.10'
             arch: arm64
-            connector-version: ''  # Use latest (v1.4.0+)
+            connector-version: 'v1.4.0'
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -50,11 +50,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        if [ -n "${{ matrix.connector-version }}" ]; then
-          go run ./cmd/download-libs -force -version ${{ matrix.connector-version }}
-        else
-          go run ./cmd/download-libs -force
-        fi
+        go run ./cmd/download-libs -force -version ${{ matrix.connector-version }}
       shell: bash
 
     - name: Verify library installation (Linux)
@@ -218,7 +214,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        go run ./cmd/download-libs -force
+        go run ./cmd/download-libs -force -version v1.4.0
 
     - name: Run memory usage analysis
       run: |

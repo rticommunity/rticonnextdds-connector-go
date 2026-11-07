@@ -48,6 +48,9 @@ Originally created by the RTI Research Group for demos and proof-of-concepts, RT
 - Go 1.26.10 or later. Go 1.27 users must use 1.27.3 or later.
 - Supported platform (Linux x64, macOS, Windows x64)
 
+The library downloader and CI use Connector v1.4.0 by default. Use `-version` to select another release.
+Intel macOS and 32-bit ARM Linux require `-version v1.3.1`.
+
 ### eMudhra certificate compromise
 
 Use a patched Go toolchain to mitigate [CVE-2026-111943](https://vuln.go.dev/ID/GO-2026-6809.json).

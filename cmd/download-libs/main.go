@@ -34,7 +34,7 @@ type Release struct {
 
 func main() {
 	var (
-		version     = flag.String("version", "", "Specific version to download (e.g., v1.3.1)")
+		version     = flag.String("version", "v1.4.0", "Specific version to download (e.g., v1.3.1)")
 		list        = flag.Bool("list", false, "List available versions")
 		current     = flag.Bool("current", false, "Show current installation info")
 		force       = flag.Bool("force", false, "Force download even if libraries exist")

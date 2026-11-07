@@ -15,7 +15,7 @@ We provide multiple approaches to handle this scenario:
 A Go program that users can run directly from the installed package:
 
 ```bash
-# Download latest libraries
+# Download the pinned Connector v1.4.0 libraries
 go run github.com/rticommunity/rticonnextdds-connector-go/cmd/download-libs@latest
 
 # Download specific version
@@ -136,7 +136,7 @@ export LD_LIBRARY_PATH=$(pwd)/rticonnextdds-connector/lib/linux-x64:$LD_LIBRARY_
 For reproducible builds, pin to specific versions:
 
 ```bash
-# Latest version (v1.4.0+)
+# Pinned default version (v1.4.0)
 go run github.com/rticommunity/rticonnextdds-connector-go/cmd/download-libs@latest
 
 # For Intel Mac or 32-bit ARM Linux support, use v1.3.1
